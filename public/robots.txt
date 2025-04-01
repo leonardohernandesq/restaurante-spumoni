@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://lhdev.com.br/restaurante/sitemap.xml
