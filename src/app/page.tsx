@@ -1,5 +1,6 @@
 import { useMetadata } from "@/hooks/useMetadata";
 import { useJsonLd } from "@/hooks/useJsonLd";
+import { Header } from "@/components/header";
 
 export const generateMetadata = () =>
   useMetadata(
@@ -25,6 +26,7 @@ export default function Home() {
       />
 
       <main>
+        <Header />
         <div>
           <h1>Restaurante Spumoni</h1>
         </div>
