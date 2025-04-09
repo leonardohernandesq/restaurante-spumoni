@@ -8,7 +8,7 @@ import { BiExit, BiListUl, BiPlus } from 'react-icons/bi'
 const Pedidos = () => {
     const router = useRouter();
 
-    const [pedidos, setPedidos] = useState([
+    const [pedidos] = useState([
         {
             "id": '1',
             "client_name": "Leonardo",

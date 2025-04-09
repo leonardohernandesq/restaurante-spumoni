@@ -2,8 +2,9 @@ import React from 'react'
 import { StatusColor } from './status-color'
 import { DetailPedidos } from './detail-pedidos'
 import { useRouter } from 'next/navigation'
+import { IPedidosData } from '@/interfaces/IPedidosData'
 
-export const PedidoRow = ({ pedido }: any) => {
+export const PedidoRow = ({ pedido }: IPedidosData) => {
     const router = useRouter();
     const handleGoToPedido = (id: string) => {
         router.push(`/admin/pedido/${id}`);

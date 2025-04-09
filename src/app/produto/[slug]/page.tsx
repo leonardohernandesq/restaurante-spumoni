@@ -14,7 +14,7 @@ interface ProductPageProps {
 export default function ProductPage({ params }: ProductPageProps) {
     const router = useRouter();
     const [quantidade, setQuantidade] = useState(1);
-    const [produto, setProduto] = useState({
+    const [produto] = useState({
         id: 1,
         name: 'Quarta-feira - Feijoada',
         slug: 'feijoada',
@@ -56,7 +56,7 @@ export default function ProductPage({ params }: ProductPageProps) {
         ]
     });
 
-    const handleAddProduct = (product: any) => {
+    const handleAddProduct = () => {
         alert('Adicionando produto no carrinho');
 
         router.push('/')
@@ -110,7 +110,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                 <textarea className="bg-white py-2 px-3 border border-zinc-100 rounded-lg" placeholder="Ex.: Sem maionese, sem salada, etc." rows={2} />
             </section>
             <section className="flex gap-3 bg-white p-5 justify-center relative z-20 shadow-md shadow-zinc-900">
-                <button className="bg-purple-principal-500 text-white py-2 px-4 flex items-center gap-2 rounded-lg" onClick={(product) => handleAddProduct(product)}><FiShoppingCart size={14} /> Adicionar</button>
+                <button className="bg-purple-principal-500 text-white py-2 px-4 flex items-center gap-2 rounded-lg" onClick={() => handleAddProduct()}><FiShoppingCart size={14} /> Adicionar</button>
             </section>
         </main>
     );

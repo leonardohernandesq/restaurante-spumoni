@@ -6,7 +6,7 @@ import { ProductSection } from "@/components/product-section";
 import { IProductAll } from "@/interfaces/IProductAll";
 import Link from "next/link";
 
-export const generateMetadata = () =>
+export const useGenerateMetadata = () =>
   useMetadata(
     "Restaurante Spumoni | O Melhor da Culinária Italiana",
     "Descubra o sabor autêntico da Itália no Restaurante Spumoni. Massas frescas, pizzas artesanais e muito mais!",

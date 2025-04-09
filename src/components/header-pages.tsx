@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { FaArrowLeft } from 'react-icons/fa6'
 import { useRouter } from 'next/navigation'
 
 
-export const HeaderPages = ({ title }: any) => {
+export const HeaderPages = ({ title }: { title: string }) => {
     const router = useRouter();
 
     const handleBack = () => {
