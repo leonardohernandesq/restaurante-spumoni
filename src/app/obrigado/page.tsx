@@ -1,6 +1,6 @@
 import React from 'react'
 import { BiCheck } from 'react-icons/bi'
-import { FaWhatsapp, FaFacebookMessenger, FaInstagram } from 'react-icons/fa6'
+import { FaWhatsapp, FaInstagram } from 'react-icons/fa6'
 
 const Obrigado = () => {
     return (

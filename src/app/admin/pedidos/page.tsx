@@ -1,7 +1,6 @@
 'use client'
 
 import { PedidoRow } from '@/components/pedido-row';
-import NfPrint from '@/components/printer';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { BiExit, BiListUl, BiPlus } from 'react-icons/bi'

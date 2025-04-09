@@ -1,6 +1,5 @@
 'use client'
 
-import React, { useState } from 'react'
 import { FaArrowLeft, FaCheckDouble, FaUserCheck } from 'react-icons/fa6'
 import { useRouter } from 'next/navigation'
 import { PiPrinter } from 'react-icons/pi';
@@ -11,7 +10,6 @@ import NfPrint from '@/components/printer';
 interface PedidoPageProps {
     params: { id: string };
 }
-
 
 export default function Pedido({ params }: PedidoPageProps) {
     const router = useRouter();
@@ -47,7 +45,7 @@ export default function Pedido({ params }: PedidoPageProps) {
                 <div className=' p-2.5 border border-zinc-100 w-full rounded-md'>
                     <div className='flex items-center'>
                         <span className='py-1 px-3 bg-green-principal-700 text-white rounded-md'>Delivery (Entrega)</span>
-                        <span className='py-1 px-3 font-medium'>Pedido: 9</span>
+                        <span className='py-1 px-3 font-medium'>Pedido: {params.id}</span>
                         <div className='bg-purple-principal-700 w-4 h-0.5 rounded-full'></div>
                         <span className='py-1 px-3'>24/03 - 16:54</span>
                     </div>

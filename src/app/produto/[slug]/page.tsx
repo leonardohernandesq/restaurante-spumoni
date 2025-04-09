@@ -67,7 +67,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             <HeaderPages title={produto.name} />
             <section className='relative max-w-full px-7 py-5 gap-4 flex flex-col md:max-w-7xl md:m-auto bg-zinc-50'>
                 <Image src={`/${produto.image}`} alt={produto.name} width={365} height={282} />
-
+                {params.slug};
                 <div className="flex justify-between items-center">
                     <h1 className="font-medium text-lg">{produto.name}</h1>
                     <div className="flex items-center justify-center gap-2 text-xs bg-purple-principal-500 text-white px-2 py-0.5 rounded-full">

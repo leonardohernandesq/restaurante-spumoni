@@ -2,7 +2,7 @@
 
 import { HeaderPages } from '@/components/header-pages'
 import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { BiPencil, BiTrash } from 'react-icons/bi'
 import { FaMinus, FaPlus } from 'react-icons/fa6'
 

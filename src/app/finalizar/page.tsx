@@ -3,11 +3,9 @@
 import { HeaderPages } from '@/components/header-pages'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
-import { BiPencil, BiPlus, BiTrash } from 'react-icons/bi'
+import { BiPencil, BiPlus } from 'react-icons/bi'
 
 const Carrinho = () => {
-    const [quantidade, setQuantidade] = useState(1);
     const router = useRouter();
 
     const handleFinish = () => {
