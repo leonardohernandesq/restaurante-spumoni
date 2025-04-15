@@ -1,6 +1,6 @@
 import React from 'react'
-import { StatusColor } from './status-color'
-import { DetailPedidos } from './detail-pedidos'
+import { StatusColor } from './StatusColor'
+import { DetailPedidos } from './DetailPedidos'
 import { useRouter } from 'next/navigation'
 import { IPedidosData } from '@/interfaces/IPedidosData'
 

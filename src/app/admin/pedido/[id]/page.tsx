@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { PiPrinter } from 'react-icons/pi';
 import { FaMotorcycle } from 'react-icons/fa6';
 import { FaTrashAlt } from 'react-icons/fa';
-import NfPrint from '@/components/printer';
+import NfPrint from '@/components/Printer';
 
 interface PedidoPageProps {
     params: { id: string };

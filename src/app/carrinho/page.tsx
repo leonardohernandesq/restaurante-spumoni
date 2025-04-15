@@ -1,6 +1,6 @@
 'use client'
 
-import { HeaderPages } from '@/components/header-pages'
+import { HeaderPages } from '@/components/HeaderPages'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { BiPencil, BiTrash } from 'react-icons/bi'

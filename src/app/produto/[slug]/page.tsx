@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from "react";
-import { HeaderPages } from "@/components/header-pages";
+import { HeaderPages } from "@/components/HeaderPages";
 import Image from "next/image";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { FiShoppingCart } from "react-icons/fi";

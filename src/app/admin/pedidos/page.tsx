@@ -1,6 +1,6 @@
 'use client'
 
-import { PedidoRow } from '@/components/pedido-row';
+import { PedidoRow } from '@/components/PedidoRow';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { BiExit, BiListUl, BiPlus } from 'react-icons/bi'
@@ -72,11 +72,11 @@ const Pedidos = () => {
                     <button onClick={() => handleLogout()}><BiExit size={25} className='text-red-800' /></button>
                 </div>
                 <div className='flex justify-between items-center my-2'>
-                    <button className='flex items-center gap-1 text-lg'>
+                    <button onClick={() => router.push('/admin/adicionarprodutos')} className='flex items-center gap-1 text-lg'>
                         <BiPlus />
                         Adicionar Produto
                     </button>
-                    <button className='flex items-center gap-1 text-lg'>
+                    <button onClick={() => router.push('/admin/listarprodutos')} className='flex items-center gap-1 text-lg'>
                         <BiListUl />
                         Lista de Produtos
                     </button>
