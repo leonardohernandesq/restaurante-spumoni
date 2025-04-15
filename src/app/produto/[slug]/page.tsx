@@ -6,6 +6,7 @@ import Image from "next/image";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { FiShoppingCart } from "react-icons/fi";
 import { useRouter } from "next/navigation";
+import Container from "@/components/Container";
 
 interface ProductPageProps {
     params: { slug: string };
@@ -63,9 +64,9 @@ export default function ProductPage({ params }: ProductPageProps) {
     }
 
     return (
-        <main>
+        <Container styleRow="bg-zinc-50">
             <HeaderPages title={produto.name} />
-            <section className='relative max-w-full px-7 py-5 gap-4 flex flex-col md:max-w-7xl md:m-auto bg-zinc-50'>
+            <section className='relative py-5 gap-4 flex flex-col'>
                 <Image src={`/${produto.image}`} alt={produto.name} width={365} height={282} />
                 {params.slug};
                 <div className="flex justify-between items-center">
@@ -112,6 +113,6 @@ export default function ProductPage({ params }: ProductPageProps) {
             <section className="flex gap-3 bg-white p-5 justify-center relative z-20 shadow-md shadow-zinc-900">
                 <button className="bg-purple-principal-500 text-white py-2 px-4 flex items-center gap-2 rounded-lg" onClick={() => handleAddProduct()}><FiShoppingCart size={14} /> Adicionar</button>
             </section>
-        </main>
+        </Container>
     );
 }
