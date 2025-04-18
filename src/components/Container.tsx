@@ -1,5 +1,4 @@
 import { IContainer } from '@/interfaces/IContainer'
-import React from 'react'
 
 const Container = ({ styleRow, styleContainer, children }: IContainer) => {
     return (

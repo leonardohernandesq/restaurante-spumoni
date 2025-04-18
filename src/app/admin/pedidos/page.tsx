@@ -2,7 +2,7 @@
 
 import { PedidoRow } from '@/components/PedidoRow';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { BiExit, BiListUl, BiPlus } from 'react-icons/bi'
 
 const Pedidos = () => {
@@ -69,14 +69,14 @@ const Pedidos = () => {
             <section className='p-5 bg-white rounded-2xl shadow-2xl'>
                 <div className='flex justify-between items-center'>
                     <h1 className='text-2xl font-bold text-purple-principal-700'>Gestor de Pedidos</h1>
-                    <button onClick={() => handleLogout()}><BiExit size={25} className='text-red-800' /></button>
+                    <button onClick={() => handleLogout()}><BiExit size={25} className='text-red-800 cursor-pointer' /></button>
                 </div>
                 <div className='flex justify-between items-center my-2'>
-                    <button onClick={() => router.push('/admin/adicionarprodutos')} className='flex items-center gap-1 text-lg'>
+                    <button onClick={() => router.push('/admin/adicionarprodutos')} className='flex items-center gap-1 text-lg cursor-pointer'>
                         <BiPlus />
                         Adicionar Produto
                     </button>
-                    <button onClick={() => router.push('/admin/listarprodutos')} className='flex items-center gap-1 text-lg'>
+                    <button onClick={() => router.push('/admin/listarprodutos')} className='flex items-center gap-1 text-lg cursor-pointer'>
                         <BiListUl />
                         Lista de Produtos
                     </button>

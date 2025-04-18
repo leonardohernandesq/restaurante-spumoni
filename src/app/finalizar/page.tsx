@@ -1,5 +1,7 @@
 'use client'
 
+import ButtonCard from '@/components/ButtonCart'
+import Container from '@/components/Container'
 import { HeaderPages } from '@/components/HeaderPages'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -13,9 +15,9 @@ const Carrinho = () => {
     }
 
     return (
-        <>
+        <Container styleRow='bg-zinc-100'>
             <HeaderPages title='Fazer pedido' />
-            <main className='relative max-w-full px-7 py-5 gap-4 flex flex-col md:max-w-7xl md:m-auto bg-zinc-100 flex-1 h-screen'>
+            <main className='relative py-5 gap-4 flex flex-col flex-1 min-h-screen'>
                 <section className='flex items-center justify-between border-b border-zinc-200 pb-4'>
                     <div>
                         <p className='font-light'>SEU PEDIDO</p>
@@ -95,12 +97,13 @@ const Carrinho = () => {
                     </div>
                 </section>
             </main>
-            <section className='bg-white shadow-2xl fixed bottom-0 w-full max-w-full px-7 py-5 gap-4 flex flex-col md:max-w-7xl md:m-auto '>
-                <button onClick={() => handleFinish()} className='flex justify-center items-center font-medium text-lg w-full bg-purple-principal-500 py-2.5 px-5 text-white rounded-xl'>
+            <section className='bg-white shadow-2xl fixed bottom-0 left-2/4 -translate-x-2/4 max-w-full w-full px-7 py-5 gap-4 flex flex-col'>
+                <ButtonCard customClassName='text-center' onClick={() => handleFinish()}>
                     <p>FAZER PEDIDO</p>
-                </button>
+                    <p>R$ 00,00</p>
+                </ButtonCard>
             </section>
-        </>
+        </Container>
     )
 }
 

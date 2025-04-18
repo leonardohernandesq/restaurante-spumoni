@@ -1,4 +1,3 @@
-import React from 'react'
 import Image from 'next/image'
 import { DetailTitle } from '@/components/DetailTitle'
 import { IoLocation } from "react-icons/io5";

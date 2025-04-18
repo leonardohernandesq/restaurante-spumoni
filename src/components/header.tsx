@@ -1,7 +1,6 @@
 'use client'
 
 import Image from 'next/image';
-import React from 'react'
 import { IoWalletOutline } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
 import Container from './Container';

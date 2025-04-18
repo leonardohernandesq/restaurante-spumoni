@@ -1,5 +1,3 @@
-import React from 'react'
-
 export const DetailPedidos = ({ status }: { status: string }) => {
     const statusColors: { [key: string]: string } = {
         'confirmado': 'bg-green-principal-700',

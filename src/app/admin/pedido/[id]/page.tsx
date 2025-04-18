@@ -6,12 +6,16 @@ import { PiPrinter } from 'react-icons/pi';
 import { FaMotorcycle } from 'react-icons/fa6';
 import { FaTrashAlt } from 'react-icons/fa';
 import NfPrint from '@/components/Printer';
+import { use } from 'react';
+import Container from '@/components/Container';
 
 interface PedidoPageProps {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }
 
 export default function Pedido({ params }: PedidoPageProps) {
+    const { id } = use(params);
+
     const router = useRouter();
 
     const handleBack = () => {
@@ -28,8 +32,8 @@ export default function Pedido({ params }: PedidoPageProps) {
 
 
     return (
-        <main>
-            <header className='relative max-w-full px-7 py-5 flex items-center justify-between md:max-w-7xl md:m-auto bg-zinc-100'>
+        <Container styleRow='bg-zinc-100' styleContainer='min-h-screen'>
+            <header className='relative py-5 flex items-center justify-between '>
                 <div className='flex items-center gap-4'>
                     <button className='p-2 bg-white rounded-full cursor-pointer' onClick={handleBack}>
                         <FaArrowLeft />
@@ -41,11 +45,11 @@ export default function Pedido({ params }: PedidoPageProps) {
                 </button>
             </header>
 
-            <section className='relative max-w-full px-7 py-5 flex flex-col gap-4 md:max-w-7xl md:m-auto'>
-                <div className=' p-2.5 border border-zinc-100 w-full rounded-md'>
+            <section className='relative py-5 flex flex-col gap-4'>
+                <div className=' p-2.5 border border-zinc-300 w-full rounded-md'>
                     <div className='flex items-center'>
                         <span className='py-1 px-3 bg-green-principal-700 text-white rounded-md'>Delivery (Entrega)</span>
-                        <span className='py-1 px-3 font-medium'>Pedido: {params.id}</span>
+                        <span className='py-1 px-3 font-medium'>Pedido: {id}</span>
                         <div className='bg-purple-principal-700 w-4 h-0.5 rounded-full'></div>
                         <span className='py-1 px-3'>24/03 - 16:54</span>
                     </div>
@@ -54,39 +58,39 @@ export default function Pedido({ params }: PedidoPageProps) {
                     <p>+55 (11) 99999-9999</p>
                     <p>Rua Logo Ali, 2000 - Poá, SP - 09663-000</p>
                 </div>
-                <div className='p-2.5 border border-zinc-100 w-full rounded-md'>
+                <div className='p-2.5 border border-zinc-300 w-full rounded-md'>
                     <h2 className='font-medium mb-2'>(Quinta-feira) - Bife Acebolado</h2>
                     <p>Tamanho: <span className='font-medium'> Grande</span></p>
                     <p>Vai precisar de talheres?: <span className='font-medium'> Sim</span></p>
                     <p>R$00,00</p>
                 </div>
-                <div className='p-2.5 border border-zinc-100 w-full rounded-md'>
+                <div className='p-2.5 border border-zinc-300 w-full rounded-md'>
                     <p>Delivery: <span className='font-medium'> R$00,00</span></p>
                     <p>Total: <span className='font-medium'> R$00,00</span></p>
                     <p>Forma de Pagamento: <span className='font-medium'> PIX</span></p>
                     <p>Observação: <span className='font-medium'>Lorem ipsum dolor sit amet</span></p>
                 </div>
 
-                <div className='w-full rounded-md flex border border-zinc-100'>
-                    <button onClick={() => handleSendNotification()} className='text-center flex flex-col items-center gap-2 border-r border-zinc-100 p-3'>
+                <div className='w-full rounded-md flex border border-zinc-300'>
+                    <button onClick={() => handleSendNotification()} className='w-full text-center flex flex-col items-center gap-2 border-r border-zinc-300 p-3 cursor-pointer'>
                         <FaUserCheck size={20} />
                         <p className='text-sm/4 font-medium'>Confirmar Pedido</p>
                     </button>
-                    <button onClick={() => handleSendNotification()} className='text-center flex flex-col items-center gap-2 border-r border-zinc-100 p-3'>
+                    <button onClick={() => handleSendNotification()} className='w-full text-center flex flex-col items-center gap-2 border-r border-zinc-300 p-3 cursor-pointer'>
                         <FaMotorcycle size={20} />
                         <p className='text-sm/4 font-medium '>Saiu para Entrega</p>
                     </button>
-                    <button onClick={() => handleSendNotification()} className='text-center flex flex-col items-center gap-2 border-r border-zinc-100 p-3'>
+                    <button onClick={() => handleSendNotification()} className='w-full text-center flex flex-col items-center gap-2 border-r border-zinc-300 p-3 cursor-pointer'>
                         <FaCheckDouble size={20} />
                         <p className='text-sm/4 font-medium'>Finalizar Pedido</p>
                     </button>
-                    <button onClick={() => handleSendNotification()} className='text-center flex flex-col items-center gap-2 border-r border-zinc-100 p-3'>
+                    <button onClick={() => handleSendNotification()} className='w-full text-center flex flex-col items-center gap-2 border-r border-zinc-300 p-3 cursor-pointer'>
                         <FaTrashAlt size={20} />
                         <p className='text-sm/4 font-medium'>Cancelar Pedido</p>
                     </button>
                 </div>
             </section>
             <NfPrint />
-        </main>
+        </Container>
     )
 }

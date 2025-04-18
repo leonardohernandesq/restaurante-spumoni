@@ -1,4 +1,3 @@
-import React from 'react'
 import { ProductCard } from './ProductCard'
 import { IProductAll } from '@/interfaces/IProductAll'
 import Container from './Container'

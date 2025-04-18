@@ -1,4 +1,3 @@
-import React from 'react'
 import { BiCheck } from 'react-icons/bi'
 import { FaWhatsapp, FaInstagram } from 'react-icons/fa6'
 

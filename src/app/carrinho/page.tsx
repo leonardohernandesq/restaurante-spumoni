@@ -1,5 +1,6 @@
 'use client'
 
+import ButtonCart from '@/components/ButtonCart'
 import Container from '@/components/Container'
 import { HeaderPages } from '@/components/HeaderPages'
 import { useRouter } from 'next/navigation'
@@ -21,7 +22,7 @@ const Carrinho = () => {
         <>
             <Container styleRow='bg-zinc-100'>
                 <HeaderPages title='Confira seu Pedido' />
-                <main className='relative py-5 gap-4 flex flex-col flex-1 h-screen'>
+                <main className='relative py-5 gap-4 flex flex-col flex-1 min-h-screen'>
                     <section className='flex items-center justify-between border-b border-zinc-200 pb-4'>
                         <div>
                             <p className='font-light'>RETIRAR EM</p>
@@ -67,10 +68,12 @@ const Carrinho = () => {
                     </section>
                 </main>
                 <section className='bg-white shadow-2xl fixed bottom-0 left-2/4 -translate-x-2/4 max-w-full w-full px-7 py-5 gap-4 flex flex-col'>
-                    <button onClick={() => handleCheckout()} className='max-w-3xl m-auto flex justify-between items-center font-medium text-lg w-full bg-purple-principal-500 py-2.5 px-5 text-white rounded-xl'>
-                        <p>Continuar</p>
-                        <p>R$ 00,00</p>
-                    </button>
+                    <ButtonCart onClick={() => handleCheckout()}>
+                        <>
+                            <p>Continuar</p>
+                            <p>R$ 00,00</p>
+                        </>
+                    </ButtonCart>
                 </section>
             </Container>
         </>

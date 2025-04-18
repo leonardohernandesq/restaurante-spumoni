@@ -1,4 +1,3 @@
-import React from 'react'
 import { StatusColor } from './StatusColor'
 import { DetailPedidos } from './DetailPedidos'
 import { useRouter } from 'next/navigation'

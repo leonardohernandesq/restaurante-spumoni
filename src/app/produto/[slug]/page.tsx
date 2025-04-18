@@ -7,6 +7,7 @@ import { FaMinus, FaPlus } from "react-icons/fa6";
 import { FiShoppingCart } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import Container from "@/components/Container";
+import ButtonCart from "@/components/ButtonCart";
 
 interface ProductPageProps {
     params: { slug: string };
@@ -66,9 +67,8 @@ export default function ProductPage({ params }: ProductPageProps) {
     return (
         <Container styleRow="bg-zinc-50">
             <HeaderPages title={produto.name} />
-            <section className='relative py-5 gap-4 flex flex-col'>
+            <section className='relative py-5 gap-4 flex flex-col mb-24'>
                 <Image src={`/${produto.image}`} alt={produto.name} width={365} height={282} />
-                {params.slug};
                 <div className="flex justify-between items-center">
                     <h1 className="font-medium text-lg">{produto.name}</h1>
                     <div className="flex items-center justify-center gap-2 text-xs bg-purple-principal-500 text-white px-2 py-0.5 rounded-full">
@@ -110,8 +110,8 @@ export default function ProductPage({ params }: ProductPageProps) {
                 <div className="bg-green-principal-500 text-white py-1 px-3 rounded-full w-fit">Observações</div>
                 <textarea className="bg-white py-2 px-3 border border-zinc-100 rounded-lg" placeholder="Ex.: Sem maionese, sem salada, etc." rows={2} />
             </section>
-            <section className="flex gap-3 bg-white p-5 justify-center relative z-20 shadow-md shadow-zinc-900">
-                <button className="bg-purple-principal-500 text-white py-2 px-4 flex items-center gap-2 rounded-lg" onClick={() => handleAddProduct()}><FiShoppingCart size={14} /> Adicionar</button>
+            <section className='bg-white shadow-2xl fixed bottom-0 left-2/4 -translate-x-2/4 max-w-full w-full px-7 py-5 gap-4 flex flex-col'>
+                <ButtonCart onClick={() => handleAddProduct()}>Adicionar<p className="flex items-center gap-2">4 <FiShoppingCart size={14} /></p> </ButtonCart>
             </section>
         </Container>
     );

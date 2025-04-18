@@ -1,6 +1,3 @@
-// components/printer.tsx
-import React from 'react';
-
 const NfPrint = () => {
     return (
         <div id="print-area" className="hidden print:block text-sm font-mono p-4">

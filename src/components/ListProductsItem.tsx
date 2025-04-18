@@ -1,7 +1,6 @@
 'use client'
 
 import Image from 'next/image'
-import React from 'react'
 import { FaPencil, FaX } from 'react-icons/fa6'
 
 const ListProductsItem = () => {
@@ -15,7 +14,7 @@ const ListProductsItem = () => {
 
 
     return (
-        <section className='relative max-w-full px-7 py-5 gap-4 flex items-center md:max-w-7xl md:m-auto border-b border-zinc-200'>
+        <section className='relative py-5 gap-4 flex items-center border-b border-zinc-200'>
             <div className='w-36'>
                 <Image src={'/prato.png'} className='rounded-full opacity-80' alt='Nome Do Prato Aqui' width={80} height={80} />
             </div>

@@ -1,11 +1,10 @@
 import Link from 'next/link'
-import React from 'react'
 
 const CategoryScroll = () => {
     const linkActive = 2;
 
     return (
-        <div className="block overflow-x-auto px-6 pt-3 pb-4 bg-zinc-100 mt-[-20] z-50 relative rounded-t-2xl">
+        <div className="block overflow-x-auto pt-3 pb-4 bg-zinc-100 mt-[-20] md:mt-0 z-50 relative rounded-t-2xl">
             <div className='xl:max-w-7xl xl:mx-auto'>
                 <div className="flex gap-4 w-max">
                     <Link href={'#pratos-do-dia'} title="Pratos do Dia" className={`${linkActive == 1 ? 'text-black' : 'text-zinc-400'}`}>Pratos do Dia {linkActive == 1 && <div className="h-[2px] w-full bg-purple-principal-500"></div>}</Link>

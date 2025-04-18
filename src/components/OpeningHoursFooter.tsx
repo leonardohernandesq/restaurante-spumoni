@@ -1,4 +1,3 @@
-import React from 'react'
 import { FaAngleDoubleRight } from 'react-icons/fa'
 import { IOpeningHoursFooter } from '@/interfaces/IOpeningHoursFooter'
 
