@@ -10,6 +10,6 @@ export interface IProduct {
     name: string,
     slug: string,
     description: string,
-    image: string,
+    image_url: string,
     price: string
 }

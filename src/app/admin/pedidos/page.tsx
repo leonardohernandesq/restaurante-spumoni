@@ -1,11 +1,13 @@
 'use client'
 
 import { PedidoRow } from '@/components/PedidoRow';
+import { userStore } from '@/store/userStore';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react'
 import { BiExit, BiListUl, BiPlus } from 'react-icons/bi'
 
 const Pedidos = () => {
+    const { logout, clearUser } = userStore();
     const router = useRouter();
 
     const [pedidos] = useState([
@@ -61,6 +63,8 @@ const Pedidos = () => {
     ]);
 
     const handleLogout = () => {
+        logout();
+        clearUser();
         router.push('/admin');
     }
 
