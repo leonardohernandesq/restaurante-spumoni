@@ -5,11 +5,13 @@ import { IoWalletOutline } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
 import Container from './Container';
 import { useState } from 'react';
+import { cartStore } from '@/store/cartStore';
 
 export const Header = () => {
   const router = useRouter();
-  const [cartQuantity, setCartQuantity] = useState(0);
   const [storeOpen, setStoreOpen] = useState(true);
+  const { produtos } = cartStore();
+  const totalItens = produtos.length;
 
   const handleCart = () => {
     router.push('/carrinho')
@@ -39,7 +41,7 @@ export const Header = () => {
         </div>
         <div className='relative'>
           <button onClick={() => handleCart()} className='bg-white p-3 rounded-full shadow-md cursor-pointer'><IoWalletOutline className='text-2xl text-black' /></button>
-          <div className='bg-purple-principal-700 h-6 w-6 flex items-center justify-center rounded-full text-xs absolute top-[-10px] right-[-5px]'>{cartQuantity}</div>
+          <div className='bg-purple-principal-700 h-6 w-6 flex items-center justify-center rounded-full text-xs absolute top-[-10px] right-[-5px]'>{totalItens}</div>
         </div>
       </header>
     </Container>

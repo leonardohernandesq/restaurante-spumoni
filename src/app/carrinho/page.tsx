@@ -3,80 +3,91 @@
 import ButtonCart from '@/components/ButtonCart'
 import Container from '@/components/Container'
 import { HeaderPages } from '@/components/HeaderPages'
+import { cartStore } from '@/store/cartStore'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import { BiPencil, BiTrash } from 'react-icons/bi'
 import { FaMinus, FaPlus } from 'react-icons/fa6'
 
-
 const Carrinho = () => {
-    const [quantidade, setQuantidade] = useState(1);
-
     const router = useRouter();
+    const { produtos, removerProduto, atualizarQuantidade } = cartStore();
 
     const handleCheckout = () => {
         router.push('/finalizar');
     }
 
+    const handleMinusQuantity = (item: any) => {
+        if (item.quantidade > 1) {
+            atualizarQuantidade(item.slug, item.quantidade - 1)
+        }
+    }
+
+    const handlePlusQuantity = (item: any) => {
+        if (item.quantidade > 0) {
+            atualizarQuantidade(item.slug, item.quantidade + 1)
+        }
+    }
+
+    const subtotal = produtos.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
+
     return (
-        <>
-            <Container styleRow='bg-zinc-100'>
-                <HeaderPages title='Confira seu Pedido' />
-                <main className='relative py-5 gap-4 flex flex-col flex-1 min-h-screen'>
-                    <section className='flex items-center justify-between border-b border-zinc-200 pb-4'>
-                        <div>
-                            <p className='font-light'>RETIRAR EM</p>
-                            <p className='font-medium'>Restaurante & Sorveteria Spumoni</p>
-                            <p>Rua Lorem Ipsum, 9999</p>
-                        </div>
-                        <button className='bg-zinc-200 p-2 rounded-full'>
-                            <BiPencil />
-                        </button>
-                    </section>
-                    <section className='flex flex-col border-b border-zinc-200 pb-4 gap-1'>
+        <Container styleRow='bg-zinc-100'>
+            <HeaderPages title='Confira seu Pedido' />
+            <main className='relative py-5 gap-4 flex flex-col flex-1 min-h-screen'>
+
+                {produtos.map((item, index) => (
+                    <section key={index} className='flex flex-col border-b border-zinc-200 pb-4 gap-1'>
                         <div className='flex justify-between items-center mb-2'>
-                            <div className=''>
-                                <p className='font-light'>SEU PEDIDO (1 ITEM)</p>
-                                <p className='font-medium'>(Quinta-feira) - Bife Acebolado</p>
+                            <div>
+                                <p className='font-light'>SEU PEDIDO ({item.quantidade} ITEM{item.quantidade > 1 && 'S'})</p>
+                                <p className='font-medium'>{item.nome}</p>
                             </div>
-                            <p className='font-medium'>R$ 00,00</p>
+                            <p className='font-medium'>R$ {(item.preco * item.quantidade).toFixed(2)}</p>
                         </div>
-                        <p className='text-sm'>
-                            Suculento bife acebolado grelhado na chapa, acompanhado de arroz soltinho,
-                            feijão caseiro temperado na medida certa, crocantes batatas fritas douradas
-                            e salada fresca com alface e legumes selecionados.
-                        </p>
+                        <p className='text-sm'>{item?.observacoes}</p>
+
+                        {item.atributos.map((attr, i) => (
+                            <div key={i} className="text-sm text-zinc-500 italic">
+                                {attr.nome}: {attr.valor} {attr.preco > 0 && `(R$ ${attr.preco})`}
+                            </div>
+                        ))}
+
+                        {item.observacoes && (
+                            <div className="text-sm text-zinc-600 italic mt-1">Obs: {item.observacoes}</div>
+                        )}
 
                         <section className='flex gap-2 mt-4'>
                             <div className="flex items-center justify-center gap-2 text-xs bg-purple-principal-500 text-white px-2 py-0.5 rounded-full w-fit">
-                                <button className="p-1" onClick={() => setQuantidade(quantidade - 1)}>
+                                <button className="p-1" onClick={() => handleMinusQuantity(item)}>
                                     <FaMinus />
                                 </button>
-                                <span>{quantidade}</span>
-                                <button className="p-1" onClick={() => setQuantidade(quantidade + 1)}>
+                                <span>{item.quantidade}</span>
+                                <button className="p-1" onClick={() => handlePlusQuantity(item)}>
                                     <FaPlus />
                                 </button>
                             </div>
-                            <button className='bg-zinc-200 p-2 rounded-full w-fit'>
+                            <button className='bg-zinc-200 p-2 rounded-full w-fit' onClick={() => removerProduto(item.slug)}>
                                 <BiTrash />
                             </button>
                         </section>
                     </section>
-                    <section className='flex justify-between items-center text-zinc-700'>
-                        <p>SUBTOTAL</p>
-                        <p>R$ 00,00</p>
-                    </section>
-                </main>
-                <section className='bg-white shadow-2xl fixed bottom-0 left-2/4 -translate-x-2/4 max-w-full w-full px-7 py-5 gap-4 flex flex-col'>
-                    <ButtonCart onClick={() => handleCheckout()}>
-                        <>
-                            <p>Continuar</p>
-                            <p>R$ 00,00</p>
-                        </>
-                    </ButtonCart>
+                ))}
+
+                <section className='flex justify-between items-center text-zinc-700'>
+                    <p>SUBTOTAL</p>
+                    <p>R$ {subtotal.toFixed(2)}</p>
                 </section>
-            </Container>
-        </>
+            </main>
+
+            <section className='bg-white shadow-2xl fixed bottom-0 left-2/4 -translate-x-2/4 max-w-full w-full px-7 py-5 gap-4 flex flex-col'>
+                <ButtonCart onClick={handleCheckout}>
+                    <>
+                        <p>Continuar</p>
+                        <p>R$ {subtotal.toFixed(2)}</p>
+                    </>
+                </ButtonCart>
+            </section>
+        </Container>
     )
 }
 

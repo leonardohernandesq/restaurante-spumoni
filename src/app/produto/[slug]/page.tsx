@@ -9,6 +9,9 @@ import { useRouter } from "next/navigation";
 import Container from "@/components/Container";
 import ButtonCart from "@/components/ButtonCart";
 import { getProductBySlug } from "@/services/produto";
+import { AtributoSelecionado, cartStore } from "@/store/cartStore";
+import LoadingIcon from "@/components/LoadingIcon";
+import { toast } from "react-toastify";
 
 interface ProductPageProps {
     params: Promise<{ slug: string }>;
@@ -17,8 +20,11 @@ interface ProductPageProps {
 export default function ProductPage({ params }: ProductPageProps) {
     const { slug } = use(params);
     const router = useRouter();
+    const { produtos } = cartStore();
+    const totalItens = produtos.length;
     const [quantidade, setQuantidade] = useState(1);
-    const [produto, setProduto] = useState<any>(null);  // Definir o tipo corretamente de acordo com a sua resposta
+    const [observacoes, setObservacoes] = useState('');
+    const [produto, setProduto] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +42,7 @@ export default function ProductPage({ params }: ProductPageProps) {
         };
 
         if (slug) {
-            fetchProduct();  // Só chama a função se o slug não for vazio
+            fetchProduct();
         } else {
             setError("Slug não encontrado.");
             setLoading(false);
@@ -44,17 +50,58 @@ export default function ProductPage({ params }: ProductPageProps) {
     }, [slug]);
 
     const handleAddProduct = () => {
-        alert('Adicionando produto no carrinho');
+        if (!produto) return;
+
+        const atributosSelecionados: AtributoSelecionado[] = [];
+
+        let precoFinal = parseFloat(produto.preco);
+
+        produto.atributos.forEach((atributo: any) => {
+            const radios = document.getElementsByName(atributo.nomes_atributos);
+            const selected = Array.from(radios).find((el: any) => el.checked);
+
+            if (selected) {
+                const valorSelecionado = atributo.valores_atributo.find(
+                    (v: any) => v.valor === selected.id
+                );
+
+                if (valorSelecionado) {
+                    atributosSelecionados.push({
+                        nome: atributo.nomes_atributos,
+                        valor: valorSelecionado.valor,
+                        preco: parseFloat(valorSelecionado.preco),
+                    });
+
+                    if (valorSelecionado.preco_incluido) {
+                        precoFinal = parseFloat(valorSelecionado.preco);
+                    } else {
+                        precoFinal += parseFloat(valorSelecionado.preco);
+                    }
+                }
+            }
+        });
+
+        cartStore.getState().adicionarProduto({
+            id: produto.id,
+            nome: produto.name,
+            slug: produto.slug,
+            imagem: produto.image,
+            preco: precoFinal,
+            quantidade,
+            observacoes,
+            atributos: atributosSelecionados,
+        });
+
+        toast.success("Produto adicionado ao carrinho");
         router.push('/');
-    }
+    };
+
 
     if (loading) {
         return (
             <Container styleRow="bg-zinc-50">
                 <HeaderPages title="Carregando Produto..." />
-                <section className='py-5 flex justify-center items-center'>
-                    <div className="text-lg text-gray-500">Carregando...</div>
-                </section>
+                <LoadingIcon color="text-purple-principal-700" />
             </Container>
         );
     }
@@ -114,10 +161,10 @@ export default function ProductPage({ params }: ProductPageProps) {
                 </div>
 
                 <div className="bg-green-principal-500 text-white py-1 px-3 rounded-full w-fit">Observações</div>
-                <textarea className="bg-white py-2 px-3 border border-zinc-100 rounded-lg" placeholder="Ex.: Sem maionese, sem salada, etc." rows={2} />
+                <textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} className="bg-white py-2 px-3 border border-zinc-100 rounded-lg" placeholder="Ex.: Sem maionese, sem salada, etc." rows={2} />
             </section>
             <section className='bg-white shadow-2xl fixed bottom-0 left-2/4 -translate-x-2/4 max-w-full w-full px-7 py-5 gap-4 flex flex-col'>
-                <ButtonCart onClick={() => handleAddProduct()}>Adicionar<p className="flex items-center gap-2">4 <FiShoppingCart size={14} /></p> </ButtonCart>
+                <ButtonCart onClick={() => handleAddProduct()}>Adicionar<p className="flex items-center gap-2">{totalItens} <FiShoppingCart size={14} /></p> </ButtonCart>
             </section>
         </Container>
     );
