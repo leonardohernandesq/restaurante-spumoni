@@ -1,79 +1,55 @@
 'use client'
 
+import { useEffect } from 'react';
 import { PedidoRow } from '@/components/PedidoRow';
 import { userStore } from '@/store/userStore';
+import { usePedidoStore } from '@/store/pedidoStore';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react'
-import { BiExit, BiListUl, BiPlus } from 'react-icons/bi'
+import { BiExit, BiListUl, BiPlus } from 'react-icons/bi';
 
 const Pedidos = () => {
     const { logout, clearUser } = userStore();
+    const { pedidos, getPedidos } = usePedidoStore();
     const router = useRouter();
 
-    const [pedidos] = useState([
-        {
-            "id": '1',
-            "client_name": "Leonardo",
-            "client_phone": "+55 (11) 99999-9999",
-            "status": "Confirmado",
-            "created_at": "08/04 - 12:00",
-        },
-        {
-            "id": '2',
-            "client_name": "Leonardo",
-            "client_phone": "+55 (11) 99999-9999",
-            "status": "Cancelado",
-            "created_at": "08/04 - 12:00",
-        },
-        {
-            "id": '3',
-            "client_name": "Leonardo",
-            "client_phone": "+55 (11) 99999-9999",
-            "status": "Saindo para entrega",
-            "created_at": "08/04 - 12:00",
-        },
-        {
-            "id": '4',
-            "client_name": "Leonardo",
-            "client_phone": "+55 (11) 99999-9999",
-            "status": "Novo Pedido",
-            "created_at": "08/04 - 12:00",
-        },
-        {
-            "id": '5',
-            "client_name": "Leonardo",
-            "client_phone": "+55 (11) 99999-9999",
-            "status": "Preparando",
-            "created_at": "08/04 - 12:00",
-        },
-        {
-            "id": '6',
-            "client_name": "Leonardo",
-            "client_phone": "+55 (11) 99999-9999",
-            "status": "Confirmado",
-            "created_at": "08/04 - 12:00",
-        },
-        {
-            "id": '7',
-            "client_name": "Leonardo",
-            "client_phone": "+55 (11) 99999-9999",
-            "status": "Confirmado",
-            "created_at": "08/04 - 12:00",
-        },
-    ]);
+    useEffect(() => {
+        getPedidos(); // Puxa ao montar a página
+
+        const ws = new WebSocket('wss://admin.lhdev.com.br:3000');
+
+        ws.onopen = () => console.log('📡 Conectado ao WebSocket');
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.tipo === 'updatePedidos') {
+                console.log('🔄 Recebido update via WS');
+                getPedidos(); // Atualiza pedidos do backend
+            }
+        };
+
+        ws.onerror = (err) => {
+            console.error('WebSocket erro:', err);
+        };
+
+        return () => {
+            ws.close();
+        };
+    }, []);
 
     const handleLogout = () => {
         logout();
         clearUser();
         router.push('/admin');
-    }
+    };
 
     return (
         <main className='p-5 bg-zinc-200'>
             <section className='p-5 bg-white rounded-2xl shadow-2xl'>
                 <div className='flex justify-between items-center'>
                     <h1 className='text-2xl font-bold text-purple-principal-700'>Gestor de Pedidos</h1>
-                    <button onClick={() => handleLogout()}><BiExit size={25} className='text-red-800 cursor-pointer' /></button>
+                    <button onClick={() => handleLogout()}>
+                        <BiExit size={25} className='text-red-800 cursor-pointer' />
+                    </button>
                 </div>
                 <div className='flex justify-between items-center my-2'>
                     <button onClick={() => router.push('/admin/adicionarprodutos')} className='flex items-center gap-1 text-lg cursor-pointer'>
@@ -92,10 +68,9 @@ const Pedidos = () => {
                         <PedidoRow key={item.id} pedido={item} />
                     ))
                 }
-
             </section>
         </main>
-    )
-}
+    );
+};
 
-export default Pedidos
+export default Pedidos;
