@@ -1,39 +1,52 @@
-'use client'
+'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PedidoRow } from '@/components/PedidoRow';
 import { userStore } from '@/store/userStore';
-import { usePedidoStore } from '@/store/pedidoStore';
 import { useRouter } from 'next/navigation';
 import { BiExit, BiListUl, BiPlus } from 'react-icons/bi';
+import { getPedidos } from '@/services/pedido';
+
+// Tipagem do pedido
+interface Pedido {
+    id: string;
+    client_name: string;
+    client_phone: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
+}
 
 const Pedidos = () => {
     const { logout, clearUser } = userStore();
-    const { pedidos, getPedidos } = usePedidoStore();
     const router = useRouter();
+    const [pedidos, setPedidos] = useState<Pedido[]>([]);
+    const lastUpdatedRef = useRef<string | null>(null);
 
     useEffect(() => {
-        getPedidos(); // Puxa ao montar a página
+        const loadPedidos = async () => {
+            try {
+                const after = lastUpdatedRef.current ?? undefined;
+                const novos: Pedido[] = await getPedidos(after);
 
-        const ws = new WebSocket('wss://admin.lhdev.com.br:3000');
+                if (novos && novos.length > 0) {
+                    lastUpdatedRef.current = novos[novos.length - 1].updated_at;
+                    setPedidos((prev) => {
+                        const novosFiltrados = novos.filter(
+                            (pedidoNovo) => !prev.some((pedidoExistente) => pedidoExistente.id === pedidoNovo.id)
+                        );
 
-        ws.onopen = () => console.log('📡 Conectado ao WebSocket');
-
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.tipo === 'updatePedidos') {
-                console.log('🔄 Recebido update via WS');
-                getPedidos(); // Atualiza pedidos do backend
+                        return [...prev, ...novosFiltrados];
+                    });
+                }
+            } catch (err) {
+                console.error('Erro ao buscar pedidos:', err);
             }
         };
 
-        ws.onerror = (err) => {
-            console.error('WebSocket erro:', err);
-        };
-
-        return () => {
-            ws.close();
-        };
+        loadPedidos();
+        const interval = setInterval(loadPedidos, 5000);
+        return () => clearInterval(interval);
     }, []);
 
     const handleLogout = () => {
@@ -43,31 +56,34 @@ const Pedidos = () => {
     };
 
     return (
-        <main className='p-5 bg-zinc-200'>
-            <section className='p-5 bg-white rounded-2xl shadow-2xl'>
-                <div className='flex justify-between items-center'>
-                    <h1 className='text-2xl font-bold text-purple-principal-700'>Gestor de Pedidos</h1>
-                    <button onClick={() => handleLogout()}>
-                        <BiExit size={25} className='text-red-800 cursor-pointer' />
+        <main className="p-5 bg-zinc-200">
+            <section className="p-5 bg-white rounded-2xl shadow-2xl">
+                <div className="flex justify-between items-center">
+                    <h1 className="text-2xl font-bold text-purple-principal-700">Gestor de Pedidos</h1>
+                    <button onClick={handleLogout}>
+                        <BiExit size={25} className="text-red-800 cursor-pointer" />
                     </button>
                 </div>
-                <div className='flex justify-between items-center my-2'>
-                    <button onClick={() => router.push('/admin/adicionarprodutos')} className='flex items-center gap-1 text-lg cursor-pointer'>
+
+                <div className="flex justify-between items-center my-2">
+                    <button onClick={() => router.push('/admin/adicionarprodutos')} className="flex items-center gap-1 text-lg cursor-pointer">
                         <BiPlus />
                         Adicionar Produto
                     </button>
-                    <button onClick={() => router.push('/admin/listarprodutos')} className='flex items-center gap-1 text-lg cursor-pointer'>
+                    <button onClick={() => router.push('/admin/listarprodutos')} className="flex items-center gap-1 text-lg cursor-pointer">
                         <BiListUl />
                         Lista de Produtos
                     </button>
                 </div>
-                <input className='w-full border bg-zinc-100 border-zinc-200 p-2 rounded-lg my-4' placeholder='Filtrar por nome, número do pedido ou telefone' />
 
-                {
-                    pedidos.map((item) => (
-                        <PedidoRow key={item.id} pedido={item} />
-                    ))
-                }
+                <input
+                    className="w-full border bg-zinc-100 border-zinc-200 p-2 rounded-lg my-4"
+                    placeholder="Filtrar por nome, número do pedido ou telefone"
+                />
+
+                {pedidos.map((item) => (
+                    <PedidoRow key={item.id} pedido={item} />
+                ))}
             </section>
         </main>
     );

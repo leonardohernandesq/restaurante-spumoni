@@ -5,7 +5,7 @@ import Container from '@/components/Container'
 import { HeaderPages } from '@/components/HeaderPages'
 import { cartStore } from '@/store/cartStore'
 import { useRouter } from 'next/navigation'
-import { BiPencil, BiTrash } from 'react-icons/bi'
+import { BiTrash } from 'react-icons/bi'
 import { FaMinus, FaPlus } from 'react-icons/fa6'
 
 const Carrinho = () => {
