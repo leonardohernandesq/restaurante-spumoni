@@ -1,7 +1,9 @@
-import { StatusColor } from './StatusColor'
-import { DetailPedidos } from './DetailPedidos'
 import { useRouter } from 'next/navigation'
+
 import { IPedidosData } from '@/interfaces/IPedidosData'
+
+import { StatusColor } from '@/components/StatusColor'
+import { DetailPedidos } from '@/components/DetailPedidos'
 
 export const PedidoRow = ({ pedido }: IPedidosData) => {
     const router = useRouter();

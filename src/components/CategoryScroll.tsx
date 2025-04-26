@@ -1,20 +1,10 @@
 'use client'
 
-import Link from 'next/link';
 import { useState } from 'react';
+import Link from 'next/link';
+import { IPropsCategory } from '@/interfaces/ICategory';
 
-interface Category {
-    id: number;
-    nome: string;
-    slug: string;
-    descricao: string;
-}
-
-interface Props {
-    categories: Category[];
-}
-
-export const CategoryScroll = ({ categories }: Props) => {
+export const CategoryScroll = ({ categories }: IPropsCategory) => {
     const [linkActive, setLinkActive] = useState(0);
 
     const handleScrollLink = (item: number) => {

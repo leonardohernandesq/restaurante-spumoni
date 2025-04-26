@@ -1,21 +1,21 @@
 'use client'
 
-import Container from '@/components/Container'
 import Image from 'next/image'
-import { useState } from 'react'
-import { BsArrowRight } from 'react-icons/bs'
-import { userStore } from '@/store/userStore';
-import { toast } from 'react-toastify'
-import { useRouter } from 'next/navigation'
-import LoadingIcon from '@/components/LoadingIcon'
 import Link from 'next/link'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { BsArrowRight } from 'react-icons/bs'
+import { toast } from 'react-toastify'
+
+import { Container } from '@/components/Container'
+import { userStore } from '@/store/userStore';
+import { LoadingIcon } from '@/components/LoadingIcon'
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const { login, loading, error } = userStore();
     const router = useRouter();
-
 
     const handleLogin = async () => {
         if (!email || !senha) {

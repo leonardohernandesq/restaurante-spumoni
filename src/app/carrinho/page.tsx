@@ -1,12 +1,13 @@
 'use client'
 
-import ButtonCart from '@/components/ButtonCart'
-import Container from '@/components/Container'
-import { HeaderPages } from '@/components/HeaderPages'
-import { cartStore } from '@/store/cartStore'
 import { useRouter } from 'next/navigation'
 import { BiTrash } from 'react-icons/bi'
 import { FaMinus, FaPlus } from 'react-icons/fa6'
+
+import { ButtonCart } from '@/components/ButtonCart'
+import { Container } from '@/components/Container'
+import { HeaderPages } from '@/components/HeaderPages'
+import { cartStore } from '@/store/cartStore'
 
 const Carrinho = () => {
     const router = useRouter();

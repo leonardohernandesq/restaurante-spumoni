@@ -1,11 +1,14 @@
 'use client'
 
 import Image from 'next/image';
-import { IoWalletOutline } from "react-icons/io5";
-import { useRouter } from 'next/navigation';
-import Container from './Container';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+import { IoWalletOutline } from "react-icons/io5";
+
 import { cartStore } from '@/store/cartStore';
+
+import { Container } from '@/components/Container';
 
 export const Header = () => {
   const router = useRouter();

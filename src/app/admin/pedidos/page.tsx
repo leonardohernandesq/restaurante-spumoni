@@ -1,33 +1,26 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { PedidoRow } from '@/components/PedidoRow';
-import { userStore } from '@/store/userStore';
 import { useRouter } from 'next/navigation';
 import { BiExit, BiListUl, BiPlus } from 'react-icons/bi';
-import { getPedidos } from '@/services/pedido';
 
-// Tipagem do pedido
-interface Pedido {
-    id: string;
-    client_name: string;
-    client_phone: string;
-    status: string;
-    created_at: string;
-    updated_at: string;
-}
+import { IPedido } from '@/interfaces/IPedidosData';
+import { PedidoRow } from '@/components/PedidoRow';
+import { userStore } from '@/store/userStore';
+import { getPedidos } from '@/services/pedido';
 
 const Pedidos = () => {
     const { logout, clearUser } = userStore();
     const router = useRouter();
-    const [pedidos, setPedidos] = useState<Pedido[]>([]);
     const lastUpdatedRef = useRef<string | null>(null);
+
+    const [pedidos, setPedidos] = useState<IPedido[]>([]);
 
     useEffect(() => {
         const loadPedidos = async () => {
             try {
                 const after = lastUpdatedRef.current ?? undefined;
-                const novos: Pedido[] = await getPedidos(after);
+                const novos: IPedido[] = await getPedidos(after);
 
                 if (novos && novos.length > 0) {
                     lastUpdatedRef.current = novos[novos.length - 1].updated_at;

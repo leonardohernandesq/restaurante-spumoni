@@ -1,7 +1,7 @@
 'use client'
 
-import { FaArrowLeft } from 'react-icons/fa6'
 import { useRouter } from 'next/navigation'
+import { FaArrowLeft } from 'react-icons/fa6'
 
 export const HeaderPages = ({ title }: { title: string }) => {
     const router = useRouter();

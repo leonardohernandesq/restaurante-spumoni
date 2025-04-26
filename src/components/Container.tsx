@@ -1,6 +1,6 @@
 import { IContainer } from '@/interfaces/IContainer'
 
-const Container = ({ styleRow, styleContainer, children }: IContainer) => {
+export const Container = ({ styleRow, styleContainer, children }: IContainer) => {
     return (
         <div className={`${styleRow} w-full flex justify-center items-center`}>
             <div className={`${styleContainer} max-w-7xl w-full m-auto px-3`}>
@@ -9,5 +9,3 @@ const Container = ({ styleRow, styleContainer, children }: IContainer) => {
         </div>
     )
 }
-
-export default Container

@@ -1,21 +1,19 @@
 'use client'
 
-import { IProduct } from '@/interfaces/IProductAll'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { BiPlus } from 'react-icons/bi'
+import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 
-interface ProductSectionProps {
-    product: IProduct
-}
+import { BiPlus } from 'react-icons/bi'
+
+import { IProductCardProps } from '@/interfaces/IProductCardProps'
 
 
-export const ProductCard = ({ product }: ProductSectionProps) => {
+
+export const ProductCard = ({ product }: IProductCardProps) => {
     const router = useRouter();
     const [storeOpen, setStoreOpen] = useState(true);
-
 
     const handleBuyProduct = (link: string) => {
         if (storeOpen) {
@@ -24,7 +22,6 @@ export const ProductCard = ({ product }: ProductSectionProps) => {
             toast.error('A Loja está fechada no momento. \n Tente novamente mais tarde!')
         }
     }
-
 
     return (
         <section className='bg-white rounded-xl shadow-lg'>

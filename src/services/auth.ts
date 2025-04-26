@@ -1,4 +1,3 @@
-import axios from "axios";
 import { TUser } from '@/store/userStore';
 import { api } from '@/config/api'
 

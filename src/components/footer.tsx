@@ -1,11 +1,13 @@
 import Image from 'next/image'
-import { DetailTitle } from '@/components/DetailTitle'
+import Link from 'next/link';
+
 import { IoLocation } from "react-icons/io5";
 import { IoLogoWhatsapp } from "react-icons/io";
 import { RiInstagramFill } from "react-icons/ri";
-import Link from 'next/link';
-import { OpeningHoursFooter } from './OpeningHoursFooter';
-import Container from './Container';
+
+import { OpeningHoursFooter } from '@/components/OpeningHoursFooter';
+import { Container } from '@/components/Container';
+import { DetailTitle } from '@/components/DetailTitle'
 
 export const Footer = () => {
   const horarios = [

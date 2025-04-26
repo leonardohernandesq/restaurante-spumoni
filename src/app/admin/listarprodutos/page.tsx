@@ -1,13 +1,13 @@
-import CategoryScroll from "@/components/CategoryScroll"
-import Container from "@/components/Container"
+import { Container } from "@/components/Container"
 import { HeaderPages } from "@/components/HeaderPages"
-import ListProductsItem from "@/components/ListProductsItem"
+import { CategoryScroll } from "@/components/CategoryScroll"
+import { ListProductsItem } from "@/components/ListProductsItem"
 
 const listarProdutos = () => {
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
             <HeaderPages title="Voltar ao Gestor de Pedidos" />
-            <CategoryScroll />
+            <CategoryScroll categories={[]} />
 
             <section>
                 <ListProductsItem />

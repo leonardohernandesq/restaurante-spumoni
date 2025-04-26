@@ -1,27 +1,26 @@
 'use client'
 
-import { use, useEffect, useState } from "react";
-import { HeaderPages } from "@/components/HeaderPages";
 import Image from "next/image";
+import { use, useEffect, useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { FiShoppingCart } from "react-icons/fi";
 import { useRouter } from "next/navigation";
-import Container from "@/components/Container";
-import ButtonCart from "@/components/ButtonCart";
-import { getProductBySlug } from "@/services/produto";
-import { AtributoSelecionado, cartStore } from "@/store/cartStore";
-import LoadingIcon from "@/components/LoadingIcon";
 import { toast } from "react-toastify";
 
-interface ProductPageProps {
-    params: Promise<{ slug: string }>;
-}
+import { Container } from "@/components/Container";
+import { ButtonCart } from "@/components/ButtonCart";
+import { LoadingIcon } from "@/components/LoadingIcon";
+import { HeaderPages } from "@/components/HeaderPages";
+import { ISingleProductPageProps } from "@/interfaces/ISingleProductPageProps";
+import { getProductBySlug } from "@/services/produto";
+import { AtributoSelecionado, cartStore } from "@/store/cartStore";
 
-export default function ProductPage({ params }: ProductPageProps) {
+export default function ProductPage({ params }: ISingleProductPageProps) {
     const { slug } = use(params);
-    const router = useRouter();
     const { produtos } = cartStore();
     const totalItens = produtos.length;
+    const router = useRouter();
+
     const [quantidade, setQuantidade] = useState(1);
     const [observacoes, setObservacoes] = useState('');
     const [produto, setProduto] = useState<any>(null);

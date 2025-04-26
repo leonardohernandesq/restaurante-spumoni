@@ -1,13 +1,14 @@
 'use client'
 
-import { FaArrowLeft, FaCheckDouble, FaUserCheck } from 'react-icons/fa6'
+import { use } from 'react';
 import { useRouter } from 'next/navigation'
+import { FaArrowLeft, FaCheckDouble, FaUserCheck } from 'react-icons/fa6'
 import { PiPrinter } from 'react-icons/pi';
 import { FaMotorcycle } from 'react-icons/fa6';
 import { FaTrashAlt } from 'react-icons/fa';
+
 import NfPrint from '@/components/Printer';
-import { use } from 'react';
-import Container from '@/components/Container';
+import { Container } from '@/components/Container';
 
 interface PedidoPageProps {
     params: Promise<{ id: string }>;

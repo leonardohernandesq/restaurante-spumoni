@@ -1,12 +1,9 @@
-import { ProductCard } from './ProductCard'
-import { IProductAll } from '@/interfaces/IProductAll'
-import Container from './Container'
+import { ProductCard } from '@/components/ProductCard'
+import { Container } from '@/components/Container'
 
-interface ProductSectionProps {
-    data: IProductAll[]
-}
+import { IProductSectionProps } from '@/interfaces/IProductSectionProps'
 
-export const ProductSection = ({ data }: ProductSectionProps) => {
+export const ProductSection = ({ data }: IProductSectionProps) => {
     return (
         <>
             {

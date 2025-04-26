@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { FaPencil, FaX } from 'react-icons/fa6'
 
-const ListProductsItem = () => {
+export const ListProductsItem = () => {
     const handleEdit = () => {
         alert('Editando');
     }
@@ -34,5 +34,3 @@ const ListProductsItem = () => {
         </section>
     )
 }
-
-export default ListProductsItem
