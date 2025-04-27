@@ -35,12 +35,11 @@ const Carrinho = () => {
         <Container styleRow='bg-zinc-100'>
             <HeaderPages title='Confira seu Pedido' />
             <main className='relative py-5 gap-4 flex flex-col flex-1 min-h-screen'>
-
+                <p className='font-light'>SEU PEDIDO ({produtos.length} ITEM{produtos.length > 1 && 'S'})</p>
                 {produtos.map((item, index) => (
                     <section key={index} className='flex flex-col border-b border-zinc-200 pb-4 gap-1'>
                         <div className='flex justify-between items-center mb-2'>
                             <div>
-                                <p className='font-light'>SEU PEDIDO ({item.quantidade} ITEM{item.quantidade > 1 && 'S'})</p>
                                 <p className='font-medium'>{item.nome}</p>
                             </div>
                             <p className='font-medium'>R$ {(item.preco * item.quantidade).toFixed(2)}</p>

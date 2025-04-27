@@ -3,19 +3,30 @@ import { useState } from 'react';
 export const useCep = () => {
     const [cep, setCep] = useState('');
 
-    const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = e.target.value;
-        value = value.replace(/\D/g, '');
+    const formatCep = (value: string) => {
+        value = value.replace(/\D/g, ''); // Remove tudo que não for número
 
-        if (value.length > 5) {
-            value = value.slice(0, 5) + '-' + value.slice(5);
-        }
-        if (value.length > 9) {
-            value = value.slice(0, 9);
+        if (value.length >= 4 && value.length <= 7) {
+            // Formato 4-3 ou 5-3
+            if (value.length > 4) {
+                value = value.slice(0, 4) + '-' + value.slice(4);
+            }
+        } else if (value.length > 7) {
+            value = value.slice(0, 5) + '-' + value.slice(5, 8);
         }
 
-        setCep(value);
+        return value.slice(0, 8); // Garantir no máximo 8 caracteres
     };
 
-    return { cep, handleCepChange };
+    const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formattedValue = formatCep(e.target.value);
+        setCep(formattedValue);
+    };
+
+    const setCepValue = (value: string) => {
+        const formattedValue = formatCep(value);
+        setCep(formattedValue);
+    };
+
+    return { cep, handleCepChange, setCepValue };
 };
