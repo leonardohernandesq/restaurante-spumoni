@@ -19,7 +19,6 @@ export const useLocalizacao = () => {
             (position) => {
                 const { latitude, longitude } = position.coords;
 
-                // Aqui você pode realizar uma requisição para buscar o endereço com base na localização
                 fetch(
                     `https://api.openrouteservice.org/geocode/reverse?api_key=5b3ce3597851110001cf6248f2b806cf974d4026a7421623106b935b&point.lon=${longitude}&point.lat=${latitude}`
                 )
@@ -27,7 +26,7 @@ export const useLocalizacao = () => {
                     .then((data) => {
                         if (data.features && data.features.length > 0) {
                             const endereco = data.features[0].properties;
-                            setDistancia(`${endereco.street}, ${endereco.city}`); // Exemplo de como você pode configurar a distância
+                            setDistancia(`${endereco.street}, ${endereco.city}`);
                         } else {
                             setErro('Endereço não encontrado.');
                         }

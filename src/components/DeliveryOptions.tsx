@@ -30,4 +30,3 @@ export const DeliveryOptions = ({ delivery, setDelivery }: DeliveryOptionsProps)
     )
 }
 
-export default DeliveryOptions

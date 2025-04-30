@@ -1,13 +1,8 @@
-export const DetailPedidos = ({ status }: { status: string }) => {
-    const statusColors: { [key: string]: string } = {
-        'confirmado': 'bg-green-principal-700',
-        'cancelado': 'bg-red-700',
-        'novo pedido': 'bg-yellow-700',
-        'preparando': 'bg-blue-700',
-        'saindo para entrega': 'bg-purple-700',
-    };
+import { useStatusColor } from '@/hooks/useStatusColor';
 
-    const color = statusColors[status.toLowerCase()] || 'bg-gray-400';
+export const DetailPedidos = ({ status }: { status: number }) => {
+    const { getColor } = useStatusColor();
+    const color = getColor(status);
 
     return (
         <div className={`w-1 h-full flex absolute top-0 left-0 rounded-sm ${color}`}></div>

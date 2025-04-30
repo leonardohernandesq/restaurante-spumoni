@@ -1,21 +1,15 @@
 import { create } from 'zustand';
-import { getPedidos as fetchPedidosAPI } from '@/services/pedido';
-
-interface Pedido {
-  id: string;
-  client_name: string;
-  client_phone: string;
-  status: string;
-  created_at: string;
-}
+import { fetchPedidosAPI, insertPedidoApi } from '@/services/pedido';
+import { IPedido } from '@/interfaces/IPedidosData';
 
 interface PedidoStore {
-  pedidos: Pedido[];
+  pedidos: IPedido[];
   getPedidos: () => Promise<void>;
-  setPedidos: (pedidos: Pedido[]) => void;
+  setPedidos: (pedidos: IPedido[]) => void;
+  insertPedido: (data: IPedido) => Promise<void>;
 }
 
-export const usePedidoStore = create<PedidoStore>((set) => ({
+export const pedidoStore = create<PedidoStore>((set, get) => ({
   pedidos: [],
   setPedidos: (pedidos) => set({ pedidos }),
   getPedidos: async () => {
@@ -26,4 +20,14 @@ export const usePedidoStore = create<PedidoStore>((set) => ({
       console.error('❌ Erro ao buscar pedidos:', error);
     }
   },
+  insertPedido: async (data: IPedido) => {
+    try {
+      const novoPedido = await insertPedidoApi(data);
+      const pedidosAtuais = get().pedidos;
+      set({ pedidos: [...pedidosAtuais, novoPedido] });
+    } catch (error) {
+      console.error('❌ Erro ao inserir pedido:', error);
+      throw error;
+    }
+  }
 }));

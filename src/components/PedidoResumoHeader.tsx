@@ -23,5 +23,3 @@ export const PedidoResumoHeader = ({ produtos }: IPedidoResumoHeaderProps) => {
         </section>
     )
 }
-
-export default PedidoResumoHeader

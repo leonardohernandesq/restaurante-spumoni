@@ -17,5 +17,3 @@ export const CheckoutButton = ({ valorFinal, handleFinish }: CheckoutButtonProps
         </section>
     )
 }
-
-export default CheckoutButton

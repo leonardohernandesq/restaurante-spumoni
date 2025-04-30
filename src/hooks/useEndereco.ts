@@ -15,12 +15,40 @@ export const useEndereco = () => {
     const [modalBairro, setModalBairro] = useState('')
     const [modalReferencia, setModalReferencia] = useState('')
 
+    const [distanciaCliente, setDistanciaCliente] = useState<number | null>(null)
+    const [restauranteCoord, setRestauranteCoord] = useState<[number, number] | null>(null)
+
     useEffect(() => {
         const loadEndereco = localStorage.getItem('endereco')
+        const loadDistancia = localStorage.getItem('distanciaCliente')
+
         if (loadEndereco) {
             setEndereco(loadEndereco)
         }
+        if (loadDistancia) {
+            setDistanciaCliente(Number(loadDistancia))
+        }
+
+        buscarCoordenadasRestaurante()
     }, [])
+
+    useEffect(() => {
+        const enderecoInfo = localStorage.getItem('enderecoInfo')
+        if (enderecoInfo) {
+            try {
+                const parsed = JSON.parse(enderecoInfo)
+                setModalEndereco(parsed.modalEndereco || '')
+                setModalNumero(parsed.modalNumero || '')
+                setModalComplemento(parsed.modalComplemento || '')
+                setModalBairro(parsed.modalBairro || '')
+                setModalReferencia(parsed.modalReferencia || '')
+                setCepValue(parsed.cep || '')
+            } catch (err) {
+                console.error('Erro ao carregar dados do endereço:', err)
+            }
+        }
+    }, [])
+
 
     useEffect(() => {
         if (modalEndereco && modalNumero && modalBairro && cep) {
@@ -36,25 +64,147 @@ export const useEndereco = () => {
         if (field === 'modalReferencia') setModalReferencia(value)
     }
 
-    const handleEndereco = () => {
+    const abrirModalEndereco = () => {
+        preencherCamposModal()
+        setShowModal(true)
+    }
+
+    const preencherCamposModal = () => {
+        const enderecoSalvo = localStorage.getItem('enderecoInfo')
+        if (!enderecoSalvo) return
+
+        try {
+            const enderecoObj = JSON.parse(enderecoSalvo)
+
+            setModalEndereco(enderecoObj.modalEndereco || '')
+            setModalNumero(enderecoObj.modalNumero || '')
+            setModalComplemento(enderecoObj.modalComplemento || '')
+            setModalBairro(enderecoObj.modalBairro || '')
+            setModalReferencia(enderecoObj.modalReferencia || '')
+            setCepValue(enderecoObj.cep || '')
+
+        } catch (error) {
+            console.error('Erro ao preencher campos do modal:', error)
+        }
+    }
+
+    async function buscarCoordenadasRestaurante() {
+        const enderecoRestaurante = 'Estrada da Giesteira 65/67, Arruda dos Vinhos, 2630-241, Portugal'
+
+        try {
+            const response = await fetch(
+                `https://api.openrouteservice.org/geocode/search?api_key=${process.env.NEXT_PUBLIC_API_LOCATION_GET}&text=${encodeURIComponent(enderecoRestaurante)}`
+            )
+            if (!response.ok) {
+                throw new Error('Erro ao buscar coordenadas do restaurante.')
+            }
+
+            const data = await response.json()
+
+            if (data.features && data.features.length > 0) {
+                const location = data.features[0].geometry.coordinates
+                const longitude = location[0]
+                const latitude = location[1]
+
+                setRestauranteCoord([latitude, longitude])
+            } else {
+                throw new Error('Nenhum resultado encontrado para o endereço do restaurante.')
+            }
+        } catch (error) {
+            console.error('Erro ao buscar coordenadas do restaurante:', error)
+        }
+    }
+
+    async function calcularDistanciaEntreCoordenadas(restaurante: [number, number], cliente: [number, number]) {
+        const R = 6371
+        const dLat = (cliente[0] - restaurante[0]) * Math.PI / 180
+        const dLon = (cliente[1] - restaurante[1]) * Math.PI / 180
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(restaurante[0] * Math.PI / 180) * Math.cos(cliente[0] * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        return R * c
+    }
+
+    const handleEndereco = async () => {
         if (!modalEndereco || !modalNumero || !modalBairro || !cep) {
             setErrorEndereco('Por favor, complete todos os campos obrigatórios: Endereço, Número, Bairro e CEP.')
             return
         }
 
-        const parts = [
-            modalEndereco ? `${modalEndereco}` : '',
-            modalNumero ? `, ${modalNumero}` : '',
-            modalComplemento ? ` ${modalComplemento}` : '',
-            modalBairro ? ` - ${modalBairro}` : '',
-            cep ? ` - ${cep}` : '',
-        ]
+        const enderecoExibicao = [
+            modalEndereco,
+            modalNumero,
+            modalComplemento,
+            modalBairro,
+            cep
+        ].filter(Boolean).join(', ')
 
-        const mainAddress = parts.filter(Boolean).join('')
-        const enderecoFormatado = modalReferencia ? `${mainAddress} | ${modalReferencia}` : mainAddress
+        const mainSearchAddress = [
+            modalEndereco,
+            modalNumero,
+            modalBairro,
+            "",
+            cep,
+            "Portugal"
+        ].filter(Boolean).join(', ')
 
-        setEndereco(enderecoFormatado)
-        localStorage.setItem('endereco', enderecoFormatado)
+
+        try {
+            const response = await fetch(
+                `https://api.openrouteservice.org/geocode/search?api_key=${process.env.NEXT_PUBLIC_API_LOCATION_GET}&text=${encodeURIComponent(mainSearchAddress)}`
+            )
+
+            if (!response.ok) {
+                throw new Error('Erro ao buscar as coordenadas do endereço do cliente.')
+            }
+
+            const data = await response.json()
+
+            if (data.features && data.features.length > 0) {
+                const location = data.features[0].geometry.coordinates
+                const clienteCoord: [number, number] = [location[1], location[0]]
+
+                const country = data.features[0].properties.country
+                if (country !== 'Portugal') {
+                    throw new Error('Endereço localizado fora de Portugal, verifique o preenchimento.')
+                }
+
+                if (!restauranteCoord) {
+                    console.error('Coordenadas do restaurante ainda não carregadas.')
+                    alert('Não foi possível calcular a distância no momento. Tente novamente.')
+                    return
+                }
+
+                const distancia = await calcularDistanciaEntreCoordenadas(restauranteCoord, clienteCoord)
+
+                setDistanciaCliente(distancia)
+                localStorage.setItem('distanciaCliente', distancia.toString())
+
+                console.log(`Distância calculada: ${distancia.toFixed(2)} km`)
+            } else {
+                console.error('Endereço do cliente não encontrado para geocodificação.')
+                alert('Não foi possível localizar o endereço. Verifique os dados preenchidos.')
+            }
+        } catch (error) {
+            console.error('Erro ao calcular distância:', error)
+            alert('Erro ao calcular distância. Verifique seu endereço e CEP.')
+        }
+
+        const enderecoInfo = {
+            modalEndereco,
+            modalNumero,
+            modalComplemento,
+            modalBairro,
+            modalReferencia,
+            cep
+        }
+
+        localStorage.setItem('endereco', modalReferencia ? `${enderecoExibicao} | ${modalReferencia}` : enderecoExibicao)
+        localStorage.setItem('enderecoInfo', JSON.stringify(enderecoInfo))
+
+        setEndereco(modalReferencia ? `${enderecoExibicao} | ${modalReferencia}` : enderecoExibicao)
         setShowModal(false)
     }
 
@@ -112,15 +262,23 @@ export const useEndereco = () => {
         endereco,
         showModal,
         setShowModal,
+        abrirModalEndereco,
         addressError,
         setAddressError,
         errorEndereco,
         modalEndereco,
+        setModalEndereco,
         modalNumero,
+        setModalNumero,
         modalComplemento,
+        setModalComplemento,
         modalBairro,
+        setModalBairro,
         cep,
+        setCepValue,
         modalReferencia,
+        setModalReferencia,
+        distanciaCliente,
         handleInputChange,
         handleCepChange,
         handleEndereco,

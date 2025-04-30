@@ -5,6 +5,8 @@ export interface AtributoSelecionado {
     nome: string;
     valor: string;
     preco: number;
+    atributo_id: number;
+    valor_atributo_id: number;
 }
 
 export interface ProdutoCarrinho {
@@ -66,7 +68,20 @@ export const cartStore = create<CartState>()(
             },
         }),
         {
-            name: 'carrinho-storage', // nome no localStorage
+            name: 'carrinho-storage',
+
+            onRehydrateStorage: () => (state) => {
+                if (typeof window !== 'undefined') {
+                    const storedDate = localStorage.getItem('carrinho-storage-date');
+                    const today = new Date().toISOString().slice(0, 10);
+
+                    if (storedDate !== today) {
+                        state?.limparCarrinho();
+
+                        localStorage.setItem('carrinho-storage-date', today);
+                    }
+                }
+            },
         }
     )
 );

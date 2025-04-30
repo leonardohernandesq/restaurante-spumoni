@@ -18,10 +18,16 @@ export const PedidoRow = ({ pedido }: IPedidosData) => {
                 <div className='flex items-center gap-2'>
                     <strong>Pedido: {pedido.id}</strong>
                     <div className='h-0.5 w-3 rounded-md bg-purple-principal-900'></div>
-                    {pedido.created_at}
+                    {pedido.data_pedido && new Date(pedido.data_pedido).toLocaleString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}
                 </div>
-                <p>{pedido.client_name}</p>
-                <p>{pedido.client_phone}</p>
+                <p>{pedido.nome_cliente}</p>
+                <p>{pedido.telefone}</p>
             </div>
             <StatusColor status={pedido.status} />
         </button>

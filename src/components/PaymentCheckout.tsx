@@ -1,8 +1,13 @@
 import Image from 'next/image'
-import { useState } from 'react';
 
-export const PaymentCheckout = () => {
-    const [payment, setPayment] = useState('pix');
+interface IPayment {
+    payment: string,
+    setPayment: (value: string) => void,
+    troco: string | number,
+    setTroco: (value: string) => void,
+}
+
+export const PaymentCheckout = ({ payment, setPayment, troco, setTroco }: IPayment) => {
 
     return (
         <section className='flex flex-col border-b border-zinc-200 pb-4'>
@@ -30,15 +35,14 @@ export const PaymentCheckout = () => {
 
 
             </div>
-            {
-                payment === 'pix' && <p className='mt-3 text-center text-lg font-bold lg:text-left text-green-principal-700'>PIX: XXXXXXXXXXXXX/0001-XX</p>
-            }
+
+            {payment === 'pix' && <p className='mt-3 text-center text-lg font-bold lg:text-left text-green-principal-700'>PIX: XXXXXXXXXXXXX/0001-XX</p>}
+
             {
                 payment === 'dinheiro' && (
                     <>
                         <label htmlFor='troco' className='mt-5 mb-1'>PRECISA DE TROCO?</label>
-                        <input name='troco' id='troco' type="text" placeholder='' className='w-full p-2 border border-zinc-400 rounded-md' />
-
+                        <input value={troco} onChange={(e) => setTroco(e.target.value)} name='troco' id='troco' type="text" placeholder='' className='w-full p-2 border border-zinc-400 rounded-md' />
                     </>
                 )
             }
