@@ -25,6 +25,8 @@ interface ValorAtributo {
 interface Atributo {
     atributo_id: number;
     nome_atributo: string;
+    limite: number | null;
+    obrigatorio: boolean;
     valores_atributo: ValorAtributo[];
 }
 
@@ -47,6 +49,7 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
 
     const [quantidade, setQuantidade] = useState(1);
     const [observacoes, setObservacoes] = useState('');
+    const [atributosSelecionados, setAtributosSelecionados] = useState<Record<number, number[]>>({});
     const [produto, setProduto] = useState<Produto | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -75,35 +78,43 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
     const handleAddProduct = () => {
         if (!produto) return;
 
-        const atributosSelecionados: AtributoSelecionado[] = [];
+        // Verificação de atributos obrigatórios
+        for (const atributo of produto.atributos) {
+            if (atributo.obrigatorio) {
+                const selecionados = atributosSelecionados[atributo.atributo_id] || [];
+                if (selecionados.length === 0) {
+                    toast.error(`O atributo "${atributo.nome_atributo}" é obrigatório. Selecione ao menos uma opção.`);
+                    return;
+                }
+            }
+        }
 
+        setLoading(true);
+
+        const atributosFinal: AtributoSelecionado[] = [];
         let precoFinal = parseFloat(produto.preco);
 
         produto.atributos.forEach((atributo) => {
-            const radios = document.getElementsByName(atributo.nome_atributo);
-            const selected = Array.from(radios).find((el: any) => el.checked);
+            const selecionados = atributosSelecionados[atributo.atributo_id] || [];
 
-            if (selected) {
-                const valorSelecionado = atributo.valores_atributo.find(
-                    (v) => v.valor === selected.id
-                );
-
-                if (valorSelecionado) {
-                    atributosSelecionados.push({
+            selecionados.forEach((valorId) => {
+                const valor = atributo.valores_atributo.find((v) => v.valor_atributo_id === valorId);
+                if (valor) {
+                    atributosFinal.push({
                         nome: atributo.nome_atributo,
-                        valor: valorSelecionado.valor,
-                        preco: parseFloat(valorSelecionado.preco),
+                        valor: valor.valor,
+                        preco: parseFloat(valor.preco),
                         atributo_id: atributo.atributo_id,
-                        valor_atributo_id: valorSelecionado.valor_atributo_id
+                        valor_atributo_id: valor.valor_atributo_id
                     });
 
-                    if (valorSelecionado.preco_incluido) {
-                        precoFinal = parseFloat(valorSelecionado.preco);
+                    if (valor.preco_incluido) {
+                        precoFinal = parseFloat(valor.preco);
                     } else {
-                        precoFinal += parseFloat(valorSelecionado.preco);
+                        precoFinal += parseFloat(valor.preco);
                     }
                 }
-            }
+            });
         });
 
         cartStore.getState().adicionarProduto({
@@ -114,12 +125,14 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
             preco: precoFinal,
             quantidade,
             observacoes,
-            atributos: atributosSelecionados,
+            atributos: atributosFinal
         });
 
+        setLoading(false);
         toast.success("Produto adicionado ao carrinho");
         router.push('/');
     };
+
 
     if (loading) {
         return (
@@ -142,7 +155,30 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
     }
 
 
+    const handleChangeCheckbox = (atributoId: number, valorId: number, limite: number | null) => {
+        const atuais = atributosSelecionados[atributoId] || [];
+        const jaSelecionado = atuais.includes(valorId);
 
+        if (!jaSelecionado && limite && atuais.length >= limite) {
+            toast.error(`Você só pode selecionar até ${limite} ${limite == 1 ? 'opção' : 'opções'} para este atributo.`);
+            return;
+        }
+
+        setAtributosSelecionados((prev) => {
+            const atuaisInterno = prev[atributoId] || [];
+            if (atuaisInterno.includes(valorId)) {
+                return {
+                    ...prev,
+                    [atributoId]: atuaisInterno.filter((id) => id !== valorId),
+                };
+            } else {
+                return {
+                    ...prev,
+                    [atributoId]: [...atuaisInterno, valorId],
+                };
+            }
+        });
+    };
 
     return (
         <Container styleRow="bg-zinc-50">
@@ -165,15 +201,29 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
                 <div>
                     {produto.atributos.map((atributo) => (
                         <div key={atributo.nome_atributo} className="py-5 flex flex-col items-start">
-                            <div className="bg-green-principal-500 text-white py-1 px-3 rounded-full mb-3">{atributo.nome_atributo}</div>
+                            <div className="mb-3">
+                                <p className="text-xs text-red-600 m-1">
+                                    {atributo.obrigatorio ? 'Obrigatório' : 'Opcional'}
+                                    {atributo.limite ? ` • Limite: ${atributo.limite}` : ''}
+                                </p>
+                                <div className="bg-green-principal-500 text-white py-1 px-3 rounded-full w-fit">
+                                    {atributo.nome_atributo}
+                                </div>
+                            </div>
                             {atributo.valores_atributo.map((atributo_valor) => (
-                                <label key={atributo_valor.valor} htmlFor={atributo_valor.valor} className="py-2 border-b border-zinc-200 w-full flex justify-between items-center">
+                                <label key={atributo_valor.valor} htmlFor={`${atributo.atributo_id}_${atributo_valor.valor_atributo_id}`} className="py-2 border-b border-zinc-200 w-full flex justify-between items-center">
                                     <div className="flex flex-col">
                                         <p className="font-medium">{atributo_valor.valor}</p>
                                         <span>{!atributo_valor.preco_incluido && '+'} R$ {atributo_valor.preco}</span>
                                     </div>
                                     <div>
-                                        <input type="radio" name={atributo.nome_atributo} id={atributo_valor.valor} />
+                                        <input
+                                            type="checkbox"
+                                            name={atributo.nome_atributo}
+                                            id={`${atributo.atributo_id}_${atributo_valor.valor_atributo_id}`}
+                                            checked={atributosSelecionados[atributo.atributo_id]?.includes(atributo_valor.valor_atributo_id) || false}
+                                            onChange={() => handleChangeCheckbox(atributo.atributo_id, atributo_valor.valor_atributo_id, atributo.limite)}
+                                        />
                                     </div>
                                 </label>
                             ))}
@@ -193,7 +243,7 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
 
             <section className='bg-white shadow-2xl fixed bottom-0 left-2/4 -translate-x-2/4 max-w-full w-full px-7 py-5 gap-4 flex flex-col'>
                 <ButtonCart onClick={() => handleAddProduct()}>
-                    Adicionar
+                    {loading ? <LoadingIcon color="text-white" /> : 'Adicionar'}
                     <p className="flex items-center gap-2">{totalItens} <FiShoppingCart size={14} /></p>
                 </ButtonCart>
             </section>

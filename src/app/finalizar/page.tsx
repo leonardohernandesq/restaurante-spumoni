@@ -30,7 +30,6 @@ const Finalizar = () => {
 
     const { insertPedido } = pedidoStore();
     const { produtos, limparCarrinho } = cartStore()
-    const carrinho = cartStore.getState().produtos;
 
     const [delivery, setDelivery] = useState<'delivery' | 'takeaway'>('delivery');
     const [entrega, setEntrega] = useState<'booking' | 'now'>('now');
@@ -41,7 +40,7 @@ const Finalizar = () => {
     const [troco, setTroco] = useState('');
     const [nf, setNf] = useState('');
 
-    const produtosParaApi = carrinho.map((produto) => ({
+    const produtosParaApi = produtos.map((produto) => ({
         produto_id: produto.id,
         quantidade: produto.quantidade,
         observacao: produto.observacoes || '',
@@ -51,10 +50,11 @@ const Finalizar = () => {
         })),
     }));
 
+
     useEffect(() => {
         if (produtos.length <= 0) {
             toast.error('Você não possui um produto!')
-
+            limparCarrinho();
             router.push('/');
         }
     }, [])
@@ -158,11 +158,11 @@ const Finalizar = () => {
 
 
         try {
-            await insertPedido(data);
+            const pedido_id = await insertPedido(data);
             resetInputs();
             limparCarrinho();
             toast.success('Pedido enviado com sucesso!');
-            router.push('/obrigado');
+            router.push(`/obrigado?pedido_id=${pedido_id}`);
         } catch (error) {
             return toast.error('Erro ao enviar o pedido, tente novamente!');
         }

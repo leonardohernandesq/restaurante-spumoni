@@ -41,8 +41,8 @@ export const PaymentCheckout = ({ payment, setPayment, troco, setTroco }: IPayme
             {
                 payment === 'dinheiro' && (
                     <>
-                        <label htmlFor='troco' className='mt-5 mb-1'>PRECISA DE TROCO?</label>
-                        <input value={troco} onChange={(e) => setTroco(e.target.value)} name='troco' id='troco' type="text" placeholder='' className='w-full p-2 border border-zinc-400 rounded-md' />
+                        <label htmlFor='troco' className='mt-5 mb-1'>PRECISA DE TROCO? <span></span></label>
+                        <input value={troco} onChange={(e) => setTroco(e.target.value)} name='troco' id='troco' placeholder='Insira o valor' type='number' className='w-full p-2 border border-zinc-400 rounded-md' />
                     </>
                 )
             }

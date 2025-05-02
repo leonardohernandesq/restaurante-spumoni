@@ -1,5 +1,5 @@
 import { api } from '@/config/api';
-import { IPedido, IPedidosData } from '@/interfaces/IPedidosData';
+import { IPedido } from '@/interfaces/IPedidosData';
 
 
 export const fetchPedidosAPI = async (after?: string): Promise<IPedido[]> => {
@@ -26,3 +26,14 @@ export const insertPedidoApi = async (data: IPedido): Promise<IPedido> => {
     throw error; // importante propagar o erro
   }
 };
+
+export const fetchPedidoById = async (id: number) => {
+  try {
+    const response = await api.get(`/order?id=${id}`)
+
+    return response.data;
+  } catch (error) {
+    console.error('❌ Erro ao carregar pedido:', error);
+    throw error; // importante propagar o erro
+  }
+}

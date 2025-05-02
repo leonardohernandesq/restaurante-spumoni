@@ -1,7 +1,16 @@
 import { useMemo } from 'react'
 
+type ProdutoCarrinho = {
+    preco?: number
+    quantidade: number
+    atributos: {
+        preco: number
+        preco_incluido?: boolean
+    }[]
+}
+
 export const useResumoPedido = (
-    produtos: { preco: number; quantidade: number }[],
+    produtos: ProdutoCarrinho[],
     distancia: number | null,
     delivery: 'delivery' | 'takeaway'
 ) => {
@@ -20,8 +29,25 @@ export const useResumoPedido = (
         return 0
     }, [distancia, delivery])
 
+    const calcularPrecoProduto = (produto: ProdutoCarrinho) => {
+        let precoBase = 0;
+
+        for (const attr of produto.atributos || []) {
+            if (attr.preco_incluido) {
+                precoBase = attr.preco;
+            } else {
+                precoBase += attr.preco;
+            }
+        }
+
+        return precoBase * produto.quantidade;
+    };
+
+
     const subtotal = useMemo(() => {
-        return produtos.reduce((acc, item) => acc + item.preco * item.quantidade, 0).toFixed(2)
+        return produtos
+            .reduce((acc, produto) => acc + calcularPrecoProduto(produto), 0)
+            .toFixed(2);
     }, [produtos])
 
     const valorFinal = useMemo(() => {
