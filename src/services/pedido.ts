@@ -37,3 +37,14 @@ export const fetchPedidoById = async (id: number) => {
     throw error; // importante propagar o erro
   }
 }
+
+export const changeStatusApi = async ({ id, status }: { id: number, status: number }) => {
+  try {
+    const response = await api.put('/order/status', { id, status });
+
+    return response.data;
+  } catch (error) {
+    console.error('❌ Erro ao alterar status do pedido:', error);
+    throw error;
+  }
+}

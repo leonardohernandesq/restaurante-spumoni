@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { fetchPedidoById, fetchPedidosAPI, insertPedidoApi } from '@/services/pedido';
+import { changeStatusApi, fetchPedidoById, fetchPedidosAPI, insertPedidoApi } from '@/services/pedido';
 import { IPedido, IPedidoCompleto } from '@/interfaces/IPedidosData';
 
 interface PedidoStore {
@@ -9,7 +9,9 @@ interface PedidoStore {
   setPedidos: (pedidos: IPedido[]) => void;
   insertPedido: (data: IPedido) => Promise<number>;
   getPedidoById: (pedido_id: number) => void;
+  changeStatus: ({ id, status }: { id: number, status: number }) => Promise<void>;
 }
+
 
 export const pedidoStore = create<PedidoStore>((set, get) => ({
   pedido: null,
@@ -42,5 +44,23 @@ export const pedidoStore = create<PedidoStore>((set, get) => ({
     } catch (error) {
 
     }
+  },
+  changeStatus: async ({ id, status }: { id: number, status: number }) => {
+    try {
+      const data = await changeStatusApi({ id, status });
+
+      set((state) => ({
+        pedidos: state.pedidos.map(pedido =>
+          pedido.pedido_id === id ? { ...pedido, status: data.status } : pedido
+        ),
+      }));
+
+      return;
+    } catch (error) {
+      console.error('❌ Erro ao alterar status na store:', error);
+      throw error;
+    }
   }
+
+
 }));

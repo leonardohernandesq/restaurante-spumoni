@@ -6,10 +6,10 @@ export interface IProductAll {
 }
 
 export interface IProduct {
-    id: string,
-    name: string,
-    slug: string,
-    description: string,
-    image_url: string,
-    price: string
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    image_url: string;
+    price: string | number;
 }

@@ -14,7 +14,7 @@ import { LoadingIcon } from '@/components/LoadingIcon'
 const Login = () => {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
-    const { login, loading, error } = userStore();
+    const { login, loading } = userStore();
     const router = useRouter();
 
     const handleLogin = async () => {

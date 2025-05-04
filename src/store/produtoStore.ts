@@ -1,4 +1,3 @@
-import { getAllProducts } from '@/services/produto';
 import { create } from 'zustand';
 
 export type TProduct = {
