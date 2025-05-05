@@ -1,7 +1,11 @@
 import { Container } from "@/components/Container"
 import { HeaderPages } from "@/components/HeaderPages"
+import { ICategory } from "@/interfaces/ICategory";
+import { getAllCategory } from "@/services/category"
 
-const adicionarProdutos = () => {
+const adicionarProdutos = async ({ slug }: { slug: string | null }) => {
+    const categories = await getAllCategory();
+    console.log(categories);
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
             <HeaderPages title="Voltar ao Gestor de Pedidos" />
@@ -17,13 +21,35 @@ const adicionarProdutos = () => {
                 <label className="mt-3" htmlFor="productTitle">Título do produto</label>
                 <input className="bg-zinc-200 border border-zinc-300 py-1.5 px-3 outline-0" type="text" name="productTitle" id="productTitle" placeholder="Digite aqui o título do produto" />
                 <label className="mt-3" htmlFor="productImage">Imagem do Produto</label>
-                <input className="bg-zinc-200 border border-zinc-300 py-1.5 px-3" type="file" name="productImage" id="productImage" />
-                <label className="mt-3" htmlFor="productDescription">Descrição do Produto</label>
+                <label htmlFor="File" className="block rounded border w-fit cursor-pointer border-gray-300 p-4 text-gray-900 shadow-sm sm:p-6">
+                    <div className="flex items-center justify-center gap-4 w-fit">
+                        <span className="font-medium"> Foto do Produto </span>
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="size-6"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M7.5 7.5h-.75A2.25 2.25 0 0 0 4.5 9.75v7.5a2.25 2.25 0 0 0 2.25 2.25h7.5a2.25 2.25 0 0 0 2.25-2.25v-7.5a2.25 2.25 0 0 0-2.25-2.25h-.75m0-3-3-3m0 0-3 3m3-3v11.25m6-2.25h.75a2.25 2.25 0 0 1 2.25 2.25v7.5a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-.75"
+                            />
+                        </svg>
+                    </div>
+
+                    <input multiple type="file" id="File" className="sr-only" />
+                </label>                <label className="mt-3" htmlFor="productDescription">Descrição do Produto</label>
                 <textarea className="bg-zinc-200 border border-zinc-300 py-1.5 px-3 outline-0" name="productDescription" id="productDescription" placeholder="Digite aqui a descrição do produto" />
                 <label className="mt-3" htmlFor="productCategory">Categoria</label>
                 <select className="bg-zinc-200 border border-zinc-300 py-1.5 px-3 outline-0" name="productCategory" id="productCategory">
-                    <option>Opção 1</option>
-                    <option>Opção 2</option>
+                    <option value={''} disabled>-- Selecione uma categoria --</option>
+                    {categories.map((category: ICategory) => (
+                        <option key={category.id}>{category.nome}</option>
+                    ))}
                 </select>
                 <label className="mt-3" htmlFor="productValue">Valor</label>
                 <input type="text" inputMode="numeric" className="bg-zinc-200 border border-zinc-300 py-1.5 px-3 outline-0" name="productValue" id="productValue" placeholder="Ex: 49.90" />

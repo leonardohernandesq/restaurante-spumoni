@@ -12,7 +12,7 @@ export const CategoryScroll = ({ categories }: IPropsCategory) => {
     }
 
     return (
-        <div className="block overflow-x-auto pt-3 pb-4 px-2 bg-zinc-100 mt-[-20] md:mt-0 z-50 relative rounded-t-2xl">
+        <div className="block overflow-x-auto pt-3 pb-4 px-2 bg-zinc-100 mt-[-20] md:mt-0 z-30 relative rounded-t-2xl">
             <div className='xl:max-w-7xl xl:mx-auto'>
                 <div className="flex gap-4 w-max">
                     {categories.map((category, index) => (

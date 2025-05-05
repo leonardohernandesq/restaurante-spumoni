@@ -1,14 +1,11 @@
-// app/admin/produtos/page.tsx
-
 import { Container } from "@/components/Container";
-import { HeaderPages } from "@/components/HeaderPages";
 import { CategoryScroll } from "@/components/CategoryScroll";
 import { ListProductsItem } from "@/components/ListProductsItem";
 import { getAllCategory } from "@/services/category";
 import { getAllProducts } from "@/services/produto";
 import { IProduct } from "@/interfaces/IProductAll";
+import { AdminMenu } from "@/components/AdminMenu";
 
-// Interface atualizada
 interface ICategoryWithProducts {
     id: number;
     category: string;
@@ -20,11 +17,13 @@ interface ICategoryWithProducts {
 const listarProdutos = async () => {
     const categories = await getAllCategory();
     const productsAll: ICategoryWithProducts[] = await getAllProducts();
-    console.log(productsAll)
 
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
-            <HeaderPages title="Voltar ao Gestor de Pedidos" />
+            <div className="py-4 px-2">
+                <AdminMenu title="Gestor de Pedidos" />
+            </div>
+
             <CategoryScroll categories={categories} />
 
             <section className="mt-6">

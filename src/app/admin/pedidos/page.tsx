@@ -2,17 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BiExit, BiListUl, BiPlus } from 'react-icons/bi';
+import { BiListUl, BiPlus } from 'react-icons/bi';
 
 import { IPedido } from '@/interfaces/IPedidosData';
 import { PedidoRow } from '@/components/PedidoRow';
-import { userStore } from '@/store/userStore';
 import { fetchPedidosAPI } from '@/services/pedido';
 import { useStatusColor } from '@/hooks/useStatusColor';
 import { Container } from '@/components/Container';
+import { AdminMenu } from '@/components/AdminMenu';
 
 const Pedidos = () => {
-    const { logout, clearUser } = userStore();
     const router = useRouter();
 
     const [pedidos, setPedidos] = useState<IPedido[]>([]);
@@ -107,33 +106,13 @@ const Pedidos = () => {
         return matchesFiltro && matchesStatus;
     });
 
-    const handleLogout = () => {
-        logout();
-        clearUser();
-        router.push('/admin');
-    };
 
     return (
         <Container styleRow='bg-zinc-200'>
             <main className="p-5 min-h-screen h-full">
                 <section className="p-5 bg-white rounded-2xl shadow-2xl">
-                    <div className="flex justify-between items-center">
-                        <h1 className="text-2xl font-bold text-purple-principal-700">Gestor de Pedidos</h1>
-                        <button onClick={handleLogout}>
-                            <BiExit size={25} className="text-red-800 cursor-pointer" />
-                        </button>
-                    </div>
+                    <AdminMenu title='Gestor de Pedidos' />
 
-                    <div className="flex justify-between items-center my-2">
-                        <button onClick={() => router.push('/admin/adicionarprodutos')} className="flex items-center gap-1 text-lg cursor-pointer">
-                            <BiPlus />
-                            Adicionar Produto
-                        </button>
-                        <button onClick={() => router.push('/admin/listarprodutos')} className="flex items-center gap-1 text-lg cursor-pointer">
-                            <BiListUl />
-                            Lista de Produtos
-                        </button>
-                    </div>
 
                     <input
                         className="w-full border bg-zinc-100 border-zinc-200 p-2 rounded-lg my-4"
