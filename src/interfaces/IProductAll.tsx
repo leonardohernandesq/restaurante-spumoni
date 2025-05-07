@@ -12,4 +12,6 @@ export interface IProduct {
     description: string;
     image_url: string;
     price: string | number;
+    categoria_id: number;
+    ativo: number;
 }

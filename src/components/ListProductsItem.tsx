@@ -1,22 +1,27 @@
 'use client'
 
 import { IProduct } from '@/interfaces/IProductAll';
+import { productStore } from '@/store/produtoStore';
 import Image from 'next/image';
 import { FaPencil, FaX } from 'react-icons/fa6';
+import { toast } from 'react-toastify';
+
 
 interface ListProductsItemProps {
     product: IProduct;
 }
 
 export const ListProductsItem = ({ product }: ListProductsItemProps) => {
-    console.log('Produto recebido:', product);
+    const { deleteProductApi, loading } = productStore();
+
 
     const handleEdit = () => {
         alert(`Editando produto: ${product.name}`);
     }
 
-    const handleDelete = () => {
-        alert(`Deletando produto: ${product.name}`);
+    const handleDelete = async (id: string | number) => {
+        await deleteProductApi(id);
+        toast.success(`Produto ${product.name} foi eliminado com sucesso!`);
     }
 
     if (!product) {
@@ -47,7 +52,7 @@ export const ListProductsItem = ({ product }: ListProductsItemProps) => {
                 <button onClick={handleEdit} className='text-yellow-600 p-2 cursor-pointer'>
                     <FaPencil />
                 </button>
-                <button onClick={handleDelete} className='text-red-600 p-2 cursor-pointer'>
+                <button onClick={() => handleDelete(product.id)} className='text-red-600 p-2 cursor-pointer'>
                     <FaX />
                 </button>
             </div>

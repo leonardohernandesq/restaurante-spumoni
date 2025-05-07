@@ -1,22 +1,27 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Container } from "@/components/Container";
 import { CategoryScroll } from "@/components/CategoryScroll";
 import { ListProductsItem } from "@/components/ListProductsItem";
 import { getAllCategory } from "@/services/category";
-import { getAllProducts } from "@/services/produto";
-import { IProduct } from "@/interfaces/IProductAll";
 import { AdminMenu } from "@/components/AdminMenu";
+import { ICategory } from "@/interfaces/ICategory";
+import { productStore } from "@/store/produtoStore";
 
-interface ICategoryWithProducts {
-    id: number;
-    category: string;
-    slug: string;
-    descriptionCategory: string;
-    products: IProduct[];
-}
+const ListarProdutos = () => {
+    const { products, fetchProducts } = productStore();
+    const [categories, setCategories] = useState<ICategory[]>([]);
 
-const listarProdutos = async () => {
-    const categories = await getAllCategory();
-    const productsAll: ICategoryWithProducts[] = await getAllProducts();
+    useEffect(() => {
+        const loadData = async () => {
+            const cats = await getAllCategory();
+            setCategories(cats);
+            await fetchProducts();
+        };
+
+        loadData();
+    }, []);
 
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
@@ -27,21 +32,28 @@ const listarProdutos = async () => {
             <CategoryScroll categories={categories} />
 
             <section className="mt-6">
-                {productsAll.map((categoria) => (
-                    <div id={categoria.slug} key={categoria.id} className="mb-6 scroll-mt-20">
-                        <h2 className="text-xl font-semibold mb-3">{categoria.category}</h2>
-                        {categoria.products.length > 0 ? (
-                            categoria.products.map((product) => (
-                                <ListProductsItem key={product.id} product={product} />
-                            ))
-                        ) : (
-                            <p className="text-zinc-500 text-sm">Nenhum produto nesta categoria.</p>
-                        )}
-                    </div>
-                ))}
+                {categories.map((categoria) => {
+                    const produtosDaCategoria = products.filter(
+                        (p) => p.categoria_id === categoria.id
+                    );
+
+                    return (
+                        <div id={categoria.slug} key={categoria.id} className="mb-6 scroll-mt-20">
+                            <h2 className="text-xl font-semibold mb-3">{categoria.nome}</h2>
+
+                            {produtosDaCategoria.length > 0 ? (
+                                produtosDaCategoria.map((product) => (
+                                    <ListProductsItem key={product.id} product={product} />
+                                ))
+                            ) : (
+                                <p className="text-zinc-500 text-sm">Nenhum produto nesta categoria.</p>
+                            )}
+                        </div>
+                    );
+                })}
             </section>
         </Container>
     );
 };
 
-export default listarProdutos;
+export default ListarProdutos;

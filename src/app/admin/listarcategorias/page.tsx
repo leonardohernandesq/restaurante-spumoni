@@ -7,7 +7,6 @@ import { FaPencil, FaTrash } from "react-icons/fa6";
 const listarCategorias = async () => {
     const categories = await getAllCategory();
 
-    console.log(categories);
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
             <div className="py-4">
