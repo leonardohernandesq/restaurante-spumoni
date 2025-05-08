@@ -6,12 +6,25 @@ export interface IProductAll {
 }
 
 export interface IProduct {
+    image_url: any;
     id: number;
     name: string;
     slug: string;
-    description: string;
-    image_url: string;
-    price: string | number;
+    descricao?: string;
+    description?: string;
+    image: string;
+    preco?: string | number;
+    price?: string | number;
     categoria_id: number;
-    ativo: number;
+    ativo: boolean;
+    atributos: {
+        nome_atributo: string;
+        valores_atributo: {
+            valor: string;
+            preco: string;
+            preco_incluido: boolean;
+        }[];
+    }[];
+    dias_disponiveis: number[];
 }
+

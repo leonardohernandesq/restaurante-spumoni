@@ -15,8 +15,9 @@ export const useGenerateMetadata = () =>
   );
 
 export default async function Home() {
+  const getAllProduct = 0;
   const categories = await getAllCategory();
-  const productsAll = await getAllProducts();
+  const productsAll = await getAllProducts(getAllProduct);
 
   return (
     <main className="bg-zinc-100">

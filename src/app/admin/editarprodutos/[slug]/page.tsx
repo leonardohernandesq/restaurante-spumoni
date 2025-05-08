@@ -1,13 +1,15 @@
 'use client';
 
+import { useRouter, useParams } from "next/navigation";
 import { Container } from "@/components/Container";
 import { HeaderPages } from "@/components/HeaderPages";
 import { PreviewImage } from "@/components/PreviewImage";
 import { useProductForm } from "@/hooks/useProductForm";
-import { useSearchParams } from "next/navigation";
 
-export default function ProdutoPage() {
-    const slugParam = useSearchParams().get("slug") || undefined;
+export default function EditarProdutoPage() {
+    const router = useRouter();
+    const params = useParams();
+    const slug = params.slug as string;
 
     const {
         formData,
@@ -15,7 +17,7 @@ export default function ProdutoPage() {
         categories,
         handleSubmit,
         loading
-    } = useProductForm(slugParam);
+    } = useProductForm(slug);
 
     const handleChange = (field: string, value: any) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
@@ -77,7 +79,12 @@ export default function ProdutoPage() {
                 <input value={formData.slug} onChange={(e) => handleChange("slug", e.target.value)} className="bg-zinc-200 border border-zinc-300 py-1.5 px-3 outline-0" placeholder="Digite aqui o slug do produto" />
 
                 <label className="mt-3">Imagem do Produto</label>
-                <PreviewImage onFileChange={(file) => handleChange("image", file)} />
+                <PreviewImage
+                    onFileChange={(file) => setFormData(prev => ({ ...prev, image: file }))}
+                    initialImageUrl={formData.imageUrl}
+                />
+
+
 
                 <label className="mt-3">Descrição do Produto</label>
                 <textarea value={formData.descricao} onChange={(e) => handleChange("descricao", e.target.value)} className="bg-zinc-200 border border-zinc-300 py-1.5 px-3 outline-0" placeholder="Digite aqui a descrição do produto" />
@@ -157,7 +164,7 @@ export default function ProdutoPage() {
                     onClick={handleSubmit}
                     className="text-2xl font-medium text-white py-2 rounded-xl mt-4 bg-purple-principal-700 cursor-pointer"
                 >
-                    {loading ? "Salvando..." : slugParam ? "Atualizar" : "Cadastrar"}
+                    {loading ? "Salvando..." : "Atualizar"}
                 </button>
             </section>
         </Container>

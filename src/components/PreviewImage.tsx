@@ -1,20 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type PreviewImageProps = {
-    onFileChange: (file: File) => void; // 👈 recebendo a prop
+    onFileChange: (file: File) => void;
+    initialImageUrl?: string | null; // 👈 nova prop opcional
 };
 
-export function PreviewImage({ onFileChange }: PreviewImageProps) {
+export function PreviewImage({ onFileChange, initialImageUrl }: PreviewImageProps) {
     const [preview, setPreview] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (initialImageUrl) {
+            setPreview(initialImageUrl);
+        }
+    }, [initialImageUrl]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        console.log(file);
         if (file && file.type.startsWith("image/")) {
-            setPreview(URL.createObjectURL(file));
-            onFileChange(file); // 👈 enviando o arquivo para o componente pai
+            const imagePreview = URL.createObjectURL(file);
+            setPreview(imagePreview);
+            onFileChange(file);
         }
     };
 
@@ -29,6 +36,7 @@ export function PreviewImage({ onFileChange }: PreviewImageProps) {
                     />
                 </div>
             )}
+
             <label
                 htmlFor="File"
                 className="block rounded border w-fit cursor-pointer border-gray-300 p-4 text-gray-900 shadow-sm sm:p-6"

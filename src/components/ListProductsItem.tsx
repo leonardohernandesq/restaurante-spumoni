@@ -3,6 +3,7 @@
 import { IProduct } from '@/interfaces/IProductAll';
 import { productStore } from '@/store/produtoStore';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { FaPencil, FaX } from 'react-icons/fa6';
 import { toast } from 'react-toastify';
 
@@ -13,10 +14,10 @@ interface ListProductsItemProps {
 
 export const ListProductsItem = ({ product }: ListProductsItemProps) => {
     const { deleteProductApi, loading } = productStore();
-
+    const router = useRouter();
 
     const handleEdit = () => {
-        alert(`Editando produto: ${product.name}`);
+        router.push(`/admin/editarprodutos/${product.slug}`)
     }
 
     const handleDelete = async (id: string | number) => {
@@ -42,7 +43,7 @@ export const ListProductsItem = ({ product }: ListProductsItemProps) => {
             <div className='w-full'>
                 <h2 className='text-lg font-medium'>{product.name}</h2>
                 <p className='text-sm/4.5 text-zinc-700 mt-2 mb-1'>
-                    {product.description || 'Sem descrição.'}
+                    {product.description}
                 </p>
                 <p className='font-medium'>
                     R$ {Number(product.price).toFixed(2)}

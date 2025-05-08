@@ -1,8 +1,8 @@
 import { api } from "@/config/api";
 import { IProduct } from "@/interfaces/IProductAll";
 
-export async function getAllProducts() {
-    const res = await api.get('/products');
+export async function getAllProducts(all: number | null) {
+    const res = await api.get(`/products${all ? `?all=${all}` : ''}`);
 
     return res.data;
 }
@@ -29,3 +29,18 @@ export async function deleteProduct({ id }: { id: string | number }) {
 
     return res.data;
 }
+
+export const updateProduct = async (slug: string, formData: FormData) => {
+    try {
+        const response = await api.put(`/products/edit`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error('Erro ao atualizar produto:', error);
+        throw new Error('Erro ao atualizar o produto');
+    }
+};

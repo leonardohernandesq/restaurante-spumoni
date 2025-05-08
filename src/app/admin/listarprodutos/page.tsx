@@ -15,9 +15,10 @@ const ListarProdutos = () => {
 
     useEffect(() => {
         const loadData = async () => {
+            const getAllProduct = 1;
             const cats = await getAllCategory();
             setCategories(cats);
-            await fetchProducts();
+            await fetchProducts(getAllProduct);
         };
 
         loadData();
