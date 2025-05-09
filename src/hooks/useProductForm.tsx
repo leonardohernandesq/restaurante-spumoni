@@ -3,9 +3,12 @@ import { getAllCategory } from "@/services/category";
 import { productStore } from "@/store/produtoStore";
 import { ICategory } from "@/interfaces/ICategory";
 import { IProductFormData, IAtributo, IValorAtributo } from "@/interfaces/IProductFormData";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export const useProductForm = (slugParam?: string) => {
     const { addNewProduct, updateProduct, getProductBySlug, loading } = productStore();
+    const router = useRouter();
 
     const [formData, setFormData] = useState<IProductFormData>({
         nome: '',
@@ -113,6 +116,9 @@ export const useProductForm = (slugParam?: string) => {
         } else {
             await addNewProduct(form);
         }
+
+        toast.success(`Produto ${slugParam ? 'editado' : 'cadastrado'} com sucesso!`)
+        router.push('/admin/listarprodutos')
     };
 
     return {

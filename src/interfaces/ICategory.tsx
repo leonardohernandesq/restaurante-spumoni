@@ -3,7 +3,7 @@ export interface ICategory {
     nome: string;
     slug: string;
     descricao: string;
-    total_produtos: number;
+    total_produtos?: number;
 }
 
 export interface IPropsCategory {

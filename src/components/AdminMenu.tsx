@@ -20,9 +20,10 @@ export const AdminMenu = ({ title }: { title: string }) => {
 
     const menuSections = [
         {
-            title: "Pedidos",
+            title: "Loja",
             links: [
                 { label: "Lista de pedidos", href: "/admin/pedidos" },
+                { label: "Configuração da loja", href: "/admin/config" },
             ],
         },
         {

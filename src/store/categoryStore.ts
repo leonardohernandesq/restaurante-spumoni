@@ -6,7 +6,6 @@ export type TCategory = {
     nome: string;
     slug: string;
     descricao: string;
-    ativo: number | null;
 }
 
 export type TcategoryStore = {
@@ -14,6 +13,7 @@ export type TcategoryStore = {
     error: true | null;
     category: TCategory | null;
     categories: TCategory[];
+    create: ({ nome, slug, descricao }: TCategory) => Promise<void>;
     getAll: () => Promise<void>;
 
 }

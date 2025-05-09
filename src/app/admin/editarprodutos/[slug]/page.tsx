@@ -76,7 +76,7 @@ export default function EditarProdutoPage() {
                 <input value={formData.nome} onChange={(e) => handleChange("nome", e.target.value)} className="bg-zinc-200 border border-zinc-300 py-1.5 px-3 outline-0" placeholder="Digite aqui o título do produto" />
 
                 <label className="mt-3">Slug do produto</label>
-                <input value={formData.slug} onChange={(e) => handleChange("slug", e.target.value)} className="bg-zinc-200 border border-zinc-300 py-1.5 px-3 outline-0" placeholder="Digite aqui o slug do produto" />
+                <input disabled value={formData.slug} onChange={(e) => handleChange("slug", e.target.value)} className="bg-zinc-200 border border-zinc-300 py-1.5 px-3 outline-0 disabled:opacity-50 disabled:cursor-no-drop" placeholder="Digite aqui o slug do produto" />
 
                 <label className="mt-3">Imagem do Produto</label>
                 <PreviewImage
