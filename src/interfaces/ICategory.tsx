@@ -1,8 +1,8 @@
 export interface ICategory {
     id: number;
-    nome: string;
-    slug: string;
-    descricao: string;
+    nome?: string;
+    slug?: string;
+    descricao?: string;
     total_produtos?: number;
 }
 

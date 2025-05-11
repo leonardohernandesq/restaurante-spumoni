@@ -1,11 +1,33 @@
+'use client';
+
 import { Container } from "@/components/Container";
-import { getAllCategory } from "@/services/category";
 import { AdminMenu } from "@/components/AdminMenu";
 import { ICategory } from "@/interfaces/ICategory";
 import { FaPencil, FaTrash } from "react-icons/fa6";
+import { categoryStore, TCategory } from "@/store/categoryStore";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
-const listarCategorias = async () => {
-    const categories = await getAllCategory();
+const listarCategorias = () => {
+    const { delete: deleteCategory, categories, loading, getAll } = categoryStore();
+    const router = useRouter();
+
+    useEffect(() => {
+        getAll();
+    }, []);
+
+    console.log(categories);
+
+    const handleEdit = (id: number) => {
+        router.push(`/admin/editarcategorias/${id}`);
+    }
+
+    const handleDelete = (id: number) => {
+        deleteCategory({ id });
+
+        toast.success('Categoria deletada com sucesso ')
+    }
 
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
@@ -24,10 +46,10 @@ const listarCategorias = async () => {
                             <p>{item.descricao}</p>
                         </div>
                         <div className='flex items-center gap-3 flex-1 pl-6'>
-                            <button className='text-yellow-600 p-2 cursor-pointer'>
+                            <button className='text-yellow-600 p-2 cursor-pointer' onClick={() => handleEdit(item.id)}>
                                 <FaPencil />
                             </button>
-                            <button className='text-red-600 p-2 cursor-pointer'>
+                            <button className='text-red-600 p-2 cursor-pointer' onClick={() => handleDelete(item.id)}>
                                 <FaTrash />
                             </button>
                         </div>
