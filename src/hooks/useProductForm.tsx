@@ -11,6 +11,7 @@ export const useProductForm = (slugParam?: string) => {
     const router = useRouter();
 
     const [formData, setFormData] = useState<IProductFormData>({
+        id: 0,
         nome: '',
         slug: '',
         descricao: '',
@@ -21,7 +22,11 @@ export const useProductForm = (slugParam?: string) => {
         imageUrl: null,
         atributos: [{
             nomes_atributos: '',
-            valores_atributo: [{ valor: '', preco: '', preco_incluido: false }]
+            limite: null,
+            obrigatorio: false,
+            valores_atributo: [
+                { valor: '', preco: '', preco_incluido: false }
+            ]
         }],
         diasDisponiveis: Array(7).fill(false),
     });
@@ -40,6 +45,8 @@ export const useProductForm = (slugParam?: string) => {
                 const atributosFormatados: IAtributo[] = Array.isArray(data.atributos)
                     ? data.atributos.map((atributo: any): IAtributo => ({
                         nomes_atributos: atributo.nome_atributo ?? '',
+                        limite: atributo.limite ?? null,
+                        obrigatorio: !!atributo.obrigatorio,
                         valores_atributo: Array.isArray(atributo.valores_atributo)
                             ? atributo.valores_atributo.map((valor: any): IValorAtributo => ({
                                 valor: valor.valor ?? '',
@@ -58,6 +65,7 @@ export const useProductForm = (slugParam?: string) => {
                 }
 
                 setFormData({
+                    id: data.id,
                     nome: data.name ?? '',
                     slug: data.slug ?? '',
                     descricao: data.descricao ?? '',
@@ -68,6 +76,8 @@ export const useProductForm = (slugParam?: string) => {
                     imageUrl: data.image ? `${process.env.NEXT_PUBLIC_IMAGE_PATH}/${data.image}` : null,
                     atributos: atributosFormatados.length > 0 ? atributosFormatados : [{
                         nomes_atributos: '',
+                        limite: null,
+                        obrigatorio: false,
                         valores_atributo: [{ valor: '', preco: '', preco_incluido: false }]
                     }],
                     diasDisponiveis,
@@ -78,47 +88,47 @@ export const useProductForm = (slugParam?: string) => {
         load();
     }, [slugParam]);
 
-    const buildFormData = (data: IProductFormData) => {
-        const formData = new FormData();
-        formData.append('nome', data.nome);
-        formData.append('slug', data.slug);
-        formData.append('descricao', data.descricao);
-        formData.append('preco', data.preco);
-        formData.append('categoria_id', String(data.categoria_id));
-        formData.append('ativo', data.ativo ? '1' : '0');
+    const buildPayload = (): any => {
+        const atributosConvertidos = formData.atributos.map(attr => ({
+            nome_atributo: attr.nomes_atributos,
+            limite: attr.limite ?? null,
+            obrigatorio: attr.obrigatorio ?? false,
+            valores_atributo: attr.valores_atributo.map(v => ({
+                valor: v.valor,
+                preco: v.preco,
+                preco_incluido: v.preco_incluido ? 1 : 0,
+            })),
+        }));
 
-        if (data.image) {
-            formData.append('image_url', data.image, data.image.name);
-        }
+        const dias_disponiveis = formData.diasDisponiveis
+            .map((isDisponivel, index) => isDisponivel ? index : null)
+            .filter((v) => v !== null);
 
-        data.atributos.forEach((atributo, i) => {
-            formData.append(`atributos[${i}][nomes_atributos]`, atributo.nomes_atributos);
-            atributo.valores_atributo.forEach((valor, j) => {
-                formData.append(`atributos[${i}][valores_atributo][${j}][valor]`, valor.valor);
-                formData.append(`atributos[${i}][valores_atributo][${j}][preco]`, valor.preco);
-                formData.append(`atributos[${i}][valores_atributo][${j}][preco_incluido]`, valor.preco_incluido ? '1' : '0');
-            });
-        });
-
-        data.diasDisponiveis.forEach((disponivel, i) => {
-            if (disponivel) {
-                formData.append(`dias_disponiveis[${i}]`, String(i));
-            }
-        });
-
-        return formData;
+        return {
+            id: formData.id,
+            nome: formData.nome,
+            slug: formData.slug,
+            descricao: formData.descricao,
+            preco: formData.preco,
+            categoria_id: formData.categoria_id,
+            ativo: formData.ativo ? 1 : 0,
+            atributos: atributosConvertidos,
+            dias_disponiveis,
+            image_url: formData.imageUrl ?? '',
+        };
     };
 
     const handleSubmit = async () => {
-        const form = buildFormData(formData);
+        const payload = buildPayload();
+
         if (slugParam) {
-            await updateProduct(slugParam, form);
+            await updateProduct(slugParam, payload);
         } else {
-            await addNewProduct(form);
+            await addNewProduct(payload);
         }
 
-        toast.success(`Produto ${slugParam ? 'editado' : 'cadastrado'} com sucesso!`)
-        router.push('/admin/listarprodutos')
+        toast.success(`Produto ${slugParam ? 'editado' : 'cadastrado'} com sucesso!`);
+        router.push('/admin/listarprodutos');
     };
 
     return {
@@ -126,6 +136,6 @@ export const useProductForm = (slugParam?: string) => {
         setFormData,
         categories,
         handleSubmit,
-        loading
+        loading,
     };
 };

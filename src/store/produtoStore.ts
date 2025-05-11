@@ -34,7 +34,7 @@ export const productStore = create<TProductStore>((set) => ({
         }
     },
 
-    updateProduct: async (slug: string, data: FormData) => {
+    updateProduct: async (slug: string, data: FormData | IProduct) => {
         set({ loading: true });
 
         try {

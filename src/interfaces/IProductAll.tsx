@@ -1,6 +1,7 @@
 export interface IProductAll {
     id: string,
     category: string,
+    slug?: string,
     descriptionCategory: string,
     products: IProduct[]
 }

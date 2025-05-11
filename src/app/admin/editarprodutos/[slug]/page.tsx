@@ -40,12 +40,18 @@ export default function EditarProdutoPage() {
     const adicionarAtributo = () => {
         setFormData((prev) => ({
             ...prev,
-            atributos: [...prev.atributos, {
-                nomes_atributos: '',
-                valores_atributo: [{ valor: '', preco: '', preco_incluido: false }]
-            }]
+            atributos: [
+                ...prev.atributos,
+                {
+                    nomes_atributos: '',
+                    limite: null,
+                    obrigatorio: false,
+                    valores_atributo: [{ valor: '', preco: '', preco_incluido: false }],
+                },
+            ],
         }));
     };
+
 
     const adicionarValorAoAtributo = (index: number) => {
         const novos = [...formData.atributos];
@@ -110,6 +116,29 @@ export default function EditarProdutoPage() {
                                 value={atributo.nomes_atributos}
                                 onChange={(e) => updateAtributo(i, "nomes_atributos", e.target.value)}
                             />
+
+                            <div className="grid grid-cols-2 gap-2 mb-2">
+                                <input
+                                    type="number"
+                                    placeholder="Limite"
+                                    className="border border-zinc-400 p-2 outline-0 rounded-md text-sm"
+                                    value={atributo.limite ?? ''}
+                                    onChange={(e) =>
+                                        updateAtributo(i, "limite", e.target.value ? parseInt(e.target.value) : null)
+                                    }
+                                />
+
+                                <label className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={atributo.obrigatorio}
+                                        onChange={(e) => updateAtributo(i, "obrigatorio", e.target.checked)}
+                                        className="w-4 h-4"
+                                    />
+                                    <span className="ml-2 text-sm">Obrigatório</span>
+                                </label>
+                            </div>
+
                             {atributo.valores_atributo.map((valor, j) => (
                                 <div key={j} className="grid grid-cols-3 gap-2 mb-2">
                                     <input
@@ -135,10 +164,16 @@ export default function EditarProdutoPage() {
                                     </label>
                                 </div>
                             ))}
-                            <button type="button" onClick={() => adicionarValorAoAtributo(i)} className="text-sm text-white cursor-pointer bg-purple-principal-700 p-2 rounded-md">
+
+                            <button
+                                type="button"
+                                onClick={() => adicionarValorAoAtributo(i)}
+                                className="text-sm text-white cursor-pointer bg-purple-principal-700 p-2 rounded-md"
+                            >
                                 + Adicionar valor
                             </button>
                         </div>
+
                     ))}
                 </div>
                 <button type="button" onClick={adicionarAtributo} className="mt-2 text-green-principal-700 text-lg font-semibold cursor-pointer">
