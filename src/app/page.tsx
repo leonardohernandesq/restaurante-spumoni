@@ -6,13 +6,14 @@ import { CategoryScroll } from "@/components/CategoryScroll";
 import { getAllCategory } from "@/services/category";
 import { getAllProducts } from "@/services/produto";
 
-export const useGenerateMetadata = () =>
+export const useGenerateMetadata = () => {
   useMetadata(
     "Restaurante Spumoni | O Melhor da Culinária Italiana",
     "Descubra o sabor autêntico da Itália no Restaurante Spumoni. Massas frescas, pizzas artesanais e muito mais!",
     "https://restaurantespumoni.com.br/",
     "https://restaurantespumoni.com.br/spumoni-home.jpg"
   );
+}
 
 export default async function Home() {
   const getAllProduct = 0;
