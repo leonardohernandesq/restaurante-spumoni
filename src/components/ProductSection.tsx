@@ -8,7 +8,7 @@ export const ProductSection = ({ data }: IProductSectionProps) => {
         <>
             {data.map((item) => (
                 <Container key={item.id}>
-                    <section id={item.slug} className="py-24">
+                    <section id={item.slug} className="py-6">
                         <div className="text-center pb-6">
                             <h2 className="font-medium text-3xl mb-3">{item.category}</h2>
                             <p className='text-zinc-700 max-w-4xl m-auto'>{item.descriptionCategory}</p>

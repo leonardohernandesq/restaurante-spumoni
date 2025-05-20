@@ -14,6 +14,7 @@ import { HeaderPages } from "@/components/HeaderPages";
 import { ISingleProductPageProps } from "@/interfaces/ISingleProductPageProps";
 import { getProductBySlug } from "@/services/produto";
 import { AtributoSelecionado, cartStore } from "@/store/cartStore";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 
 interface ValorAtributo {
     valor_atributo_id: number;
@@ -53,6 +54,19 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
     const [produto, setProduto] = useState<Produto | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { storeOpen, loading: loadingStoreOpen } = useStoreStatus();
+
+    useEffect(() => {
+        if (loadingStoreOpen) return;
+
+        if (!storeOpen) {
+            toast.error('A loja está fechada no momento. Tente novamente mais tarde!')
+
+            setTimeout(() => {
+                router.push('/');
+            }, 1000)
+        }
+    }, [storeOpen])
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -78,7 +92,6 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
     const handleAddProduct = () => {
         if (!produto) return;
 
-        // Verificação de atributos obrigatórios
         for (const atributo of produto.atributos) {
             if (atributo.obrigatorio) {
                 const selecionados = atributosSelecionados[atributo.atributo_id] || [];
@@ -133,6 +146,14 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
         router.push('/');
     };
 
+    if (!storeOpen) {
+        return (
+            <Container styleRow="bg-zinc-50">
+                <HeaderPages title="Carregando Produto..." />
+                <LoadingIcon color="text-purple-principal-700" />
+            </Container>
+        );
+    }
 
     if (loading) {
         return (
@@ -153,7 +174,6 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
             </Container>
         );
     }
-
 
     const handleChangeCheckbox = (atributoId: number, valorId: number, limite: number | null) => {
         const atuais = atributosSelecionados[atributoId] || [];

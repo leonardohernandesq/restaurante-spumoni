@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'
-import { FaArrowLeft, FaCheckDouble, FaUserCheck } from 'react-icons/fa6'
+import { FaArrowLeft, FaCheckDouble, FaPlus, FaUserCheck } from 'react-icons/fa6'
 import { PiPrinter } from 'react-icons/pi';
 import { FaMotorcycle } from 'react-icons/fa6';
 import { FaTrashAlt } from 'react-icons/fa';
@@ -18,10 +18,8 @@ interface PedidoPageProps {
 export default function Pedido({ params }: PedidoPageProps) {
     const [pedidoId, setPedidoId] = useState<number | null>(null);
     const { getColor, getLabel } = useStatusColor();
-
     const { getPedidoById, pedido, changeStatus } = pedidoStore();
     const { id } = use(params);
-
     const router = useRouter();
 
     useEffect(() => {
@@ -40,18 +38,31 @@ export default function Pedido({ params }: PedidoPageProps) {
         if (!pedidoId) return;
         try {
             await changeStatus({ id: pedidoId, status });
-            getPedidoById(pedidoId); // Atualiza os dados do pedido atual
+            getPedidoById(pedidoId);
+
+            const statusMessages: Record<number, string> = {
+                0: `Olá ${pedido?.nome_cliente}, Somos do *Restaurante & Sorveteria Spumoni* :)\nSeu pedido foi *cancelado*. Se tiver dúvidas, estamos à disposição.`,
+                1: `Olá ${pedido?.nome_cliente}, Somos do *Restaurante & Sorveteria Spumoni* :)\nRecebemos seu pedido <3 Em breve começaremos o preparo.`,
+                2: `Olá ${pedido?.nome_cliente}, Somos do *Restaurante & Sorveteria Spumoni* :)\nSeu pedido está sendo *preparado* <3`,
+                3: `Olá ${pedido?.nome_cliente}, Somos do *Restaurante & Sorveteria Spumoni* :)\nSeu pedido *saiu para entrega* <3 Aguarde só mais um pouquinho!`,
+                4: `Olá ${pedido?.nome_cliente}, Somos do *Restaurante & Sorveteria Spumoni* :)\nPedido *concluído* com sucesso! <3 Esperamos que tenha gostado. Até a próxima!`,
+            };
+
+            const message = statusMessages[status];
+            if (message) {
+                const whatsappUrl = `https://wa.me/${pedido?.telefone}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            }
+
             router.push('/admin/pedidos');
         } catch (error) {
             console.error('Erro ao mudar status:', error);
         }
     };
 
-
     const handlePrint = () => {
         window.print();
     };
-
 
     return (
         <Container styleRow='bg-zinc-100' styleContainer='min-h-screen'>
@@ -146,7 +157,7 @@ export default function Pedido({ params }: PedidoPageProps) {
                         <p className='text-sm/4 font-medium'>Cancelar Pedido</p>
                     </button>
                     <button onClick={() => handleSendNotification(1)} className='w-full text-center flex flex-col items-center gap-2 border-r border-zinc-300 p-3 cursor-pointer'>
-                        <FaTrashAlt size={20} />
+                        <FaPlus size={20} />
                         <p className='text-sm/4 font-medium'>Novo Pedido</p>
                     </button>
                     <button onClick={() => handleSendNotification(2)} className='w-full text-center flex flex-col items-center gap-2 border-r border-zinc-300 p-3 cursor-pointer'>
@@ -167,7 +178,3 @@ export default function Pedido({ params }: PedidoPageProps) {
         </Container>
     )
 }
-function getPedidoById(id: string) {
-    throw new Error('Function not implemented.');
-}
-

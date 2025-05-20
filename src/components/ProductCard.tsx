@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 
@@ -9,11 +9,12 @@ import { BiPlus } from 'react-icons/bi'
 
 import { IProductCardProps } from '@/interfaces/IProductCardProps'
 
+import { useStoreStatus } from '@/hooks/useStoreStatus';
 
 
 export const ProductCard = ({ product }: IProductCardProps) => {
+    const { storeOpen } = useStoreStatus();
     const router = useRouter();
-    const [storeOpen, setStoreOpen] = useState(true);
 
     const handleBuyProduct = (link: string) => {
         if (storeOpen) {

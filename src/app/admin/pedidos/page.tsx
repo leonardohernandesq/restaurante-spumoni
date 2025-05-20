@@ -23,12 +23,22 @@ const Pedidos = () => {
     const [selectedStatuses, setSelectedStatuses] = useState<number[]>([]);
     const { statusOptions, getColor } = useStatusColor();
 
+    const [showModal, setShowModal] = useState(true); // Controlar o modal
+    const hasInteractedRef = useRef(false); // Referência para detectar interação
+
     const handleStatusChange = (statusId: number) => {
         setSelectedStatuses((prev) =>
             prev.includes(statusId)
                 ? prev.filter((s) => s !== statusId)
                 : [...prev, statusId]
         );
+    };
+
+    const handleUserInteraction = () => {
+        // Libera o som e fecha o modal
+        hasInteractedRef.current = true;
+        setShowModal(false);
+        document.removeEventListener('click', handleUserInteraction);
     };
 
     useEffect(() => {
@@ -72,7 +82,13 @@ const Pedidos = () => {
                         const novosFiltrados = novos.filter(
                             (pedidoNovo) => !prev.some((pedidoExistente) => pedidoExistente.id === pedidoNovo.id)
                         );
-                        return [...prev, ...novosFiltrados];
+
+                        if (novosFiltrados.length > 0 && hasInteractedRef.current) {
+                            const audio = new Audio('/notification.mp3');
+                            audio.play();
+                        }
+
+                        return [...novosFiltrados, ...prev];
                     });
                 }
             } catch (err) {
@@ -93,7 +109,6 @@ const Pedidos = () => {
         };
     }, []);
 
-
     const pedidosFiltrados = pedidos.filter((p) => {
         const matchesFiltro =
             p.nome_cliente.toLowerCase().includes(filtro.toLowerCase()) ||
@@ -106,13 +121,26 @@ const Pedidos = () => {
         return matchesFiltro && matchesStatus;
     });
 
-
     return (
         <Container styleRow='bg-zinc-200'>
             <main className="p-5 min-h-screen h-full">
                 <section className="p-5 bg-white rounded-2xl shadow-2xl">
                     <AdminMenu title='Gestor de Pedidos' />
 
+                    {/* Modal para pedir interação do usuário */}
+                    {showModal && (
+                        <div className="fixed inset-0 bg-black opacity-80 flex items-center justify-center z-50">
+                            <div className="bg-white p-5 rounded-lg text-center">
+                                <p className="mb-4">Para ativar as notificações sonoras, clique em qualquer lugar.</p>
+                                <button
+                                    onClick={handleUserInteraction}
+                                    className="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer"
+                                >
+                                    Entendido
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     <input
                         className="w-full border bg-zinc-100 border-zinc-200 p-2 rounded-lg my-4"
@@ -142,7 +170,6 @@ const Pedidos = () => {
                                     </div>
                                 );
                             })}
-
                         </div>
                     </div>
 

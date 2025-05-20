@@ -1,60 +1,26 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link';
 
 import { IoLocation } from "react-icons/io5";
 import { IoLogoWhatsapp } from "react-icons/io";
-import { RiInstagramFill } from "react-icons/ri";
+import { RiFacebookFill, RiInstagramFill } from "react-icons/ri";
 
 import { OpeningHoursFooter } from '@/components/OpeningHoursFooter';
 import { Container } from '@/components/Container';
 import { DetailTitle } from '@/components/DetailTitle'
+import { useConfigStore } from '@/store/configStore';
+import { useEffect } from 'react';
+import { getDiaSemana } from '@/utils/getDiaSemana';
 
 export const Footer = () => {
-  const horarios = [
-    {
-      "id": 1,
-      "horario_abertura": '09:00:00',
-      "horario_fechamento": '18:00:00',
-      "dia_da_semana": "Segunda-feira"
-    },
-    {
-      "id": 2,
-      "horario_abertura": '09:00:00',
-      "horario_fechamento": '18:00:00',
-      "dia_da_semana": "Terça-feira"
-    },
-    {
-      "id": 3,
-      "horario_abertura": '09:00:00',
-      "horario_fechamento": '18:00:00',
-      "dia_da_semana": "Quarta-feira"
-    },
-    {
-      "id": 4,
-      "horario_abertura": '09:00:00',
-      "horario_fechamento": '18:00:00',
-      "dia_da_semana": "Quinta-feira"
-    },
-    {
-      "id": 5,
-      "horario_abertura": '09:00:00',
-      "horario_fechamento": '18:00:00',
-      "dia_da_semana": "Sexta-feira"
-    },
-    {
-      "id": 6,
-      "horario_abertura": '09:00:00',
-      "horario_fechamento": '18:00:00',
-      "dia_da_semana": "Sábado"
-    },
-    {
-      "id": 7,
-      "horario_abertura": '09:00:00',
-      "horario_fechamento": '18:00:00',
-      "dia_da_semana": "Domingo",
-      "observacao": "Apenas retirada e Ifood"
-    }
-  ]
+  const { fetchOpeningHours, openingHours: horarios, fetchSettings, settings } = useConfigStore();
+
+  useEffect(() => {
+    fetchOpeningHours();
+    fetchSettings();
+  }, [])
 
 
   return (
@@ -63,7 +29,9 @@ export const Footer = () => {
         <div className='grid md:grid-cols-3 md:py-5 gap-10'>
           <div>
             <Image src={'/logo-footer.svg'} alt='Logo do Restaurante Spumoni' width={300} height={60} />
-            <p className='mt-4'>Um lugar acolhedor onde o sabor se encontra com a tradição! Oferecemos pratos deliciosos, sobremesas irresistíveis e sorvetes artesanais feitos com ingredientes selecionados.</p>
+            <p className='mt-4'>
+              {settings.mensagem_rodape}
+            </p>
           </div>
 
           <section>
@@ -75,9 +43,9 @@ export const Footer = () => {
               {
                 horarios.map((item) => (
                   <OpeningHoursFooter key={item.id}>
-                    {item.dia_da_semana}: {item.horario_abertura} às {item.horario_fechamento}
+                    {getDiaSemana(item.dia_semana)}: {item.horario_abertura} às {item.horario_fechamento}
                     {
-                      item.observacao && (<><br /><span className='text-sm'>(apenas retirada e Ifood)</span></>)
+                      item.observacao && (<><br /><span className='text-sm'>({item.observacao})</span></>)
                     }
                   </OpeningHoursFooter>
                 ))
@@ -92,11 +60,20 @@ export const Footer = () => {
             </div>
             <div className='flex gap-2 mt-2'>
               <IoLocation className='text-purple-principal-500 text-2xl w-7' />
-              <p className='text-md w-full'>R. Raimundo Correia, 38 - Centro, Poá - SP, 08557-030</p>
+              <p className='text-md w-full'>{settings.address}</p>
             </div>
             <div className='text-purple-principal-500 flex gap-2 text-2xl my-4'>
-              <Link href={'https://instagram.com/sorveteriaspumoni'} target='_blank'><IoLogoWhatsapp /></Link>
-              <Link href={'https://facebook.com/sorveteriaspumoni'} target='_blank'><RiInstagramFill /></Link>
+              {settings.facebook_url && (<Link href={settings.facebook_url} target='_blank'><RiFacebookFill /></Link>)}
+              {settings.instagram_url && (<Link href={settings.instagram_url} target='_blank'><RiInstagramFill /></Link>)}
+              {settings.whatsapp_number && (
+                <Link
+                  href={`https://api.whatsapp.com/send?phone=${settings.whatsapp_number.replace(/\D/g, '')}`}
+                  target="_blank"
+                >
+                  <IoLogoWhatsapp />
+                </Link>
+              )}
+
             </div>
           </section>
         </div>
