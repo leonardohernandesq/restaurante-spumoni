@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { changeStatusApi, fetchPedidoById, fetchPedidosAPI, insertPedidoApi } from '@/services/pedido';
-import { IPedido, IPedidoCompleto } from '@/interfaces/IPedidosData';
+import { IPedido, IPedido } from '@/interfaces/IPedidosData';
 
 interface PedidoStore {
-  pedido: IPedidoCompleto | null;
+  pedido: IPedido | null;
   pedidos: IPedido[];
   getPedidos: () => Promise<void>;
   setPedidos: (pedidos: IPedido[]) => void;
@@ -42,7 +42,8 @@ export const pedidoStore = create<PedidoStore>((set, get) => ({
       const data = await fetchPedidoById(id);
       set({ pedido: data });
     } catch (error) {
-
+      console.error('❌ Erro ao carregar pedido:', error);
+      throw error;
     }
   },
   changeStatus: async ({ id, status }: { id: number, status: number }) => {

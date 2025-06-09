@@ -31,7 +31,7 @@ export const useLocalizacao = () => {
                             setErro('Endereço não encontrado.');
                         }
                     })
-                    .catch((err) => setErro('Erro ao buscar o endereço.'));
+                    .catch(() => setErro('Erro ao buscar o endereço.'));
 
                 setCarregando(false);
             },

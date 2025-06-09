@@ -5,14 +5,14 @@ export interface IValorAtributo {
 }
 
 export interface IAtributo {
-    limite: null;
+    limite?: null;
     obrigatorio: boolean;
     nomes_atributos: string;
     valores_atributo: IValorAtributo[];
 }
 
 export interface IProductFormData {
-    id: any;
+    id?: string | number;
     nome: string;
     slug: string;
     descricao: string;

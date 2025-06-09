@@ -21,7 +21,7 @@ export type TcategoryStore = {
     setCategory: (newData: Partial<TCategory>) => void;
 }
 
-export const categoryStore = create<TcategoryStore>((set, get) => ({
+export const categoryStore = create<TcategoryStore>((set) => ({
     category: null,
     setCategory: (newData: Partial<TCategory>) =>
         set((state) => ({

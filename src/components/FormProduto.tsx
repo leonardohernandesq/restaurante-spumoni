@@ -8,19 +8,20 @@ interface FormProdutoProps {
     formData: IProductFormData;
     categories: ICategory[];
     loading: boolean;
-    onChange: (field: string, value: any) => void;
-    onAtributoChange: (index: number, field: string, value: any) => void;
-    onValorChange: (
+    onChange: <K extends keyof IProductFormData>(field: K, value: IProductFormData[K]) => void;
+    onAtributoChange: <K extends keyof IAtributo>(index: number, field: K, value: IAtributo[K]) => void;
+    onValorChange: <K extends keyof IValorAtributo>(
         attrIndex: number,
         valIndex: number,
-        field: string,
-        value: any
+        field: K,
+        value: IValorAtributo[K]
     ) => void;
     adicionarAtributo: () => void;
     adicionarValorAoAtributo: (index: number) => void;
     handleDiaDisponivelChange: (index: number) => void;
     onSubmit: () => void;
 }
+
 
 export const FormProduto = ({
     formData,
@@ -72,7 +73,7 @@ export const FormProduto = ({
 
             <select
                 value={formData.categoria_id}
-                onChange={(e) => onChange("categoriaId", e.target.value)}
+                onChange={(e) => onChange("categoria_id", e.target.value)}
                 className="input"
             >
                 <option value="">Selecione uma categoria</option>
@@ -82,6 +83,7 @@ export const FormProduto = ({
                     </option>
                 ))}
             </select>
+
 
             <label className="flex items-center gap-2">
                 <input

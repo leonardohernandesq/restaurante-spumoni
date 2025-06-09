@@ -29,10 +29,17 @@ const Login = () => {
             toast.success('Login realizado com sucesso!');
 
             router.push('/admin/pedidos')
-        } catch (err: any) {
-            const serverMsg = err?.response?.data?.message || 'Erro ao fazer login';
+        } catch (err: unknown) {
+            let serverMsg = 'Erro ao fazer login';
+
+            if (typeof err === 'object' && err !== null && 'response' in err) {
+                const error = err as { response?: { data?: { message?: string } } };
+                serverMsg = error.response?.data?.message || serverMsg;
+            }
+
             toast.error(serverMsg);
         }
+
     };
 
     return (

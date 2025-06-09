@@ -38,7 +38,7 @@ export const userStore = create<TuserStore>((set) => ({
         try {
             await logoutUser();
             set({ user: null });
-        } catch (error: any) {
+        } catch (error) {
             console.error('Erro ao fazer logout', error);
         } finally {
             set({ loading: false });

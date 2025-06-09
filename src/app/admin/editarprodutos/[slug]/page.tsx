@@ -1,13 +1,12 @@
 'use client';
 
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Container } from "@/components/Container";
 import { HeaderPages } from "@/components/HeaderPages";
 import { PreviewImage } from "@/components/PreviewImage";
 import { useProductForm } from "@/hooks/useProductForm";
 
 export default function EditarProdutoPage() {
-    const router = useRouter();
     const params = useParams();
     const slug = params.slug as string;
 
@@ -19,23 +18,30 @@ export default function EditarProdutoPage() {
         loading
     } = useProductForm(slug);
 
-    const handleChange = (field: string, value: any) => {
+    const handleChange = (field: string, value: string | number | boolean) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    const updateAtributo = (index: number, field: string, value: any) => {
+    const updateAtributo = (index: number, field: string, value: string | number | boolean | null) => {
         const novos = [...formData.atributos];
         novos[index] = { ...novos[index], [field]: value };
         setFormData((prev) => ({ ...prev, atributos: novos }));
     };
 
-    const updateValor = (attrIndex: number, valIndex: number, field: string, value: any) => {
+
+    const updateValor = (
+        attrIndex: number,
+        valIndex: number,
+        field: string,
+        value: string | number | boolean
+    ) => {
         const novos = [...formData.atributos];
         const valores = [...novos[attrIndex].valores_atributo];
         valores[valIndex] = { ...valores[valIndex], [field]: value };
         novos[attrIndex].valores_atributo = valores;
         setFormData((prev) => ({ ...prev, atributos: novos }));
     };
+
 
     const adicionarAtributo = () => {
         setFormData((prev) => ({

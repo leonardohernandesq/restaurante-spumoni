@@ -22,7 +22,7 @@ const ListarProdutos = () => {
         };
 
         loadData();
-    }, []);
+    }, [fetchProducts]);
 
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">

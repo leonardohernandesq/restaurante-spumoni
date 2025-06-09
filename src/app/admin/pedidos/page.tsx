@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { BiListUl, BiPlus } from 'react-icons/bi';
 
 import { IPedido } from '@/interfaces/IPedidosData';
 import { PedidoRow } from '@/components/PedidoRow';
@@ -12,8 +10,6 @@ import { Container } from '@/components/Container';
 import { AdminMenu } from '@/components/AdminMenu';
 
 const Pedidos = () => {
-    const router = useRouter();
-
     const [pedidos, setPedidos] = useState<IPedido[]>([]);
     const [filtro, setFiltro] = useState('');
     const [loading, setLoading] = useState(true);

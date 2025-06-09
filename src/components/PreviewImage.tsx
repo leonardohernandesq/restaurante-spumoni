@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 type PreviewImageProps = {
@@ -29,10 +30,12 @@ export function PreviewImage({ onFileChange, initialImageUrl }: PreviewImageProp
         <div>
             {preview && (
                 <div className="mb-4">
-                    <img
+                    <Image
                         src={preview}
                         alt="Preview"
-                        className="w-48 h-48 object-cover rounded border"
+                        className="object-cover rounded border"
+                        width={192}
+                        height={192}
                     />
                 </div>
             )}

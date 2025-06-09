@@ -42,6 +42,27 @@ interface Produto {
     atributos: Atributo[];
 }
 
+function isErrorWithResponse(error: unknown): error is { response: { data: { error?: string } } } {
+    if (
+        typeof error === 'object' &&
+        error !== null &&
+        'response' in error
+    ) {
+        const response = (error as Record<string, unknown>).response;
+        if (
+            typeof response === 'object' &&
+            response !== null &&
+            'data' in response
+        ) {
+            const data = (response as Record<string, unknown>).data;
+            return typeof data === 'object' && data !== null;
+        }
+    }
+    return false;
+}
+
+
+
 export default function ProductPage({ params }: ISingleProductPageProps) {
     const { slug } = use(params);
     const { produtos } = cartStore();
@@ -66,20 +87,32 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
                 router.push('/');
             }, 1000)
         }
-    }, [storeOpen])
+    }, [storeOpen, loadingStoreOpen, router])
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
                 const data: Produto = await getProductBySlug(slug);
                 setProduto(data);
-                setLoading(false);
-            } catch (err: any) {
-                setError(err?.response?.data?.error || 'Erro ao carregar produto');
-                setLoading(false);
+            } catch (err: unknown) {
+                let errorMessage = 'Erro ao carregar produto';
+
+                if (isErrorWithResponse(err)) {
+                    const errorData = err.response.data;
+                    if (errorData && typeof errorData.error === 'string') {
+                        errorMessage = errorData.error;
+                    }
+                } else if (err instanceof Error) {
+                    errorMessage = err.message;
+                }
+
+                setError(errorMessage);
                 router.push('/');
+            } finally {
+                setLoading(false);
             }
         };
+
 
         if (slug) {
             fetchProduct();
@@ -87,7 +120,7 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
             setError("Slug não encontrado.");
             setLoading(false);
         }
-    }, [slug]);
+    }, [slug, router]);
 
     const handleAddProduct = () => {
         if (!produto) return;

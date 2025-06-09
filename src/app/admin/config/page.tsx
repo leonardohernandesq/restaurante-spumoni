@@ -42,7 +42,7 @@ const Config = () => {
             await fetchOpeningHours();
         };
         load();
-    }, []);
+    }, [fetchSettings, fetchOpeningHours]);
 
     const addOpeningHour = () => {
         if (openingHours.length >= 7) {

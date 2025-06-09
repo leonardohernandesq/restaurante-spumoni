@@ -1,29 +1,30 @@
 import { api } from "@/config/api";
+import { OpeningHour, Settings } from "@/store/configStore";
 
 export const configService = {
-    async getSettings() {
+    async getSettings(): Promise<Settings> {
         const { data } = await api.get('/config/settings');
         return data;
     },
 
-    async updateSettings(payload: any) {
-        return await api.post('/config/settings', payload);
+    updateSettings(payload: Settings) {
+        return api.post('/config/settings', payload);
     },
 
-    async getOpeningHours() {
+    async getOpeningHours(): Promise<OpeningHour[]> {
         const { data } = await api.get('/config/opening_hours');
         return data;
     },
 
-    async createOpeningHour(payload: any) {
-        return await api.post('/config/opening_hours', payload);
+    createOpeningHour(payload: OpeningHour) {
+        return api.post('/config/opening_hours', payload);
     },
 
-    async updateOpeningHour(id: number, payload: any) {
-        return await api.put(`/config/opening_hours/${id}`, payload);
+    updateOpeningHour(id: number, payload: OpeningHour) {
+        return api.put(`/config/opening_hours/${id}`, payload);
     },
 
-    async getStatusLoja() {
-        return await api.get('/config/status');
+    getStatusLoja() {
+        return api.get('/config/status');
     }
 }

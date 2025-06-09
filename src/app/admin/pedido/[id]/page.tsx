@@ -28,7 +28,7 @@ export default function Pedido({ params }: PedidoPageProps) {
             setPedidoId(numId);
             getPedidoById(numId);
         });
-    }, [params]);
+    }, [params, getPedidoById]);
 
     const handleBack = () => {
         router.back();

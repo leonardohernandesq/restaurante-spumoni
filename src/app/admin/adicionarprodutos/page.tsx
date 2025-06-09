@@ -1,12 +1,14 @@
+
 'use client';
 
 import { Container } from "@/components/Container";
 import { HeaderPages } from "@/components/HeaderPages";
 import { PreviewImage } from "@/components/PreviewImage";
 import { useProductForm } from "@/hooks/useProductForm";
+import { IAtributo, IProductFormData, IValorAtributo } from "@/interfaces/IProductFormData";
 import { useSearchParams } from "next/navigation";
 
-export default function ProdutoPage() {
+export default function AdicionarProdutos() {
     const slugParam = useSearchParams().get("slug") || undefined;
 
     const {
@@ -17,33 +19,46 @@ export default function ProdutoPage() {
         loading
     } = useProductForm(slugParam);
 
-    const handleChange = (field: string, value: any) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
+    const handleChange = <K extends keyof IProductFormData>(field: K, value: IProductFormData[K]) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    const updateAtributo = (index: number, field: string, value: any) => {
+    const updateAtributo = (index: number, field: keyof IAtributo, value: IAtributo[keyof IAtributo]) => {
         const novos = [...formData.atributos];
         novos[index] = { ...novos[index], [field]: value };
-        setFormData((prev) => ({ ...prev, atributos: novos }));
+        setFormData(prev => ({ ...prev, atributos: novos }));
     };
 
-    const updateValor = (attrIndex: number, valIndex: number, field: string, value: any) => {
+    const updateValor = (
+        attrIndex: number,
+        valIndex: number,
+        field: keyof IValorAtributo,
+        value: IValorAtributo[keyof IValorAtributo]
+    ) => {
         const novos = [...formData.atributos];
         const valores = [...novos[attrIndex].valores_atributo];
         valores[valIndex] = { ...valores[valIndex], [field]: value };
         novos[attrIndex].valores_atributo = valores;
-        setFormData((prev) => ({ ...prev, atributos: novos }));
+        setFormData(prev => ({ ...prev, atributos: novos }));
     };
 
     const adicionarAtributo = () => {
         setFormData((prev) => ({
             ...prev,
-            atributos: [...prev.atributos, {
-                nomes_atributos: '',
-                valores_atributo: [{ valor: '', preco: '', preco_incluido: false }]
-            }]
+            atributos: [
+                ...prev.atributos,
+                {
+                    nomes_atributos: '',
+                    limite: null,
+                    obrigatorio: false,
+                    valores_atributo: [
+                        { valor: '', preco: '', preco_incluido: false }
+                    ]
+                }
+            ]
         }));
     };
+
 
     const adicionarValorAoAtributo = (index: number) => {
         const novos = [...formData.atributos];

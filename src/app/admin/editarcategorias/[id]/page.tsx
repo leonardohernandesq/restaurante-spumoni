@@ -12,14 +12,14 @@ export default function EditarCategorias() {
     const params = useParams();
     const id = parseInt(params.id as string);
 
-    const { getCatById, loading, error, update, category, setCategory } = categoryStore();
+    const { getCatById, loading, update, category, setCategory } = categoryStore();
     const router = useRouter();
 
     useEffect(() => {
         if (id) {
             getCatById({ id });
         }
-    }, [])
+    }, [id, getCatById])
 
     const handleSubmit = () => {
         if (!category) return;
@@ -33,17 +33,15 @@ export default function EditarCategorias() {
             toast.success('Categoria atualizada com sucesso')
             router.push("/admin/listarcategorias");
         } catch (error) {
-            toast.error('Erro ao atualizar a categoria')
+            toast.error('Erro ao atualizar a categoria');
+            throw error
         }
     };
 
-
-    loading && (
-        <LoadingIcon color="text-purple-principal-700" />
-    );
-
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
+            {loading && <LoadingIcon color="text-purple-principal-700" />}
+
             <HeaderPages title="Voltar ao Gestor de Pedidos" />
             <section className="relative py-5 gap-1 flex flex-col">
 

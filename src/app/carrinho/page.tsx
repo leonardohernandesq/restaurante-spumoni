@@ -7,7 +7,7 @@ import { FaMinus, FaPlus } from 'react-icons/fa6'
 import { ButtonCart } from '@/components/ButtonCart'
 import { Container } from '@/components/Container'
 import { HeaderPages } from '@/components/HeaderPages'
-import { cartStore } from '@/store/cartStore'
+import { cartStore, ProdutoCarrinho } from '@/store/cartStore'
 
 const Carrinho = () => {
     const router = useRouter();
@@ -17,13 +17,13 @@ const Carrinho = () => {
         router.push('/finalizar');
     }
 
-    const handleMinusQuantity = (item: any) => {
+    const handleMinusQuantity = (item: ProdutoCarrinho) => {
         if (item.quantidade > 1) {
             atualizarQuantidade(item.slug, item.quantidade - 1)
         }
     }
 
-    const handlePlusQuantity = (item: any) => {
+    const handlePlusQuantity = (item: ProdutoCarrinho) => {
         if (item.quantidade > 0) {
             atualizarQuantidade(item.slug, item.quantidade + 1)
         }

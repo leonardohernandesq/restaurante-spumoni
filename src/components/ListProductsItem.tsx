@@ -13,7 +13,7 @@ interface ListProductsItemProps {
 }
 
 export const ListProductsItem = ({ product }: ListProductsItemProps) => {
-    const { deleteProductApi, loading } = productStore();
+    const { deleteProductApi } = productStore();
     const router = useRouter();
 
     const handleEdit = () => {

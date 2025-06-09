@@ -43,12 +43,12 @@ export const useProductForm = (slugParam?: string) => {
                 console.log("📦 Dados recebidos da API:", data);
 
                 const atributosFormatados: IAtributo[] = Array.isArray(data.atributos)
-                    ? data.atributos.map((atributo: any): IAtributo => ({
+                    ? data.atributos.map((atributo): IAtributo => ({
                         nomes_atributos: atributo.nome_atributo ?? '',
                         limite: atributo.limite ?? null,
                         obrigatorio: !!atributo.obrigatorio,
                         valores_atributo: Array.isArray(atributo.valores_atributo)
-                            ? atributo.valores_atributo.map((valor: any): IValorAtributo => ({
+                            ? atributo.valores_atributo.map((valor): IValorAtributo => ({
                                 valor: valor.valor ?? '',
                                 preco: valor.preco ?? '',
                                 preco_incluido: !!valor.preco_incluido,
@@ -86,37 +86,43 @@ export const useProductForm = (slugParam?: string) => {
         };
 
         load();
-    }, [slugParam]);
+    }, [slugParam, getProductBySlug]);
 
-    const buildPayload = (): any => {
-        const atributosConvertidos = formData.atributos.map(attr => ({
+    const buildPayload = (): FormData => {
+        const form = new FormData();
+
+        form.append("id", String(formData.id ?? ''));
+        form.append("nome", formData.nome);
+        form.append("slug", formData.slug);
+        form.append("descricao", formData.descricao);
+        form.append("preco", formData.preco);
+        form.append("categoria_id", String(formData.categoria_id));
+        form.append("ativo", formData.ativo ? '1' : '0');
+        form.append("image_url", formData.imageUrl ?? '');
+
+        form.append("dias_disponiveis", JSON.stringify(
+            formData.diasDisponiveis
+                .map((val, i) => val ? i : null)
+                .filter((v): v is number => v !== null)
+        ));
+
+        const atributos = formData.atributos.map(attr => ({
             nome_atributo: attr.nomes_atributos,
-            limite: attr.limite ?? null,
-            obrigatorio: attr.obrigatorio ?? false,
+            limite: attr.limite,
+            obrigatorio: attr.obrigatorio,
             valores_atributo: attr.valores_atributo.map(v => ({
                 valor: v.valor,
                 preco: v.preco,
-                preco_incluido: v.preco_incluido ? 1 : 0,
-            })),
+                preco_incluido: v.preco_incluido ? 1 : 0
+            }))
         }));
 
-        const dias_disponiveis = formData.diasDisponiveis
-            .map((isDisponivel, index) => isDisponivel ? index : null)
-            .filter((v) => v !== null);
+        form.append("atributos", JSON.stringify(atributos));
 
-        return {
-            id: formData.id,
-            nome: formData.nome,
-            slug: formData.slug,
-            descricao: formData.descricao,
-            preco: formData.preco,
-            categoria_id: formData.categoria_id,
-            ativo: formData.ativo ? 1 : 0,
-            atributos: atributosConvertidos,
-            dias_disponiveis,
-            image_url: formData.imageUrl ?? '',
-        };
+        return form;
     };
+
+
 
     const handleSubmit = async () => {
         const payload = buildPayload();

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { configService } from '@/services/config'
 
-interface Settings {
+export interface Settings {
     fechado_manual: string;
     mensagem_rodape: string;
     facebook_url: string;
@@ -12,7 +12,7 @@ interface Settings {
     tamanho_bobina: string;
 }
 
-interface OpeningHour {
+export interface OpeningHour {
     id?: number;
     horario_abertura: string;
     horario_fechamento: string;
@@ -43,7 +43,7 @@ export const useConfigStore = create<ConfigStore>((set) => ({
         address: '',
         tamanho_bobina: ''
     },
-    setSettings: (data: any) => set((state) => ({
+    setSettings: (data: Partial<Settings>) => set((state) => ({
         settings: { ...state.settings, ...data }
     })),
     openingHours: [],

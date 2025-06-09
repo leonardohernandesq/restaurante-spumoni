@@ -7,7 +7,7 @@ export interface IProductAll {
 }
 
 export interface IProduct {
-    image_url: any;
+    image_url: string;
     id: number;
     name: string;
     slug: string;
@@ -19,6 +19,8 @@ export interface IProduct {
     categoria_id: number;
     ativo: boolean;
     atributos: {
+        limite: null;
+        obrigatorio: boolean | string | number;
         nome_atributo: string;
         valores_atributo: {
             valor: string;

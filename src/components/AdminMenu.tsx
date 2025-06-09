@@ -1,23 +1,16 @@
 'use client'
 
-import { userStore } from '@/store/userStore';
+import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
-import { CgMenuLeft } from 'react-icons/cg'
-import { FiLogOut, FiXCircle } from 'react-icons/fi';
+
+import { FiXCircle } from 'react-icons/fi';
+
+import { HamburgerButton } from './HamburgerButton';
+import { BackgroundOverlay } from './BackgroundOverlay';
+import { LogoutButton } from './LogoutButton';
 
 export const AdminMenu = ({ title }: { title: string }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const { logout, clearUser } = userStore();
-    const router = useRouter();
-
-    const handleLogout = () => {
-        logout();
-        clearUser();
-        router.push('/admin');
-    };
-
     const menuSections = [
         {
             title: "Loja",
@@ -42,16 +35,13 @@ export const AdminMenu = ({ title }: { title: string }) => {
         },
     ];
 
-
     return (
         <header className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-purple-principal-700">{title}</h1>
 
-            <button className='cursor-pointer transition-all' onClick={() => setIsOpen(true)}>
-                <CgMenuLeft size={25} />
-            </button>
+            <HamburgerButton onClick={() => setIsOpen(true)} />
+            <BackgroundOverlay isOpen={isOpen} />
 
-            <div className={`bg-zinc-900 fixed right-0 top-0 w-full h-screen z-40 opacity-70 ${isOpen ? 'block' : 'hidden'}`}></div>
             <div className={`fixed right-0 top-0 w-96 h-screen bg-white z-50 ${isOpen ? 'block' : 'hidden'}`}>
                 <div className='p-4'>
                     <button onClick={() => setIsOpen(!isOpen)} className='fixed right-3 top-3 text-zinc-400 cursor-pointer mb-4'><FiXCircle size={30} /></button>
@@ -77,10 +67,7 @@ export const AdminMenu = ({ title }: { title: string }) => {
                             </li>
                         ))}
                     </ul>
-                    <button onClick={() => handleLogout()} className={`flex items-center gap-3 absolute right-4 bottom-2 text-left rounded-lg px-4 py-2 text-sm font-medium transition text-red-700 hover:bg-red-700 hover:text-gray-100 cursor-pointer opacity-70 hover:opacity-100`}>
-                        <FiLogOut size={20} />
-                        Sair da conta
-                    </button>
+                    <LogoutButton />
                 </div>
             </div>
         </header>

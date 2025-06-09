@@ -4,18 +4,18 @@ import { Container } from "@/components/Container";
 import { AdminMenu } from "@/components/AdminMenu";
 import { ICategory } from "@/interfaces/ICategory";
 import { FaPencil, FaTrash } from "react-icons/fa6";
-import { categoryStore, TCategory } from "@/store/categoryStore";
+import { categoryStore } from "@/store/categoryStore";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
-const listarCategorias = () => {
-    const { delete: deleteCategory, categories, loading, getAll } = categoryStore();
+const ListarCategorias = () => {
+    const { delete: deleteCategory, categories, getAll } = categoryStore();
     const router = useRouter();
 
     useEffect(() => {
         getAll();
-    }, []);
+    }, [getAll]);
 
     console.log(categories);
 
@@ -60,4 +60,4 @@ const listarCategorias = () => {
     );
 };
 
-export default listarCategorias;
+export default ListarCategorias;

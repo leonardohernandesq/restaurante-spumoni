@@ -1,12 +1,4 @@
-import React from 'react'
-
-interface IBookingInputs {
-    entrega: string,
-    delivery: string,
-    setEntrega: (type: 'booking' | 'now') => void;
-    bookingDate: string,
-    handleChangeBookingDate: (e: string) => void,
-}
+import { IBookingInputs } from '@/interfaces/IBookingInput'
 
 export const BookingInputs = ({ entrega, delivery, setEntrega, bookingDate, handleChangeBookingDate }: IBookingInputs) => {
     return (

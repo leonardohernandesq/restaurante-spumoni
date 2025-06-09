@@ -20,7 +20,7 @@ const Obrigado = () => {
                 getPedidoById(id);
             }
         }
-    }, [searchParams]);
+    }, [searchParams, getPedidoById]);
 
     console.log(pedido)
     return (

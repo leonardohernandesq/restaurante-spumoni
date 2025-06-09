@@ -1,6 +1,6 @@
-import { IPedidoCompleto } from "@/interfaces/IPedidosData";
+import { IPedido } from "@/interfaces/IPedidosData";
 
-export const NfPrint = ({ pedido }: { pedido: IPedidoCompleto | null }) => {
+export const NfPrint = ({ pedido }: { pedido: IPedido | null }) => {
     return (
         <div id="print-area" className="hidden print:block text-sm font-mono p-4">
             <h2 className="text-center font-bold text-base">Restaurante Spumoni</h2>

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-const adicionarcategorias = () => {
+const AdicionarCategorias = () => {
     const { create } = categoryStore();
     const router = useRouter();
 
@@ -51,4 +51,4 @@ const adicionarcategorias = () => {
     )
 }
 
-export default adicionarcategorias
+export default AdicionarCategorias
