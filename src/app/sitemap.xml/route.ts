@@ -34,10 +34,6 @@ export async function GET() {
           <loc>${baseUrl}/</loc>
           <priority>1.00</priority>
         </url>
-        <url>
-          <loc>${baseUrl}/about</loc>
-          <priority>0.80</priority>
-        </url>
         ${urls}
       </urlset>`;
 
