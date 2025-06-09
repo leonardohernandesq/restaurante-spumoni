@@ -47,7 +47,7 @@ export const useEndereco = () => {
                 console.error('Erro ao carregar dados do endereço:', err)
             }
         }
-    }, [])
+    }, [setCepValue])
 
 
     useEffect(() => {

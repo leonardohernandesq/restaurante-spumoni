@@ -12,7 +12,7 @@ export const PedidoRow = ({ pedido }: IPedidosData) => {
     }
 
     return (
-        <button onClick={() => pedido.id && handleGoToPedido(pedido.id)} className='cursor-pointer w-full text-left bg-zinc-100 border border-zinc-200 gap-3 my-2 py-2.5 px-3.5 rounded-md flex justify-between items-center relative'>
+        <button onClick={() => pedido.id && handleGoToPedido(String(pedido.id))} className='cursor-pointer w-full text-left bg-zinc-100 border border-zinc-200 gap-3 my-2 py-2.5 px-3.5 rounded-md flex justify-between items-center relative'>
             <DetailPedidos status={pedido.status ?? 0} />
             <div>
                 <div className='flex items-center gap-2'>

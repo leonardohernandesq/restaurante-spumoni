@@ -1,4 +1,5 @@
 import { api } from '@/config/api';
+import { IPedidoCreate } from '@/interfaces/IPedidoCreate';
 import { IPedido } from '@/interfaces/IPedidosData';
 
 
@@ -17,15 +18,16 @@ export const fetchPedidosAPI = async (after?: string): Promise<IPedido[]> => {
 };
 
 
-export const insertPedidoApi = async (data: IPedido): Promise<IPedido> => {
+export const insertPedidoApi = async (data: IPedidoCreate): Promise<IPedido> => {
   try {
     const response = await api.post('/orders/create', data);
-    return response.data;
+    return response.data; // que agora deve ser IPedido completo vindo do backend
   } catch (error) {
     console.error('❌ Erro ao inserir pedido:', error);
-    throw error; // importante propagar o erro
+    throw error;
   }
 };
+
 
 export const fetchPedidoById = async (id: number) => {
   try {

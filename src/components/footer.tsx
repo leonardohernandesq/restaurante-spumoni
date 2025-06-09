@@ -3,10 +3,6 @@
 import Image from 'next/image'
 import Link from 'next/link';
 
-import { IoLocation } from "react-icons/io5";
-import { IoLogoWhatsapp } from "react-icons/io";
-import { RiFacebookFill, RiInstagramFill } from "react-icons/ri";
-
 import { OpeningHoursFooter } from '@/components/OpeningHoursFooter';
 import { Container } from '@/components/Container';
 

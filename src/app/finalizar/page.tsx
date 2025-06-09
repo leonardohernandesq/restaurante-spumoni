@@ -9,7 +9,6 @@ import { pedidoStore } from '@/store/pedidoStore'
 
 import { useEndereco } from '@/hooks/useEndereco'
 import { useResumoPedido } from '@/hooks/useResumoPedido'
-import { IPedido } from '@/interfaces/IPedidosData'
 
 import { Container } from '@/components/Container'
 import { HeaderPages } from '@/components/HeaderPages'
@@ -22,6 +21,7 @@ import { PaymentCheckout } from '@/components/PaymentCheckout'
 import { DeliveryOptions } from '@/components/DeliveryOptions'
 import { PedidoResumoHeader } from '@/components/PedidoResumoHeader'
 import { RequiredAsteristic } from '@/components/RequiredAsteristic'
+import { IPedidoCreate } from '@/interfaces/IPedidoCreate'
 
 
 const Finalizar = () => {
@@ -57,7 +57,8 @@ const Finalizar = () => {
             limparCarrinho();
             router.push('/');
         }
-    }, [])
+    }, [produtos.length, limparCarrinho, router])
+
 
     const { endereco, showModal, setShowModal, abrirModalEndereco, addressError, setAddressError, errorEndereco, modalEndereco,
         setModalEndereco, modalNumero, setModalNumero, modalComplemento, setModalComplemento, modalBairro, setModalBairro, cep,
@@ -128,7 +129,7 @@ const Finalizar = () => {
             return
         }
 
-        const baseData: IPedido = {
+        const baseData: IPedidoCreate = {
             nome_cliente: name,
             telefone: phone,
             tipo_entrega: delivery,
@@ -137,7 +138,7 @@ const Finalizar = () => {
             forma_pagamento: payment,
             troco: troco || undefined,
             nota_fiscal: nf || undefined,
-            data_pedido: new Date(),
+            data_pedido: new Date().toISOString(),
             produtos: produtosParaApi
         }
 
@@ -154,7 +155,7 @@ const Finalizar = () => {
             })
         }
 
-        const data: IPedido = baseData
+        const data = baseData
 
 
         try {
@@ -163,7 +164,7 @@ const Finalizar = () => {
             limparCarrinho();
             toast.success('Pedido enviado com sucesso!');
             router.push(`/obrigado?pedido_id=${pedido_id}`);
-        } catch (error) {
+        } catch {
             return toast.error('Erro ao enviar o pedido, tente novamente!');
         }
     }
