@@ -1,7 +1,7 @@
 import { api } from "@/config/api";
 
 export async function GET() {
-  const baseUrl = "https://lhdev.com.br/restaurante/public";
+  const baseUrl = "https://restaurantespumoni.com.br/api/public";
 
   try {
     const response = await api.get("/products");

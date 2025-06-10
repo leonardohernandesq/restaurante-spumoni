@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['lhdev.com.br'],
+    domains: ['lhdev.com.br', 'restaurantespumoni.com.br'],
   },
   allowedDevOrigins: ['https://admin.lhdev.com.br:3000', 'https://restaurante-spumoni.vercel.app/admin'],
 
