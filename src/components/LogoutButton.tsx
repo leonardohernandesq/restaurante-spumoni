@@ -1,10 +1,12 @@
-import { userStore } from '@/store/userStore';
-import router from 'next/router';
 import React from 'react'
+import { useRouter } from 'next/navigation';
+
+import { userStore } from '@/store/userStore';
 import { FiLogOut } from 'react-icons/fi'
 
 export const LogoutButton = () => {
     const { logout, clearUser } = userStore();
+    const router = useRouter();
 
     const handleLogout = () => {
         logout();
