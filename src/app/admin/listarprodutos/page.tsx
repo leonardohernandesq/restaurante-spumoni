@@ -28,6 +28,10 @@ const ListarProdutos = () => {
         loadData();
     }, []);
 
+    useEffect(() => {
+        console.log('Produtos no estado:', products);
+    }, [products]);
+
 
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
