@@ -8,6 +8,7 @@ import { getAllCategory } from "@/services/category";
 import { AdminMenu } from "@/components/AdminMenu";
 import { ICategory } from "@/interfaces/ICategory";
 import { productStore } from "@/store/produtoStore";
+import { toast } from 'react-toastify';
 
 const ListarProdutos = () => {
     const { products, fetchProducts } = productStore();
@@ -15,14 +16,18 @@ const ListarProdutos = () => {
 
     useEffect(() => {
         const loadData = async () => {
-            const getAllProduct = 1;
-            const cats = await getAllCategory();
-            setCategories(cats);
-            await fetchProducts(getAllProduct);
+            try {
+                const cats = await getAllCategory();
+                setCategories(cats);
+                await fetchProducts(1);
+            } catch (err) {
+                toast.error("Erro ao carregar dados");
+            }
         };
 
         loadData();
-    }, [fetchProducts]);
+    }, []);
+
 
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
