@@ -71,15 +71,14 @@ export const productStore = create<TProductStore>((set) => ({
 
         try {
             await deleteProduct({ id });
-            set((state) => ({
-                products: state.products.filter((prev) => prev.id !== id),
-                loading: false
-            }));
+            await productStore.getState().fetchProducts(null); // <- refaz a busca completa
+            set({ loading: false });
         } catch (error) {
             console.error("Erro ao deletar produto:", error);
             set({ loading: false });
         }
     },
+
 
     fetchProducts: async (all: number | null) => {
         set({ loading: true });
@@ -88,11 +87,14 @@ export const productStore = create<TProductStore>((set) => ({
             const result = await getAllProducts(all);
 
             const flatProducts = result.flatMap((cat: IProductAll) =>
-                cat.products.map((product) => ({
-                    ...product,
-                    categoria_id: cat.id
-                }))
+                cat.products
+                    .filter((product) => !!product?.id) // ignora nulos
+                    .map((product) => ({
+                        ...product,
+                        categoria_id: cat.id
+                    }))
             );
+
 
             set({ products: flatProducts, loading: false });
         } catch (error) {
