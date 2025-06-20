@@ -1,13 +1,12 @@
 'use client';
 
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Container } from "@/components/Container";
 import { HeaderPages } from "@/components/HeaderPages";
 import { PreviewImage } from "@/components/PreviewImage";
 import { useProductForm } from "@/hooks/useProductForm";
 
 export default function EditarProdutoPage() {
-    const router = useRouter();
     const params = useParams();
     const slug = params.slug as string;
 
@@ -43,10 +42,11 @@ export default function EditarProdutoPage() {
             atributos: [
                 ...prev.atributos,
                 {
+                    atributo_id: '',
                     nomes_atributos: '',
                     limite: null,
                     obrigatorio: false,
-                    valores_atributo: [{ valor: '', preco: '', preco_incluido: false }],
+                    valores_atributo: [{ valor_atributo_id: '', valor: '', preco: '', preco_incluido: false }],
                 },
             ],
         }));
@@ -55,7 +55,7 @@ export default function EditarProdutoPage() {
 
     const adicionarValorAoAtributo = (index: number) => {
         const novos = [...formData.atributos];
-        novos[index].valores_atributo.push({ valor: '', preco: '', preco_incluido: false });
+        novos[index].valores_atributo.push({ valor_atributo_id: '', valor: '', preco: '', preco_incluido: false });
         setFormData((prev) => ({ ...prev, atributos: novos }));
     };
 
@@ -64,6 +64,8 @@ export default function EditarProdutoPage() {
         dias[index] = !dias[index];
         setFormData((prev) => ({ ...prev, diasDisponiveis: dias }));
     };
+
+    console.log(formData);
 
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
@@ -110,6 +112,8 @@ export default function EditarProdutoPage() {
                 <div className="grid grid-cols-3 gap-5">
                     {formData.atributos.map((atributo, i) => (
                         <div key={i} className="bg-zinc-200 border border-zinc-300 p-3 my-2">
+                            <input type="hidden" value={atributo.atributo_id ?? ''} />
+
                             <input
                                 className="w-full mb-2 border border-zinc-400 p-2 outline-0 rounded-md text-sm"
                                 placeholder="Nome do atributo"
@@ -141,6 +145,8 @@ export default function EditarProdutoPage() {
 
                             {atributo.valores_atributo.map((valor, j) => (
                                 <div key={j} className="grid grid-cols-3 gap-2 mb-2">
+                                    <input type="hidden" value={valor.valor_atributo_id ?? ''} />
+
                                     <input
                                         className="border border-zinc-400 p-2 outline-0 rounded-md text-sm"
                                         placeholder="Valor atributo"
