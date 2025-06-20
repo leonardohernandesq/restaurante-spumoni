@@ -20,7 +20,7 @@ const ListarProdutos = () => {
                 const cats = await getAllCategory();
                 setCategories(cats);
                 await fetchProducts(1);
-            } catch (err) {
+            } catch {
                 toast.error("Erro ao carregar dados");
             }
         };

@@ -28,20 +28,13 @@ export default function EditarProdutoPage() {
         setFormData((prev) => ({ ...prev, atributos: novos }));
     };
 
-
-    const updateValor = (
-        attrIndex: number,
-        valIndex: number,
-        field: string,
-        value: string | number | boolean
-    ) => {
+    const updateValor = (attrIndex: number, valIndex: number, field: string, value: string | number | boolean | null) => {
         const novos = [...formData.atributos];
         const valores = [...novos[attrIndex].valores_atributo];
         valores[valIndex] = { ...valores[valIndex], [field]: value };
         novos[attrIndex].valores_atributo = valores;
         setFormData((prev) => ({ ...prev, atributos: novos }));
     };
-
 
     const adicionarAtributo = () => {
         setFormData((prev) => ({
@@ -170,7 +163,6 @@ export default function EditarProdutoPage() {
                                     </label>
                                 </div>
                             ))}
-
                             <button
                                 type="button"
                                 onClick={() => adicionarValorAoAtributo(i)}
