@@ -60,7 +60,8 @@ export const useProductForm = (slugParam?: string) => {
                 const diasDisponiveis: boolean[] = Array(7).fill(false);
                 if (Array.isArray(data.dias_disponiveis)) {
                     data.dias_disponiveis.forEach((i: number) => {
-                        if (i >= 0 && i < 7) diasDisponiveis[i] = true;
+                        const index = i - 1;
+                        if (index >= 0 && index < 7) diasDisponiveis[index] = true;
                     });
                 }
 
@@ -102,7 +103,7 @@ export const useProductForm = (slugParam?: string) => {
 
         form.append("dias_disponiveis", JSON.stringify(
             formData.diasDisponiveis
-                .map((val, i) => val ? i + 1 : null)  // soma 1 aqui
+                .map((val, i) => val ? i + 1 : null)
                 .filter((v): v is number => v !== null)
         ))
 
