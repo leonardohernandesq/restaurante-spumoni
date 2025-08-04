@@ -19,7 +19,7 @@ export const useProductForm = (slugParam?: string) => {
         categoria_id: '',
         ativo: true,
         image: null,
-        imageUrl: null,
+        image_url: null,
         atributos: [{
             atributo_id: '',
             nomes_atributos: '',
@@ -76,7 +76,7 @@ export const useProductForm = (slugParam?: string) => {
                     categoria_id: data.categoria_id ? String(data.categoria_id) : '',
                     ativo: !!data.ativo,
                     image: null,
-                    imageUrl: data.image ? `${process.env.NEXT_PUBLIC_IMAGE_PATH}/${data.image}` : null,
+                    image_url: data.image ? `${process.env.NEXT_PUBLIC_IMAGE_PATH}/${data.image}` : null,
                     atributos: atributosFormatados.length > 0 ? atributosFormatados : [{
                         atributo_id: '',
                         nomes_atributos: '',
@@ -92,7 +92,17 @@ export const useProductForm = (slugParam?: string) => {
         load();
     }, [slugParam]);
 
-    const buildPayload = (): any => {
+    const buildPayload = (): FormData => {
+        const form = new FormData();
+
+        form.append("id", String(formData.id));
+        form.append("nome", formData.nome);
+        form.append("slug", formData.slug);
+        form.append("descricao", formData.descricao);
+        form.append("preco", formData.preco);
+        form.append("categoria_id", String(formData.categoria_id));
+        form.append("ativo", formData.ativo ? "1" : "0");
+
         const atributosConvertidos = formData.atributos.map(attr => ({
             atributo_id: attr.atributo_id,
             nome_atributo: attr.nomes_atributos,
@@ -106,35 +116,38 @@ export const useProductForm = (slugParam?: string) => {
             })),
         }));
 
+        form.append("atributos", JSON.stringify(atributosConvertidos));
+
         const dias_disponiveis = formData.diasDisponiveis
             .map((isDisponivel, index) => isDisponivel ? index : null)
             .filter((v) => v !== null);
 
-        return {
-            id: formData.id,
-            nome: formData.nome,
-            slug: formData.slug,
-            descricao: formData.descricao,
-            preco: formData.preco,
-            categoria_id: formData.categoria_id,
-            ativo: formData.ativo ? 1 : 0,
-            atributos: atributosConvertidos,
-            dias_disponiveis,
-            image_url: formData.imageUrl ?? '',
-        };
-    };
+        form.append("dias_disponiveis", JSON.stringify(dias_disponiveis));
 
-    const handleSubmit = async () => {
-        const payload = buildPayload();
-
-        if (slugParam) {
-            await updateProduct(slugParam, payload);
-        } else {
-            await addNewProduct(payload);
+        if (formData.image) {
+            form.append("image_url", formData.image);
         }
 
-        toast.success(`Produto ${slugParam ? 'editado' : 'cadastrado'} com sucesso!`);
-        router.push('/admin/listarprodutos');
+        return form;
+    };
+
+
+    const handleSubmit = async () => {
+        const formDataToSend = buildPayload();
+
+        try {
+            if (slugParam) {
+                await updateProduct(slugParam, formDataToSend);
+            } else {
+                await addNewProduct(formDataToSend);
+            }
+
+            toast.success(`Produto ${slugParam ? 'editado' : 'cadastrado'} com sucesso!`);
+            router.push('/admin/listarprodutos');
+        } catch (err) {
+            console.error("Erro ao enviar:", err);
+            toast.error("Erro ao salvar o produto");
+        }
     };
 
     return {

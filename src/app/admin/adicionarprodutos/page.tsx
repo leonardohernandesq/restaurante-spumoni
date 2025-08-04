@@ -17,17 +17,27 @@ export default function ProdutoPage() {
         loading
     } = useProductForm(slugParam);
 
-    const handleChange = (field: string, value: any) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
+    const handleChange = (field: string, value: string | boolean | File | number) => {
+        if (field === "image" && value instanceof File) {
+            const imagePreview = URL.createObjectURL(value);
+            setFormData((prev) => ({
+                ...prev,
+                image: value,
+                image_url: imagePreview
+            }));
+        } else {
+            setFormData((prev) => ({ ...prev, [field]: value }));
+        }
     };
 
-    const updateAtributo = (index: number, field: string, value: any) => {
+
+    const updateAtributo = (index: number, field: string, value: string | boolean | File | number) => {
         const novos = [...formData.atributos];
         novos[index] = { ...novos[index], [field]: value };
         setFormData((prev) => ({ ...prev, atributos: novos }));
     };
 
-    const updateValor = (attrIndex: number, valIndex: number, field: string, value: any) => {
+    const updateValor = (attrIndex: number, valIndex: number, field: string, value: string | boolean | File | number) => {
         const novos = [...formData.atributos];
         const valores = [...novos[attrIndex].valores_atributo];
         valores[valIndex] = { ...valores[valIndex], [field]: value };
@@ -39,15 +49,18 @@ export default function ProdutoPage() {
         setFormData((prev) => ({
             ...prev,
             atributos: [...prev.atributos, {
+                atributo_id: '',
                 nomes_atributos: '',
-                valores_atributo: [{ valor: '', preco: '', preco_incluido: false }]
+                valores_atributo: [{ valor_atributo_id: '', valor: '', preco: '', preco_incluido: false }],
+                limite: null,
+                obrigatorio: false
             }]
         }));
     };
 
     const adicionarValorAoAtributo = (index: number) => {
         const novos = [...formData.atributos];
-        novos[index].valores_atributo.push({ valor: '', preco: '', preco_incluido: false });
+        novos[index].valores_atributo.push({ valor_atributo_id: '', valor: '', preco: '', preco_incluido: false });
         setFormData((prev) => ({ ...prev, atributos: novos }));
     };
 
@@ -77,8 +90,10 @@ export default function ProdutoPage() {
                 <input value={formData.slug} onChange={(e) => handleChange("slug", e.target.value)} className="bg-zinc-200 border border-zinc-300 py-1.5 px-3 outline-0" placeholder="Digite aqui o slug do produto" />
 
                 <label className="mt-3">Imagem do Produto</label>
-                <PreviewImage onFileChange={(file) => handleChange("image", file)} />
-
+                <PreviewImage
+                    onFileChange={(file) => handleChange("image", file)}
+                    initialImageUrl={formData.image_url}
+                />
                 <label className="mt-3">Descrição do Produto</label>
                 <textarea value={formData.descricao} onChange={(e) => handleChange("descricao", e.target.value)} className="bg-zinc-200 border border-zinc-300 py-1.5 px-3 outline-0" placeholder="Digite aqui a descrição do produto" />
 

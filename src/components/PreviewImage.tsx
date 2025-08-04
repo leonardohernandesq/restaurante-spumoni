@@ -17,13 +17,29 @@ export function PreviewImage({ onFileChange, initialImageUrl }: PreviewImageProp
     }, [initialImageUrl]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log("Input mudou"); // Debug 1: Disparo do onChange
+
         const file = e.target.files?.[0];
-        if (file && file.type.startsWith("image/")) {
-            const imagePreview = URL.createObjectURL(file);
-            setPreview(imagePreview);
-            onFileChange(file);
+
+        if (!file) {
+            console.warn("Nenhum arquivo selecionado.");
+            return;
         }
+
+        console.log("Arquivo selecionado:", file); // Debug 2: Mostra o arquivo
+
+        if (!file.type.startsWith("image/")) {
+            console.warn("Arquivo não é uma imagem:", file.type);
+            return;
+        }
+
+        const imagePreview = URL.createObjectURL(file);
+        console.log("URL de preview gerada:", imagePreview); // Debug 3: Mostra o URL
+
+        setPreview(imagePreview);
+        onFileChange(file);
     };
+
 
     return (
         <div>

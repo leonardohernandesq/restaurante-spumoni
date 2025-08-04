@@ -11,7 +11,13 @@ export function middleware(req: NextRequest) {
     ) {
         console.log('🚫 Redirecionando para /admin');
         return NextResponse.redirect(new URL('/admin', req.url));
+    } else if (
+        req.nextUrl.pathname == '/admin' &&
+        token
+    ) {
+        return NextResponse.redirect(new URL('/admin/pedidos', req.url));
     }
+    console.log(req.nextUrl.pathname);
 
     return NextResponse.next();
 }

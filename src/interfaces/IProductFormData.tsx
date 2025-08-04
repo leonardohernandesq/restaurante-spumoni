@@ -23,7 +23,7 @@ export interface IProductFormData {
     ativo: boolean;
 
     image: File | null;
-    imageUrl?: string | null;
+    image_url?: string | null;
 
     atributos: IAtributo[];
     diasDisponiveis: boolean[];

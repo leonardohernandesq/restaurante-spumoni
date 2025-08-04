@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BsArrowRight } from 'react-icons/bs'
 import { toast } from 'react-toastify'
+import { AxiosError } from 'axios';
 
 import { Container } from '@/components/Container'
 import { userStore } from '@/store/userStore';
@@ -29,8 +30,13 @@ const Login = () => {
             toast.success('Login realizado com sucesso!');
 
             router.push('/admin/pedidos')
-        } catch (err: any) {
-            const serverMsg = err?.response?.data?.message || 'Erro ao fazer login';
+        } catch (err: unknown) {
+            let serverMsg = 'Erro ao fazer login';
+
+            if (err instanceof AxiosError && err.response?.data?.message) {
+                serverMsg = err.response.data.message;
+            }
+
             toast.error(serverMsg);
         }
     };
