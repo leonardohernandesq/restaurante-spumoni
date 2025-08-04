@@ -102,9 +102,10 @@ export const useProductForm = (slugParam?: string) => {
 
         form.append("dias_disponiveis", JSON.stringify(
             formData.diasDisponiveis
-                .map((val, i) => val ? i : null)
+                .map((val, i) => val ? i + 1 : null)  // soma 1 aqui
                 .filter((v): v is number => v !== null)
-        ));
+        ))
+
 
         const atributos = formData.atributos.map(attr => ({
             nome_atributo: attr.nomes_atributos,
