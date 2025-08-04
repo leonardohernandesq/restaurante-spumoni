@@ -57,6 +57,8 @@ export const productStore = create<TProductStore>((set) => ({
 
         try {
             const product = await getProductBySlug(slug);
+
+            console.log("📦 Produto obtido:", product);
             set({ product, loading: false });
             return product;
         } catch (error) {
