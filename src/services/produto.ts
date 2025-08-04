@@ -8,8 +8,10 @@ export async function getAllProducts(all: number | null) {
 }
 
 export async function getProductBySlug(slug: string) {
+    console.log('slug:', slug);
     const res = await api.get(`/product?slug=${slug}`);
 
+    console.log('res:', res.data);
     return res.data;
 }
 
