@@ -6,7 +6,7 @@ import { IProductFormData, IAtributo, IValorAtributo } from "@/interfaces/IProdu
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
-export const useProductForm = (slugParam: string) => {
+export const useProductForm = (slugParam?: string) => {
     const { addNewProduct, updateProduct, getProductBySlug, loading } = productStore();
     const router = useRouter();
 
