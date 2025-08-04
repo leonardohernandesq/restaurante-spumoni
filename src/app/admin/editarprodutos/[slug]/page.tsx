@@ -18,6 +18,8 @@ export default function EditarProdutoPage() {
         loading
     } = useProductForm(slug);
 
+    console.log("Form Data:", formData);
+
     const handleChange = (field: string, value: string | number | boolean) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
@@ -63,6 +65,8 @@ export default function EditarProdutoPage() {
         dias[index] = !dias[index];
         setFormData((prev) => ({ ...prev, diasDisponiveis: dias }));
     };
+
+    console.log('Dias: ', formData.diasDisponiveis);
 
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
