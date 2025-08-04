@@ -11,8 +11,9 @@ import { productStore } from "@/store/produtoStore";
 import { toast } from 'react-toastify';
 
 const ListarProdutos = () => {
-    const { products, fetchProducts } = productStore();
     const [categories, setCategories] = useState<ICategory[]>([]);
+    const fetchProducts = productStore(state => state.fetchProducts);
+    const products = productStore(state => state.products);
 
     useEffect(() => {
         const loadData = async () => {
@@ -26,7 +27,8 @@ const ListarProdutos = () => {
         };
 
         loadData();
-    }, []);
+    }, [fetchProducts]);
+
 
     useEffect(() => {
         console.log('Produtos no estado:', products);
