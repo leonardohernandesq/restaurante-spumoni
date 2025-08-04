@@ -128,6 +128,8 @@ export const useProductForm = (slugParam?: string) => {
         const payload = buildPayload();
 
         if (slugParam) {
+            console.log("🧪 Payload enviado:", Object.fromEntries(payload.entries()));
+
             await updateProduct(slugParam, payload);
         } else {
             await addNewProduct(payload);

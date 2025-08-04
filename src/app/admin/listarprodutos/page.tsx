@@ -29,12 +29,6 @@ const ListarProdutos = () => {
         loadData();
     }, [fetchProducts]);
 
-
-    useEffect(() => {
-        console.log('Produtos no estado:', products);
-    }, [products]);
-
-
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
             <div className="py-4 px-2">
