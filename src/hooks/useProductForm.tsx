@@ -57,6 +57,9 @@ export const useProductForm = (slugParam?: string) => {
                     }))
                     : [];
 
+                console.log("📅 dias_disponiveis brutos:", data.dias_disponiveis);
+
+
                 const diasDisponiveis: boolean[] = Array(7).fill(false);
                 if (Array.isArray(data.dias_disponiveis)) {
                     data.dias_disponiveis.forEach((i: number) => {
