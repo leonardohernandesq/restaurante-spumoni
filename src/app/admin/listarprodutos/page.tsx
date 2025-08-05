@@ -21,8 +21,6 @@ const ListarProdutos = () => {
                 const cats = await getAllCategory();
                 setCategories(cats);
                 await fetchProducts(1);
-                console.log("🔄 Carregando produtos...", products);
-                console.log("🔄 Carregando categorias...", categories);
             } catch {
                 toast.error("Erro ao carregar dados");
             }
@@ -31,6 +29,8 @@ const ListarProdutos = () => {
         loadData();
     }, [fetchProducts]);
 
+    console.log("🔄 Carregando produtos...", products);
+    console.log("🔄 Carregando categorias...", categories);
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
             <div className="py-4 px-2">
