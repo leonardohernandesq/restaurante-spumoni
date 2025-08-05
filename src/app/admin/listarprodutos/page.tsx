@@ -5,42 +5,29 @@ import { Container } from "@/components/Container";
 import { CategoryScroll } from "@/components/CategoryScroll";
 import { ListProductsItem } from "@/components/ListProductsItem";
 import { getAllCategory } from "@/services/category";
-import { getAllProducts } from "@/services/produto";
 import { AdminMenu } from "@/components/AdminMenu";
 import { ICategory } from "@/interfaces/ICategory";
-import { IProduct, IProductAll } from "@/interfaces/IProductAll";
+import { productStore } from "@/store/produtoStore";
 import { toast } from 'react-toastify';
 
 const ListarProdutos = () => {
     const [categories, setCategories] = useState<ICategory[]>([]);
-    const [products, setProducts] = useState<IProduct[]>([]);
+    const fetchProducts = productStore(state => state.fetchProducts);
+    const products = productStore(state => state.products);
 
     useEffect(() => {
         const loadData = async () => {
             try {
                 const cats = await getAllCategory();
                 setCategories(cats);
-
-                const result = await getAllProducts(1);
-
-                const flatProducts = (result as IProductAll[]).flatMap((cat) =>
-                    (cat.products ?? [])
-                        .filter((p): p is IProduct => !!p?.id)
-                        .map((p) => ({
-                            ...p,
-                            categoria_id: Number(cat.id),
-                        }))
-                );
-
-
-                setProducts(flatProducts);
+                await fetchProducts(1);
             } catch {
-                toast.error("Erro ao carregar categorias ou produtos.");
+                toast.error("Erro ao carregar dados");
             }
         };
 
         loadData();
-    }, []);
+    }, [fetchProducts]);
 
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
