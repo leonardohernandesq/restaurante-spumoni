@@ -3,13 +3,14 @@ import { IProduct } from "@/interfaces/IProductAll";
 
 export async function getAllProducts(all: number | null) {
     try {
-        const res = await api.get(`/products${all ? `?all=${all}` : ''}`);
+        const res = await api.get(`/products${all ? `?all=${all}` : ''}&_ts=${Date.now()}`);
         return res.data;
     } catch (error) {
         console.error('Erro ao buscar todos os produtos:', error);
         throw new Error('Erro ao buscar todos os produtos');
     }
 }
+
 
 export async function getProductBySlug(slug: string) {
     try {
