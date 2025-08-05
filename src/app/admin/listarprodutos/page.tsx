@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 
 const ListarProdutos = () => {
     const [categories, setCategories] = useState<ICategory[]>([]);
+
     const fetchProducts = productStore(state => state.fetchProducts);
     const products = productStore(state => state.products);
 
@@ -20,17 +21,16 @@ const ListarProdutos = () => {
             try {
                 const cats = await getAllCategory();
                 setCategories(cats);
+
                 await fetchProducts(1);
-            } catch {
-                toast.error("Erro ao carregar dados");
+            } catch (error) {
+                toast.error("Erro ao carregar categorias ou produtos.");
             }
         };
 
         loadData();
     }, [fetchProducts]);
 
-    console.log("🔄 Carregando produtos...", products);
-    console.log("🔄 Carregando categorias...", categories);
     return (
         <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
             <div className="py-4 px-2">

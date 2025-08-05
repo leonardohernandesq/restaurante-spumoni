@@ -2,27 +2,37 @@ import { api } from "@/config/api";
 import { IProduct } from "@/interfaces/IProductAll";
 
 export async function getAllProducts(all: number | null) {
-    const res = await api.get(`/products${all ? `?all=${all}` : ''}`);
-
-    console.log(all);
-    console.log('GetProdutos', res.data);
-    return res.data;
+    try {
+        const res = await api.get(`/products${all ? `?all=${all}` : ''}`);
+        return res.data;
+    } catch (error) {
+        console.error('Erro ao buscar todos os produtos:', error);
+        throw new Error('Erro ao buscar todos os produtos');
+    }
 }
 
 export async function getProductBySlug(slug: string) {
-    const res = await api.get(`/product?slug=${slug}`);
-
-    return res.data;
+    try {
+        const res = await api.get(`/product?slug=${slug}`);
+        return res.data;
+    } catch (error) {
+        console.error(`Erro ao buscar produto com slug "${slug}":`, error);
+        throw new Error('Erro ao buscar o produto');
+    }
 }
 
 export async function addProduct(data: FormData | IProduct) {
     const isFormData = data instanceof FormData;
 
-    const res = await api.post('/products', data, {
-        headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : undefined,
-    });
-
-    return res.data;
+    try {
+        const res = await api.post('/products', data, {
+            headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : undefined,
+        });
+        return res.data;
+    } catch (error) {
+        console.error('Erro ao adicionar produto:', error);
+        throw new Error('Erro ao adicionar produto');
+    }
 }
 
 export async function updateProduct(slug: string, data: FormData | IProduct) {
@@ -33,8 +43,8 @@ export async function updateProduct(slug: string, data: FormData | IProduct) {
     }
 
     try {
-        const response = await api.put(
-            `/products/edit`,
+        const res = await api.put(
+            '/products/edit',
             isFormData ? data : JSON.stringify(data),
             {
                 headers: isFormData
@@ -43,18 +53,21 @@ export async function updateProduct(slug: string, data: FormData | IProduct) {
             }
         );
 
-        return response.data;
+        return res.data;
     } catch (error) {
-        console.error('Erro ao atualizar produto:', error);
+        console.error(`Erro ao atualizar produto com slug "${slug}":`, error);
         throw new Error('Erro ao atualizar o produto');
     }
 }
 
-
 export async function deleteProduct({ id }: { id: string | number }) {
-    const res = await api.delete('/products/delete', {
-        data: { id }
-    });
-
-    return res.data;
+    try {
+        const res = await api.delete('/products/delete', {
+            data: { id },
+        });
+        return res.data;
+    } catch (error) {
+        console.error(`Erro ao deletar produto com ID "${id}":`, error);
+        throw new Error('Erro ao deletar o produto');
+    }
 }
