@@ -19,10 +19,12 @@ export interface IProduct {
     categoria_id: number;
     ativo: boolean;
     atributos: {
+        atributo_id?: number;
         limite: null;
         obrigatorio: boolean | string | number;
         nome_atributo: string;
         valores_atributo: {
+            valor_atributo_id?: number;
             valor: string;
             preco: string;
             preco_incluido: boolean;

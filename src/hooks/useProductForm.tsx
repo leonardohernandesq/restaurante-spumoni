@@ -21,11 +21,12 @@ export const useProductForm = (slugParam?: string) => {
         image: null,
         imageUrl: null,
         atributos: [{
+            atributo_id: null,
             nomes_atributos: '',
             limite: null,
             obrigatorio: false,
             valores_atributo: [
-                { valor: '', preco: '', preco_incluido: false }
+                { valor_atributo_id: null, valor: '', preco: '', preco_incluido: false }
             ]
         }],
         diasDisponiveis: Array(7).fill(false),
@@ -44,11 +45,13 @@ export const useProductForm = (slugParam?: string) => {
 
                 const atributosFormatados: IAtributo[] = Array.isArray(data.atributos)
                     ? data.atributos.map((atributo): IAtributo => ({
+                        atributo_id: atributo.atributo_id ?? null,
                         nomes_atributos: atributo.nome_atributo ?? '',
                         limite: atributo.limite ?? null,
                         obrigatorio: !!atributo.obrigatorio,
                         valores_atributo: Array.isArray(atributo.valores_atributo)
                             ? atributo.valores_atributo.map((valor): IValorAtributo => ({
+                                valor_atributo_id: valor.valor_atributo_id ?? undefined,
                                 valor: valor.valor ?? '',
                                 preco: valor.preco ?? '',
                                 preco_incluido: !!valor.preco_incluido,
@@ -79,10 +82,11 @@ export const useProductForm = (slugParam?: string) => {
                     image: null,
                     imageUrl: data.image ? `${process.env.NEXT_PUBLIC_IMAGE_PATH}/${data.image}` : null,
                     atributos: atributosFormatados.length > 0 ? atributosFormatados : [{
+                        atributo_id: null,
                         nomes_atributos: '',
                         limite: null,
                         obrigatorio: false,
-                        valores_atributo: [{ valor: '', preco: '', preco_incluido: false }]
+                        valores_atributo: [{ valor_atributo_id: null, valor: '', preco: '', preco_incluido: false }]
                     }],
                     diasDisponiveis,
                 });
@@ -112,10 +116,12 @@ export const useProductForm = (slugParam?: string) => {
 
 
         const atributos = formData.atributos.map(attr => ({
+            atributo_id: attr.atributo_id ?? null,
             nome_atributo: attr.nomes_atributos,
             limite: attr.limite,
             obrigatorio: attr.obrigatorio,
             valores_atributo: attr.valores_atributo.map(v => ({
+                valor_atributo_id: v.valor_atributo_id ?? null,
                 valor: v.valor,
                 preco: v.preco,
                 preco_incluido: v.preco_incluido ? 1 : 0

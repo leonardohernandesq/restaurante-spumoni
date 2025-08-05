@@ -1,10 +1,12 @@
 export interface IValorAtributo {
+    valor_atributo_id?: string | number | null;
     valor: string;
     preco: string;
     preco_incluido: boolean;
 }
 
 export interface IAtributo {
+    atributo_id?: string | number | null;
     limite?: null;
     obrigatorio: boolean;
     nomes_atributos: string;
@@ -12,11 +14,12 @@ export interface IAtributo {
 }
 
 export interface IProductFormData {
-    id?: string | number;
+    id?: string | number | null;
     nome: string;
     slug: string;
     descricao: string;
     preco: string;
+
     categoria_id: string | number;
     ativo: boolean;
 

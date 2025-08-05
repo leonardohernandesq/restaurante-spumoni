@@ -44,6 +44,7 @@ export default function EditarProdutoPage() {
             atributos: [
                 ...prev.atributos,
                 {
+                    atributo_id: null,
                     nomes_atributos: '',
                     limite: null,
                     obrigatorio: false,
@@ -112,7 +113,7 @@ export default function EditarProdutoPage() {
                 <h3 className="mt-4 font-semibold">Atributos</h3>
                 <div className="grid grid-cols-3 gap-5">
                     {formData.atributos.map((atributo, i) => (
-                        <div key={i} className="bg-zinc-200 border border-zinc-300 p-3 my-2">
+                        <div key={atributo.atributo_id!} className="bg-zinc-200 border border-zinc-300 p-3 my-2">
                             <input
                                 className="w-full mb-2 border border-zinc-400 p-2 outline-0 rounded-md text-sm"
                                 placeholder="Nome do atributo"
