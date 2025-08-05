@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { addProduct, deleteProduct, getAllProducts, getProductBySlug, updateProduct } from '@/services/produto';
+import { addProduct, deleteProduct, getAllProducts, getProductBySlug, updateProduct as updateProductAPI } from '@/services/produto';
 import { IProduct, IProductAll } from '@/interfaces/IProductAll';
 
 export type TProductStore = {
@@ -38,7 +38,7 @@ export const productStore = create<TProductStore>((set) => ({
         set({ loading: true });
 
         try {
-            const response = await updateProduct(slug, data);
+            const response = await updateProductAPI(slug, data);
             set((state) => ({
                 products: state.products.map((prod) =>
                     prod.slug === slug ? response : prod
@@ -99,6 +99,10 @@ export const productStore = create<TProductStore>((set) => ({
                         categoria_id: cat.id,
                     }))
             );
+
+            console.log('Produtos recebidos da API:', result);
+            console.log('Produtos formatados:', flatProducts);
+
 
             set({ products: flatProducts, loading: false });
         } catch (error) {

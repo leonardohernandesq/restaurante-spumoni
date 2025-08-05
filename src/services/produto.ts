@@ -4,14 +4,14 @@ import { IProduct } from "@/interfaces/IProductAll";
 export async function getAllProducts(all: number | null) {
     const res = await api.get(`/products${all ? `?all=${all}` : ''}`);
 
+    console.log(all);
+    console.log('GetProdutos', res.data);
     return res.data;
 }
 
 export async function getProductBySlug(slug: string) {
-    console.log('slug:', slug);
     const res = await api.get(`/product?slug=${slug}`);
 
-    console.log('res:', res.data);
     return res.data;
 }
 
