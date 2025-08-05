@@ -8,7 +8,7 @@ import { getAllCategory } from "@/services/category";
 import { getAllProducts } from "@/services/produto";
 import { AdminMenu } from "@/components/AdminMenu";
 import { ICategory } from "@/interfaces/ICategory";
-import { IProduct } from "@/interfaces/IProductAll";
+import { IProduct, IProductAll } from "@/interfaces/IProductAll";
 import { toast } from 'react-toastify';
 
 const ListarProdutos = () => {
@@ -22,12 +22,16 @@ const ListarProdutos = () => {
                 setCategories(cats);
 
                 const result = await getAllProducts(1);
-                const flatProducts = result.flatMap((cat: any) =>
-                    (cat.products ?? []).filter((p: any) => !!p?.id).map((p: any) => ({
-                        ...p,
-                        categoria_id: cat.id,
-                    }))
+
+                const flatProducts = (result as IProductAll[]).flatMap((cat) =>
+                    (cat.products ?? [])
+                        .filter((p): p is IProduct => !!p?.id)
+                        .map((p) => ({
+                            ...p,
+                            categoria_id: Number(cat.id),
+                        }))
                 );
+
 
                 setProducts(flatProducts);
             } catch {
