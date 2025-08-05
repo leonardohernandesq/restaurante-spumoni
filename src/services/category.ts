@@ -8,14 +8,14 @@ export async function createCategory({ nome, slug, descricao }: TCategory) {
 }
 
 export async function getAllCategory() {
-    const res = await api.get('/category');
+    const res = await api.get('/category?_ts=${Date.now()}');
 
     return res.data;
 }
 
 
 export async function getCategoryById({ id }: { id: number }) {
-    const res = await api.get(`/categoryId?id=${id}`);
+    const res = await api.get(`/categoryId?id=${id}&_ts=${Date.now()}`);
 
     return res.data;
 }

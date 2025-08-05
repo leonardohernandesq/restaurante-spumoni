@@ -5,7 +5,7 @@ import { IPedido } from '@/interfaces/IPedidosData';
 
 export const fetchPedidosAPI = async (after?: string): Promise<IPedido[]> => {
   try {
-    const response = await api.get<IPedido[]>('/orders', {
+    const response = await api.get<IPedido[]>('/orders?_ts=${Date.now()}', {
       params: after ? { after } : {},
       withCredentials: true,
     });
@@ -31,7 +31,7 @@ export const insertPedidoApi = async (data: IPedidoCreate): Promise<IPedido> => 
 
 export const fetchPedidoById = async (id: number) => {
   try {
-    const response = await api.get(`/order?id=${id}`)
+    const response = await api.get(`/order?id=${id}&_ts=${Date.now()}`)
 
     return response.data;
   } catch (error) {

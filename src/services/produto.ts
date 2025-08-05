@@ -14,7 +14,7 @@ export async function getAllProducts(all: number | null) {
 
 export async function getProductBySlug(slug: string) {
     try {
-        const res = await api.get(`/product?slug=${slug}`);
+        const res = await api.get(`/product?slug=${slug}&_ts=${Date.now()}`);
         return res.data;
     } catch (error) {
         console.error(`Erro ao buscar produto com slug "${slug}":`, error);
