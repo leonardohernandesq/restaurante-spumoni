@@ -18,39 +18,31 @@ export const productStore = create<TProductStore>((set) => ({
     product: null,
     products: [],
 
-    addNewProduct: async (data: FormData | IProduct) => {
+    addNewProduct: async (data) => {
         set({ loading: true });
-
         try {
-            const response = await addProduct(data);
-            set((state) => ({
-                products: [...state.products, response],
-                product: response,
-                loading: false
-            }));
+            await addProduct(data);
+            await productStore.getState().fetchProducts(null); // força atualização
+            set({ loading: false });
         } catch (error) {
             console.error("Erro ao adicionar produto:", error);
             set({ loading: false });
         }
     },
 
-    updateProduct: async (slug: string, data: FormData | IProduct) => {
-        set({ loading: true });
 
+    updateProduct: async (slug, data) => {
+        set({ loading: true });
         try {
-            const response = await updateProductAPI(slug, data);
-            set((state) => ({
-                products: state.products.map((prod) =>
-                    prod.slug === slug ? response : prod
-                ),
-                product: response,
-                loading: false
-            }));
+            await updateProductAPI(slug, data);
+            await productStore.getState().fetchProducts(null); // força atualização
+            set({ loading: false });
         } catch (error) {
             console.error("Erro ao atualizar produto:", error);
             set({ loading: false });
         }
     },
+
 
     getProductBySlug: async (slug: string) => {
         set({ loading: true });
