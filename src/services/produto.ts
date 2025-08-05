@@ -1,9 +1,24 @@
 import { api } from "@/config/api";
 import { IProduct } from "@/interfaces/IProductAll";
 
-export async function getAllProducts(all: number | null) {
+// Helper para saber se estamos no browser
+const isBrowser = typeof window !== 'undefined';
+
+export async function getAllProducts(all: number | null, bustCache = false) {
     try {
-        const res = await api.get(`/products${all ? `?all=${all}&_ts=${Date.now()}` : '?_ts=${Date.now()}'}`);
+        const params = new URLSearchParams();
+
+        if (all !== null) params.append('all', all.toString());
+
+        // Só adiciona timestamp se for client e solicitado
+        if (bustCache && isBrowser) {
+            params.append('_ts', Date.now().toString());
+        }
+
+        const query = params.toString();
+        const url = `/products${query ? `?${query}` : ''}`;
+
+        const res = await api.get(url);
         return res.data;
     } catch (error) {
         console.error('Erro ao buscar todos os produtos:', error);
@@ -11,10 +26,18 @@ export async function getAllProducts(all: number | null) {
     }
 }
 
-
-export async function getProductBySlug(slug: string) {
+export async function getProductBySlug(slug: string, bustCache = false) {
     try {
-        const res = await api.get(`/product?slug=${slug}&_ts=${Date.now()}`);
+        const params = new URLSearchParams();
+        params.append('slug', slug);
+
+        if (bustCache && isBrowser) {
+            params.append('_ts', Date.now().toString());
+        }
+
+        const url = `/product?${params.toString()}`;
+
+        const res = await api.get(url);
         return res.data;
     } catch (error) {
         console.error(`Erro ao buscar produto com slug "${slug}":`, error);

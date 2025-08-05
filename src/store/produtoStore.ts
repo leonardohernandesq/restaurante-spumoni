@@ -17,7 +17,7 @@ export type TProductStore = {
     updateProduct: (slug: string, data: FormData | IProduct) => Promise<void>;
     getProductBySlug: (slug: string) => Promise<IProduct>;
     deleteProductApi: (id: string | number) => Promise<void>;
-    fetchProducts: (all: number | null) => Promise<void>;
+    fetchProducts: (all: number | null, bustCache?: boolean) => Promise<void>;
 };
 
 export const productStore = create<TProductStore>((set) => ({
@@ -25,10 +25,10 @@ export const productStore = create<TProductStore>((set) => ({
     product: null,
     products: [],
 
-    fetchProducts: async (all: number | null) => {
+    fetchProducts: async (all: number | null, bustCache = false) => {
         set({ loading: true });
         try {
-            const result = await getAllProducts(all);
+            const result = await getAllProducts(all, bustCache);
             const flatProducts = result.flatMap((cat: IProductAll) =>
                 (cat.products ?? [])
                     .filter((product) => !!product?.id)
@@ -54,7 +54,7 @@ export const productStore = create<TProductStore>((set) => ({
         try {
             const response = await addProduct(data);
             set({ product: response });
-            await productStore.getState().fetchProducts(null); // Sincroniza a lista
+            await productStore.getState().fetchProducts(null, true); // bust cache
         } catch (error) {
             console.error('Erro ao adicionar produto:', error);
         } finally {
@@ -67,7 +67,7 @@ export const productStore = create<TProductStore>((set) => ({
         try {
             const response = await updateProductAPI(slug, data);
             set({ product: response });
-            await productStore.getState().fetchProducts(null); // Sincroniza a lista
+            await productStore.getState().fetchProducts(null, true); // bust cache
         } catch (error) {
             console.error('Erro ao atualizar produto:', error);
         } finally {
@@ -79,7 +79,7 @@ export const productStore = create<TProductStore>((set) => ({
         set({ loading: true });
         try {
             await deleteProduct({ id });
-            await productStore.getState().fetchProducts(null); // Atualiza a lista após deletar
+            await productStore.getState().fetchProducts(null, true); // bust cache
         } catch (error) {
             console.error('Erro ao deletar produto:', error);
         } finally {
@@ -90,7 +90,7 @@ export const productStore = create<TProductStore>((set) => ({
     getProductBySlug: async (slug) => {
         set({ loading: true });
         try {
-            const product = await getProductBySlug(slug);
+            const product = await getProductBySlug(slug, true); // garante fetch atualizado
             console.log('📦 Produto obtido:', product);
             set({ product });
             return product;
