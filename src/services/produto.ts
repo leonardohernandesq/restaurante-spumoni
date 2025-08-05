@@ -2,8 +2,6 @@ import { api } from "@/config/api";
 import { IProduct } from "@/interfaces/IProductAll";
 
 // Helper para saber se estamos no browser
-const isBrowser = typeof window !== 'undefined';
-
 export async function getAllProducts(all: number | null, bustCache = false) {
     try {
         const params = new URLSearchParams();
@@ -11,7 +9,7 @@ export async function getAllProducts(all: number | null, bustCache = false) {
         if (all !== null) params.append('all', all.toString());
 
         // Só adiciona timestamp se for client e solicitado
-        if (bustCache && isBrowser) {
+        if (bustCache) {
             params.append('_ts', Date.now().toString());
         }
 
@@ -31,7 +29,7 @@ export async function getProductBySlug(slug: string, bustCache = false) {
         const params = new URLSearchParams();
         params.append('slug', slug);
 
-        if (bustCache && isBrowser) {
+        if (bustCache) {
             params.append('_ts', Date.now().toString());
         }
 
