@@ -9,8 +9,6 @@ export default async function Home() {
   const getAllProduct = 0;
   const categories = await getAllCategory();
   const productsAll = await getAllProducts(getAllProduct);
-
-  console.log(productsAll);
   return (
     <main className="bg-zinc-100">
       <Header />
