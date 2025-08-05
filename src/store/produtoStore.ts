@@ -1,12 +1,5 @@
 import { create } from 'zustand';
-import {
-    addProduct,
-    deleteProduct,
-    getAllProducts,
-    getProductBySlug,
-    updateProduct as updateProductAPI
-} from '@/services/produto';
-
+import { addProduct, deleteProduct, getAllProducts, getProductBySlug, updateProduct } from '@/services/produto';
 import { IProduct, IProductAll } from '@/interfaces/IProductAll';
 
 export type TProductStore = {
@@ -14,10 +7,10 @@ export type TProductStore = {
     product: IProduct | null;
     products: IProduct[];
     addNewProduct: (data: FormData | IProduct) => Promise<void>;
-    updateProduct: (slug: string, data: FormData | IProduct) => Promise<void>;
+    updateProduct: (slug: string, data: FormData) => Promise<void>;
     getProductBySlug: (slug: string) => Promise<IProduct>;
     deleteProductApi: (id: string | number) => Promise<void>;
-    fetchProducts: (all: number | null, bustCache?: boolean) => Promise<void>;
+    fetchProducts: (all: number | null) => Promise<void>;
 };
 
 export const productStore = create<TProductStore>((set) => ({
@@ -25,10 +18,79 @@ export const productStore = create<TProductStore>((set) => ({
     product: null,
     products: [],
 
-    fetchProducts: async (all: number | null, bustCache = false) => {
+    addNewProduct: async (data: FormData | IProduct) => {
         set({ loading: true });
+
         try {
-            const result = await getAllProducts(all, bustCache);
+            const response = await addProduct(data);
+            set((state) => ({
+                products: [...state.products, response],
+                product: response,
+                loading: false
+            }));
+        } catch (error) {
+            console.error("Erro ao adicionar produto:", error);
+            set({ loading: false });
+        }
+    },
+
+    updateProduct: async (slug: string, data: FormData | IProduct) => {
+        set({ loading: true });
+
+        try {
+            const response = await updateProduct(slug, data);
+            set((state) => ({
+                products: state.products.map((prod) =>
+                    prod.slug === slug ? response : prod
+                ),
+                product: response,
+                loading: false
+            }));
+        } catch (error) {
+            console.error("Erro ao atualizar produto:", error);
+            set({ loading: false });
+        }
+    },
+
+    getProductBySlug: async (slug: string) => {
+        set({ loading: true });
+
+        try {
+            const product = await getProductBySlug(slug);
+
+            console.log("📦 Produto obtido:", product);
+            set({ product, loading: false });
+            return product;
+        } catch (error) {
+            console.error("Erro ao buscar produto por slug:", error);
+            set({ loading: false });
+            throw error;
+        }
+    },
+
+    deleteProductApi: async (id: string | number) => {
+        set({ loading: true });
+
+        try {
+            await deleteProduct({ id });
+            set((state) => ({
+                products: state.products.filter(p => p.id !== id)
+            }));
+            set({ loading: false });
+        } catch (error) {
+            console.error("Erro ao deletar produto:", error);
+            set({ loading: false });
+        }
+    },
+
+
+
+    fetchProducts: async (all: number | null) => {
+        set({ loading: true });
+
+        try {
+            const result = await getAllProducts(all);
+
             const flatProducts = result.flatMap((cat: IProductAll) =>
                 (cat.products ?? [])
                     .filter((product) => !!product?.id)
@@ -38,67 +100,10 @@ export const productStore = create<TProductStore>((set) => ({
                     }))
             );
 
-            console.log('Produtos recebidos da API:', result);
-            console.log('Produtos formatados:', flatProducts);
-
-            set({ products: flatProducts });
+            set({ products: flatProducts, loading: false });
         } catch (error) {
             console.error('Erro ao buscar produtos:', error);
-        } finally {
             set({ loading: false });
         }
-    },
-
-    addNewProduct: async (data) => {
-        set({ loading: true });
-        try {
-            const response = await addProduct(data);
-            set({ product: response });
-            await productStore.getState().fetchProducts(null, true); // bust cache
-        } catch (error) {
-            console.error('Erro ao adicionar produto:', error);
-        } finally {
-            set({ loading: false });
-        }
-    },
-
-    updateProduct: async (slug, data) => {
-        set({ loading: true });
-        try {
-            const response = await updateProductAPI(slug, data);
-            set({ product: response });
-            await productStore.getState().fetchProducts(null, true); // bust cache
-        } catch (error) {
-            console.error('Erro ao atualizar produto:', error);
-        } finally {
-            set({ loading: false });
-        }
-    },
-
-    deleteProductApi: async (id) => {
-        set({ loading: true });
-        try {
-            await deleteProduct({ id });
-            await productStore.getState().fetchProducts(null, true); // bust cache
-        } catch (error) {
-            console.error('Erro ao deletar produto:', error);
-        } finally {
-            set({ loading: false });
-        }
-    },
-
-    getProductBySlug: async (slug) => {
-        set({ loading: true });
-        try {
-            const product = await getProductBySlug(slug, true); // garante fetch atualizado
-            console.log('📦 Produto obtido:', product);
-            set({ product });
-            return product;
-        } catch (error) {
-            console.error('Erro ao buscar produto por slug:', error);
-            throw error;
-        } finally {
-            set({ loading: false });
-        }
-    },
+    }
 }));
