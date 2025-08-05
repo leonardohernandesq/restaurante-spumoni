@@ -16,6 +16,8 @@ const ListarProdutos = () => {
     const products = productStore(state => state.products);
 
     useEffect(() => {
+        console.log("🔄 Carregando produtos...", products);
+        console.log("🔄 Carregando categorias...", categories);
         const loadData = async () => {
             try {
                 const cats = await getAllCategory();
