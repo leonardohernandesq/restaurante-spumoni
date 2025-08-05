@@ -23,7 +23,7 @@ const ListarProdutos = () => {
                 setCategories(cats);
 
                 await fetchProducts(1);
-            } catch (error) {
+            } catch {
                 toast.error("Erro ao carregar categorias ou produtos.");
             }
         };
