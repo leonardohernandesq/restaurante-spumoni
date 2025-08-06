@@ -4,6 +4,7 @@ import { Container } from '@/components/Container'
 import { IProductSectionProps } from '@/interfaces/IProductSectionProps'
 
 export const ProductSection = ({ data }: IProductSectionProps) => {
+    console.log(data);
     return (
         <>
             {data.map((item) => (
