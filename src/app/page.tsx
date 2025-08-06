@@ -32,7 +32,7 @@ export default function Home() {
       {
         loading ?
           <>
-            <h2 className="text-3xl font-bold text-center mt-4 mb-32">Loading...</h2>
+            <h2 className="font-medium text-3xl text-center mt-4 mb-64">Loading...</h2>
           </> :
           <>
             <CategoryScroll categories={categories} />
