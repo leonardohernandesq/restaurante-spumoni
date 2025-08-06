@@ -10,24 +10,25 @@ import { productStore } from "@/store/produtoStore";
 import { IProductAll } from "@/interfaces/IProductAll";
 
 export default function Home() {
-  const categories = categoryStore(state => state.categories);
-  const getAllCategories = categoryStore(state => state.getAll);
+  const { categories, getAll, loading: catLoading } = categoryStore();
+  const { products, fetchProducts, loading: prodLoading } = productStore();
 
-  const products = productStore(state => state.products);
-  const fetchProducts = productStore(state => state.fetchProducts);
+  const loading = prodLoading || catLoading;
 
   useEffect(() => {
-    getAllCategories();
-    fetchProducts(0);
-  }, [getAllCategories, fetchProducts]);
+    Promise.all([getAll(), fetchProducts(0)]);
+  }, [getAll, fetchProducts]);
 
-  // 🔹 Converte para IProductAll[] antes de passar para ProductSection
   const productsAll: IProductAll[] = categories.map(cat => ({
-    id: cat.id.toString(), // Convert id to string
+    id: cat.id.toString(),
     category: cat.nome ?? "",
     descriptionCategory: cat.descricao ?? "",
     products: products.filter(p => p.categoria_id === cat.id)
   }));
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
 
   return (
     <main className="bg-zinc-100">
