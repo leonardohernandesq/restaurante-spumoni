@@ -26,15 +26,19 @@ export default function Home() {
     products: products.filter(p => p.categoria_id === cat.id)
   }));
 
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  }
-
   return (
     <main className="bg-zinc-100">
       <Header />
-      <CategoryScroll categories={categories} />
-      <ProductSection data={productsAll} />
+      {
+        loading ?
+          <>
+            <div className="flex justify-center items-center h-screen">Loading...</div>
+          </> :
+          <>
+            <CategoryScroll categories={categories} />
+            <ProductSection data={productsAll} />
+          </>
+      }
       <Footer />
     </main>
   );
