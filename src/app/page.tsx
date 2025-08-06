@@ -32,8 +32,8 @@ export default function Home() {
       {
         loading ?
           <>
-            <div className="flex items-center justify-center min-h-screen mt-4">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="flex flex-col items-center justify-center min-h-screen mt-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-b-purple-principal-900"></div>
               <h2 className="font-medium text-3xl text-center">Loading...</h2>
             </div>
           </> :
