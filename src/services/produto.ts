@@ -2,16 +2,34 @@ import { api } from "@/config/api";
 import { IProduct } from "@/interfaces/IProductAll";
 
 export async function getAllProducts(all: number | null) {
-    const res = await api.get(`/products${all ? `?all=${all}` : ''}`);
+    const res = await api.get(`/products${all ? `?all=${all}` : ''}`, {
+        params: {
+            _t: Date.now() // força URL única
+        },
+        headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+        }
+    });
 
     return res.data;
 }
 
 export async function getProductBySlug(slug: string) {
-    const res = await api.get(`/product?slug=${slug}`);
+    const res = await api.get(`/product`, {
+        params: {
+            slug,
+            _t: Date.now() // quebra cache
+        },
+        headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+        }
+    });
 
     return res.data;
 }
+
 
 export async function addProduct(data: FormData | IProduct) {
     const isFormData = data instanceof FormData;
