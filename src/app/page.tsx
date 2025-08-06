@@ -32,7 +32,7 @@ export default function Home() {
       {
         loading ?
           <>
-            <div className="flex justify-center items-center h-screen">Loading...</div>
+            <h2 className="text-3xl font-bold text-center">Loading...</h2>
           </> :
           <>
             <CategoryScroll categories={categories} />
