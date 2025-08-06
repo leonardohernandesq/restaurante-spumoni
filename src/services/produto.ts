@@ -1,7 +1,7 @@
 import { api } from "@/config/api";
 import { IProduct } from "@/interfaces/IProductAll";
 
-export async function getAllProducts(all = null) {
+export async function getAllProducts(all = null as number | null) {
     const res = await api.get(`/products`, {
         params: {
             all,
