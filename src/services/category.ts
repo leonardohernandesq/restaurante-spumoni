@@ -8,14 +8,31 @@ export async function createCategory({ nome, slug, descricao }: TCategory) {
 }
 
 export async function getAllCategory() {
-    const res = await api.get('/category?_ts=${Date.now()}');
+    const res = await api.get('/category', {
+        params: {
+            _t: Date.now()
+        },
+        headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+        }
+    });
 
     return res.data;
 }
 
 
 export async function getCategoryById({ id }: { id: number }) {
-    const res = await api.get(`/categoryId?id=${id}&_ts=${Date.now()}`);
+    const res = await api.get(`/categoryId`, {
+        params: {
+            id,
+            _t: Date.now() // quebra cache
+        },
+        headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+        }
+    });
 
     return res.data;
 }
