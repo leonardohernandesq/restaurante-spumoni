@@ -1,10 +1,11 @@
 import { api } from "@/config/api";
 import { IProduct } from "@/interfaces/IProductAll";
 
-export async function getAllProducts(all: number | null) {
-    const res = await api.get(`/products${all ? `?all=${all}` : ''}`, {
+export async function getAllProducts(all = null) {
+    const res = await api.get(`/products`, {
         params: {
-            _t: Date.now() // força URL única
+            all,
+            _t: Date.now()
         },
         headers: {
             'Cache-Control': 'no-cache',

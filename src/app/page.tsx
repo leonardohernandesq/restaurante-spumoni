@@ -6,9 +6,8 @@ import { getAllCategory } from "@/services/category";
 import { getAllProducts } from "@/services/produto";
 
 export default async function Home() {
-  const getAllProduct = 0;
   const categories = await getAllCategory();
-  const productsAll = await getAllProducts(getAllProduct);
+  const productsAll = await getAllProducts();
   return (
     <main className="bg-zinc-100">
       <Header />
