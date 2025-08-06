@@ -8,12 +8,12 @@ export const revalidate = 60;
 export default async function Home() {
   const categories = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/categories`,
-    { next: { revalidate: 60 } }
+    { next: { revalidate: revalidate } }
   ).then(res => res.json());
 
   const productsAll = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/products`,
-    { next: { revalidate: 60 } }
+    { next: { revalidate: revalidate } }
   ).then(res => res.json());
 
   return (
