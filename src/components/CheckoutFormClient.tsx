@@ -1,6 +1,7 @@
 import { RequiredAsteristic } from "./RequiredAsteristic";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { CheckoutFormData } from "@/interfaces/ICheckoutForm";
+import { isValidPhone, formatPhone } from "@/utils/validators";
 
 interface CheckoutFormClientProps {
   register: UseFormRegister<CheckoutFormData>;
@@ -46,14 +47,19 @@ export const CheckoutFormClient = ({
         <input
           {...register("telefone", {
             required: "Telefone é obrigatório",
-            pattern: {
-              value: /^[0-9+\s()-]+$/,
-              message: "Formato de telefone inválido",
+            validate: {
+              validPhone: (value) =>
+                isValidPhone(value) || "Telefone deve ter 10 ou 11 dígitos",
+            },
+            onChange: (e) => {
+              const formatted = formatPhone(e.target.value);
+              e.target.value = formatted;
             },
           })}
           id="telefone"
           type="text"
-          placeholder="Digite o seu telefone"
+          placeholder="(XX) XXXXX-XXXX"
+          maxLength={15}
           className={`w-full p-2 border rounded-md ${
             errors.telefone ? "border-red-500" : "border-zinc-400"
           }`}

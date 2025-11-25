@@ -30,6 +30,7 @@ interface CheckoutFormEntregaProps {
     modalReferencia: string;
     handleInputChange: (field: string, value: string) => void;
     handleCepChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    limparEndereco: () => void;
   };
   loja: string;
 }
@@ -77,6 +78,7 @@ export const CheckoutFormEntrega = ({
         modalReferencia={enderecoHook.modalReferencia}
         handleInputChange={enderecoHook.handleInputChange}
         handleCepChange={enderecoHook.handleCepChange}
+        limparEndereco={enderecoHook.limparEndereco}
         loja={loja}
       />
 
