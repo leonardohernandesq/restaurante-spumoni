@@ -19,6 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
+      <head>
+        <title>Restaurante Spumoni - O melhor restaurante do Alto Tietê</title>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased scroll-smooth`}
       >
