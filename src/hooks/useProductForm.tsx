@@ -136,7 +136,7 @@ export const useProductForm = (slugParam?: string) => {
     form.append("preco", formData.preco);
     form.append("categoria_id", String(formData.categoria_id));
     form.append("ativo", formData.ativo ? "1" : "0");
-    form.append("image_url", formData.imageUrl ?? "");
+    form.append("image_url", formData.image ?? "");
 
     form.append(
       "dias_disponiveis",

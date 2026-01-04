@@ -115,7 +115,6 @@ export function AdicionarProdutosClient() {
 
         <label className="mt-3">Imagem do Produto</label>
         <PreviewImage onFileChange={(file) => handleChange("image", file)} />
-
         <label className="mt-3">Descrição do Produto</label>
         <textarea
           value={formData.descricao}

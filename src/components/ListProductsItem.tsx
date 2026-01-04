@@ -21,8 +21,10 @@ export const ListProductsItem = ({ product }: ListProductsItemProps) => {
   };
 
   const handleDelete = async (id: string | number) => {
-    await deleteProductApi(id);
-    toast.success(`Produto ${product.name} foi eliminado com sucesso!`);
+    if (confirm("Tem certeza que deseja eliminar este produto?")) {
+      await deleteProductApi(id);
+      toast.success(`Produto ${product.name} foi eliminado com sucesso!`);
+    }
   };
 
   if (!product) {
