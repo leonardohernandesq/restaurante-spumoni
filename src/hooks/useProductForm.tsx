@@ -128,7 +128,7 @@ export const useProductForm = (slugParam?: string) => {
 
   const buildPayload = (): FormData => {
     const form = new FormData();
-
+    console.log("📦 Construindo payload com formData:", formData);
     form.append("id", String(formData.id ?? ""));
     form.append("nome", formData.nome);
     form.append("slug", formData.slug);
@@ -176,7 +176,7 @@ export const useProductForm = (slugParam?: string) => {
       }
 
       toast.success(
-        `Produto ${slugParam ? "editado" : "cadastrado"} com sucesso!`
+        `Produto ${slugParam ? "editado" : "cadastrado"} com sucesso!!`
       );
       router.push("/admin/listarprodutos");
     } catch (error: any) {
