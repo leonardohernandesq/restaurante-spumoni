@@ -74,7 +74,6 @@ const Finalizar = () => {
     handleInputChange,
     handleCepChange,
     handleEndereco,
-    preencherEnderecoAutomaticamente,
   } = useEndereco();
 
   const { subtotal, taxaEntrega, valorFinal } = useResumoPedido(
@@ -236,7 +235,6 @@ const Finalizar = () => {
           showModal={showModal}
           setShowModal={setShowModal}
           handleEndereco={handleEndereco}
-          preencherEnderecoAutomaticamente={preencherEnderecoAutomaticamente}
           errorEndereco={errorEndereco}
           addressError={addressError}
           modalEndereco={modalEndereco}

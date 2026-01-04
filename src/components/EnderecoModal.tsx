@@ -11,7 +11,6 @@ interface EnderecoModalProps {
   setShowModal: (value: boolean) => void;
   abrirModalEndereco: () => void;
   handleEndereco: () => void;
-  preencherEnderecoAutomaticamente: () => void;
   errorEndereco: string;
   addressError: boolean;
   modalEndereco: string;
