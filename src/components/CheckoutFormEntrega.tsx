@@ -13,7 +13,6 @@ interface CheckoutFormEntregaProps {
     showModal: boolean;
     setShowModal: (value: boolean) => void;
     handleEndereco: () => void;
-    preencherEnderecoAutomaticamente: () => void;
     errorEndereco: string;
     addressError: boolean;
     modalEndereco: string;
@@ -59,9 +58,6 @@ export const CheckoutFormEntrega = ({
         showModal={enderecoHook.showModal}
         setShowModal={enderecoHook.setShowModal}
         handleEndereco={enderecoHook.handleEndereco}
-        preencherEnderecoAutomaticamente={
-          enderecoHook.preencherEnderecoAutomaticamente
-        }
         errorEndereco={enderecoHook.errorEndereco}
         addressError={enderecoHook.addressError}
         modalEndereco={enderecoHook.modalEndereco}
