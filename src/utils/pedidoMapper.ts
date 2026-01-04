@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IPedidoCreate } from "@/interfaces/IPedidoCreate";
 import { CheckoutFormData } from "@/interfaces/ICheckoutForm";
 
