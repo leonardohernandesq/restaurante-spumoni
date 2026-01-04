@@ -1,7 +1,12 @@
-import { create } from 'zustand';
-import { changeStatusApi, fetchPedidoById, fetchPedidosAPI, insertPedidoApi } from '@/services/pedido';
-import { IPedido } from '@/interfaces/IPedidosData';
-import { IPedidoCreate } from '@/interfaces/IPedidoCreate';
+import { create } from "zustand";
+import {
+  changeStatusApi,
+  fetchPedidoById,
+  fetchPedidosAPI,
+  insertPedidoApi,
+} from "@/services/pedido";
+import { IPedido } from "@/interfaces/IPedidosData";
+import { IPedidoCreate } from "@/interfaces/IPedidoCreate";
 
 interface PedidoStore {
   pedido: IPedido | null;
@@ -10,7 +15,13 @@ interface PedidoStore {
   setPedidos: (pedidos: IPedido[]) => void;
   insertPedido: (data: IPedidoCreate) => Promise<number>;
   getPedidoById: (pedido_id: number) => void;
-  changeStatus: ({ id, status }: { id: number, status: number }) => Promise<void>;
+  changeStatus: ({
+    id,
+    status,
+  }: {
+    id: number;
+    status: number;
+  }) => Promise<void>;
 }
 
 export const pedidoStore = create<PedidoStore>((set, get) => ({
@@ -22,7 +33,7 @@ export const pedidoStore = create<PedidoStore>((set, get) => ({
       const data = await fetchPedidosAPI();
       set({ pedidos: data });
     } catch (error) {
-      console.error('❌ Erro ao buscar pedidos:', error);
+      console.error("❌ Erro ao buscar pedidos:", error);
     }
   },
   insertPedido: async (data: IPedidoCreate): Promise<number> => {
@@ -33,9 +44,10 @@ export const pedidoStore = create<PedidoStore>((set, get) => ({
       const pedidosAtuais = get().pedidos;
       set({ pedidos: [...pedidosAtuais, novoPedido] });
 
-      return novoPedido.id; // ou novoPedido.pedido_id, depende do que você usa
+      console.log("✅ Pedido inserido com sucesso:", novoPedido);
+      return novoPedido.pedido_id ?? 0; // ou novoPedido.pedido_id, depende do que você usa
     } catch (error) {
-      console.error('❌ Erro ao inserir pedido:', error);
+      console.error("❌ Erro ao inserir pedido:", error);
       throw error;
     }
   },
@@ -44,7 +56,7 @@ export const pedidoStore = create<PedidoStore>((set, get) => ({
       const data = await fetchPedidoById(id);
       set({ pedido: data });
     } catch (error) {
-      console.error('❌ Erro ao carregar pedido:', error);
+      console.error("❌ Erro ao carregar pedido:", error);
       throw error;
     }
   },
@@ -60,7 +72,7 @@ export const pedidoStore = create<PedidoStore>((set, get) => ({
 
       return;
     } catch (error) {
-      console.error('❌ Erro ao alterar status na store:', error);
+      console.error("❌ Erro ao alterar status na store:", error);
       throw error;
     }
   },

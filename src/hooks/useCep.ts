@@ -1,31 +1,25 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 export const useCep = () => {
-    const [cep, setCep] = useState('');
+  const [cep, setCep] = useState("");
 
-    const formatCep = (value: string) => {
-        value = value.replace(/\D/g, '');
+  const formatCep = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 8);
 
-        if (value.length >= 4 && value.length <= 7) {
-            if (value.length > 4) {
-                value = value.slice(0, 4) + '-' + value.slice(4);
-            }
-        } else if (value.length > 7) {
-            value = value.slice(0, 5) + '-' + value.slice(5, 8);
-        }
+    if (digits.length <= 5) {
+      return digits;
+    }
 
-        return value.slice(0, 8);
-    };
+    return `${digits.slice(0, 5)}-${digits.slice(5)}`;
+  };
 
-    const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const formattedValue = formatCep(e.target.value);
-        setCep(formattedValue);
-    };
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCep(formatCep(e.target.value));
+  };
 
-    const setCepValue = (value: string) => {
-        const formattedValue = formatCep(value);
-        setCep(formattedValue);
-    };
+  const setCepValue = (value: string) => {
+    setCep(formatCep(value));
+  };
 
-    return { cep, handleCepChange, setCepValue };
+  return { cep, handleCepChange, setCepValue };
 };

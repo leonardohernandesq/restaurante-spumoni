@@ -1,5 +1,6 @@
 import { IProductAll } from "./IProductAll";
 
 export interface IProductSectionProps {
-    data: IProductAll[]
+  data: IProductAll[];
+  isLoading?: boolean;
 }

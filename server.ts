@@ -3,6 +3,7 @@ import { parse } from "url";
 import next from "next";
 import fs from "fs";
 import path from "path";
+import "dotenv/config";
 
 const port = 3000;
 const dev = true;

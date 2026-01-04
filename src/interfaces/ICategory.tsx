@@ -1,11 +1,12 @@
 export interface ICategory {
-    id: number;
-    nome?: string;
-    slug?: string;
-    descricao?: string;
-    total_produtos?: number;
+  id: number;
+  nome?: string;
+  slug?: string;
+  descricao?: string;
+  total_produtos?: number;
 }
 
 export interface IPropsCategory {
-    categories: ICategory[];
+  categories: ICategory[];
+  isLoading?: boolean;
 }

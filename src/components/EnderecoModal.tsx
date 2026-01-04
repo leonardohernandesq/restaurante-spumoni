@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { BiPencil, BiLocationPlus } from "react-icons/bi";
+import { BiPencil } from "react-icons/bi";
 import { Modal } from "./Modal";
 
 interface EnderecoModalProps {
@@ -38,7 +38,6 @@ export const EnderecoModal = ({
   setShowModal,
   abrirModalEndereco,
   handleEndereco,
-  preencherEnderecoAutomaticamente,
   errorEndereco,
   addressError,
   modalEndereco,
@@ -98,15 +97,6 @@ export const EnderecoModal = ({
                 Insira seu endereço
               </h2>
 
-              {/* Botão de Geolocalização */}
-              <button
-                onClick={preencherEnderecoAutomaticamente}
-                className="flex items-center justify-center gap-2 bg-green-principal-500 text-white p-3 rounded-md hover:bg-green-principal-900 transition-colors cursor-pointer w-full mb-4"
-              >
-                <BiLocationPlus size={20} />
-                <span>Usar Endereço Atual</span>
-              </button>
-
               {/* Formulário de Endereço */}
               <form
                 className="flex flex-col gap-3"
@@ -155,7 +145,7 @@ export const EnderecoModal = ({
                       required
                     />
                   </div>
-                  <div className="w-2/3">
+                  <div className="w-1/3">
                     <label
                       htmlFor="complemento"
                       className="block text-sm font-medium mb-1"
@@ -172,6 +162,26 @@ export const EnderecoModal = ({
                       className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none"
                     />
                   </div>
+                  {/* CEP */}
+                  <div className="w-1/3">
+                    <label
+                      htmlFor="cep"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      CEP <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="cep"
+                      value={cep}
+                      onChange={handleCepChange}
+                      placeholder="XXXXX-XXX"
+                      pattern="\d{5}-\d{3}"
+                      maxLength={9}
+                      className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none"
+                      required
+                    />
+                  </div>
                 </div>
 
                 {/* Bairro */}
@@ -182,35 +192,24 @@ export const EnderecoModal = ({
                   >
                     Bairro <span className="text-red-500">*</span>
                   </label>
-                  <input
+                  <select
                     id="bairro"
                     value={modalBairro}
                     onChange={(e) =>
                       handleInputChange("modalBairro", e.target.value)
                     }
-                    placeholder="Bairro"
                     className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none"
                     required
-                  />
-                </div>
-
-                {/* CEP */}
-                <div>
-                  <label
-                    htmlFor="cep"
-                    className="block text-sm font-medium mb-1"
                   >
-                    CEP <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="cep"
-                    value={cep}
-                    onChange={handleCepChange}
-                    placeholder="XXXX-XXX"
-                    pattern="\d{4}-\d{3}"
-                    className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none"
-                    required
-                  />
+                    <option value="" disabled>
+                      Selecione o bairro
+                    </option>
+                    <option value="Unhos">Unhos</option>
+                    <option value="Sao Joao da Talha">São João da Talha</option>
+                    <option value="Sacavem">Sacavém</option>
+                    <option value="Portela">Portela</option>
+                    <option value="Olivais">Olivais</option>
+                  </select>
                 </div>
 
                 {/* Referência */}
