@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { BiPencil } from "react-icons/bi";
 import { Modal } from "./Modal";
+import { useFreteStore } from "@/store/freteStore";
 
 interface EnderecoModalProps {
   endereco: string;
@@ -60,6 +61,14 @@ export const EnderecoModal = ({
   const isDelivery = delivery === "delivery";
   const enderecoExibido = isDelivery ? endereco : loja;
   const tituloSecao = isDelivery ? "ENTREGAR EM" : "RETIRAR EM";
+  const { fetchFretes, fretes } = useFreteStore();
+
+  useEffect(() => {
+    const load = async () => {
+      await fetchFretes();
+    };
+    load();
+  }, [fetchFretes]);
 
   return (
     <section className="flex items-center justify-between border-b border-zinc-200 pb-4">
@@ -203,11 +212,11 @@ export const EnderecoModal = ({
                     <option value="" disabled>
                       Selecione o bairro
                     </option>
-                    <option value="Unhos">Unhos</option>
-                    <option value="Sao Joao da Talha">São João da Talha</option>
-                    <option value="Sacavem">Sacavém</option>
-                    <option value="Portela">Portela</option>
-                    <option value="Olivais">Olivais</option>
+                    {fretes.map((frete) => (
+                      <option key={frete.id} value={frete.bairro}>
+                        {frete.bairro}
+                      </option>
+                    ))}
                   </select>
                 </div>
 

@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useFreteStore } from "@/store/freteStore";
+import { useEffect, useMemo } from "react";
 
 type ProdutoCarrinho = {
   preco?: number;
@@ -14,20 +15,27 @@ export const useResumoPedido = (
   bairro: string,
   delivery: "delivery" | "takeaway"
 ) => {
+  const { fetchFretes, fretes } = useFreteStore();
+
+  useEffect(() => {
+    fetchFretes();
+  }, [fetchFretes]);
+
   const taxaEntrega = useMemo(() => {
     if (delivery === "takeaway") return 0;
 
-    if (bairro.toLowerCase() === "unhos") return 3.5;
-    if (bairro.toLowerCase() === "sao joao da talha") return 5.0;
-    if (bairro.toLowerCase() === "sacavem") return 6.0;
-    if (bairro.toLowerCase() === "portela") return 7.0;
-    if (bairro.toLowerCase() === "olivais") return 8.0;
+    const freteEncontrado = fretes.find(
+      (frete) => frete.bairro.toLowerCase() === bairro.toLowerCase()
+    );
+    if (freteEncontrado) {
+      return parseFloat(freteEncontrado.preco);
+    }
 
     return 0;
-  }, [delivery, bairro]);
+  }, [delivery, bairro, fretes]);
 
   const calcularPrecoProduto = (produto: ProdutoCarrinho) => {
-    let precoBase = 0;
+    let precoBase = produto.preco || 0;
 
     for (const attr of produto.atributos || []) {
       if (attr.preco_incluido) {
