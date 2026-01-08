@@ -25,8 +25,6 @@ export const ProductCard = ({ product }: IProductCardProps) => {
     }
   };
 
-  console.log(product);
-
   return (
     <section className="bg-white rounded-xl shadow-lg">
       <div
@@ -42,12 +40,12 @@ export const ProductCard = ({ product }: IProductCardProps) => {
           className="absolute -bottom-14"
         />
       </div>
-      <div className="px-4 pt-16 pb-4 flex flex-col justify-between">
-        <div>
-          <h2 className="font-medium text-2xl mb-2">{product.name}</h2>
+      <div className="px-4 pt-16 pb-4 flex flex-col">
+        <div className="flex flex-col flex-1">
+          <h2 className="font-medium text-xl mb-2">{product.name}</h2>
           <p className="text-zinc-700 md:min-h-20">{product.description}</p>
         </div>
-        <section className="flex justify-between items-center mt-6">
+        <section className="flex justify-between items-center mt-auto">
           <div className="text-lg font-medium text-green-principal-900">
             Desde {formatCurrencyBRL(Number(product.price))}
           </div>

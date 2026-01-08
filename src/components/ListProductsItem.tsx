@@ -31,15 +31,38 @@ export const ListProductsItem = ({ product }: ListProductsItemProps) => {
     return <p>Erro ao carregar produto!</p>;
   }
 
+  const hoje = new Date().getDay(); // 0 = domingo ... 6 = sábado
+  const hojeMap = hoje === 0 ? 1 : hoje + 1;
+
+  const isAvailableToday = product.available_days?.includes(hojeMap);
+
+  console.log("product", product);
+
   return (
     <section className="relative py-5 gap-4 flex items-center border-b border-zinc-200">
-      <div className="w-36">
+      <div className="w-18 relative">
         <Image
           src={`${process.env.NEXT_PUBLIC_IMAGE_PATH}/${product.image_url}`}
-          className="rounded-full opacity-80"
+          className="rounded-full opacity-80 w-full shadow-lg"
           alt={product.name || "Produto inválido"}
           width={80}
           height={80}
+        />
+        <span
+          className={`absolute top-0 -right-1 rounded-full w-4 h-4 shadow-2xl border border-zinc-500 cursor-pointer ${
+            !product.active
+              ? "bg-red-500"
+              : isAvailableToday
+              ? "bg-green-principal-500"
+              : "bg-yellow-500"
+          }`}
+          title={
+            !product.active
+              ? "Inativo"
+              : isAvailableToday
+              ? "Ativo e disponível hoje"
+              : "Ativo, mas indisponível hoje"
+          }
         />
       </div>
       <div className="w-full">
