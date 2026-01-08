@@ -78,7 +78,7 @@ export const Footer = () => {
               reservados.
             </p>
             <p>
-              Desenvolvido por
+              Desenvolvido por{" "}
               <Link href={"http://www.lordsystem.com.br/"} target="_blank">
                 Lord System
               </Link>
