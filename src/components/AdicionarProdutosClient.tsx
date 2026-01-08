@@ -80,7 +80,7 @@ export function AdicionarProdutosClient() {
   };
 
   return (
-    <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
+    <Container styleRow="bg-zinc-100" styleContainer="min-h-screen mb-10">
       <HeaderPages title="Voltar ao Gestor de Pedidos" />
       <section className="relative py-5 gap-1 flex flex-col">
         <div className="flex flex-col">

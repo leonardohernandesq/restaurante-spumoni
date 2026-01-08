@@ -219,7 +219,7 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
 
   if (error) {
     return (
-      <Container styleRow="bg-zinc-50" styleContainer="min-h-screen">
+      <Container styleRow="bg-zinc-50" styleContainer="min-h-screen mb-10">
         <HeaderPages title="Erro" />
         <section className="py-5 flex justify-center items-center">
           <div className="text-2xl text-red-500">

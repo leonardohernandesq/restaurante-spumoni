@@ -137,7 +137,7 @@ const FreteConfig = () => {
   };
 
   return (
-    <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
+    <Container styleRow="bg-zinc-100" styleContainer="min-h-screen mb-10">
       <div className="py-4">
         <AdminMenu title="Configurações de Frete" />
       </div>

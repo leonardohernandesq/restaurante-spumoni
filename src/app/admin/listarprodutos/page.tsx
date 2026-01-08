@@ -31,7 +31,7 @@ const ListarProdutos = () => {
   }, [fetchProducts]);
 
   return (
-    <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
+    <Container styleRow="bg-zinc-100" styleContainer="min-h-screen mb-10">
       <div className="py-4 px-2">
         <AdminMenu title="Gestor de Pedidos" />
       </div>

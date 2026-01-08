@@ -73,7 +73,7 @@ export default function Pedido({ params }: PedidoPageProps) {
   };
 
   return (
-    <Container styleRow="bg-zinc-100" styleContainer="min-h-screen">
+    <Container styleRow="bg-zinc-100" styleContainer="min-h-screen mb-10">
       <header className="relative py-5 flex items-center justify-between ">
         <div className="flex items-center gap-4">
           <button
