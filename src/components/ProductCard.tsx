@@ -25,6 +25,8 @@ export const ProductCard = ({ product }: IProductCardProps) => {
     }
   };
 
+  console.log(product);
+
   return (
     <section className="bg-white rounded-xl shadow-lg">
       <div

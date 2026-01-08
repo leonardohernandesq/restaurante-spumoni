@@ -5,13 +5,30 @@ export interface Frete {
   id?: number;
   bairro: string;
   preco: string;
+  cidade: string;
+}
+
+export interface FretePagination {
+  currentPage: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface FreteApiResponse {
+  data: Frete[];
+  pagination: FretePagination;
 }
 
 export const freteService = {
   // Buscar todos os fretes
-  async getAll(): Promise<Frete[]> {
-    const { data } = await api.get("/fretes"); // rota do backend
-    return data;
+  async getAll(
+    page: number = 1,
+    perPage: number = 10
+  ): Promise<FreteApiResponse> {
+    // Usar GET com query params (ajustável conforme backend)
+    const response = await api.get("/fretes", { params: { page, perPage } });
+    return response.data; // já retorna { data, pagination }
   },
 
   // Criar novo frete

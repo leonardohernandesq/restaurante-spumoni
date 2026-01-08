@@ -1,16 +1,22 @@
 import { create } from "zustand";
-import { freteService } from "@/services/frete";
+import {
+  FretePagination,
+  freteService,
+  FreteApiResponse,
+} from "@/services/frete";
 
 export interface Frete {
   id?: number;
   bairro: string;
   preco: string;
+  cidade: string;
 }
 
 interface FreteStore {
   fretes: Frete[];
-  setFretes: (data: Frete[]) => void;
-  fetchFretes: () => Promise<Frete[]>;
+  pagination: FretePagination;
+  setFretes: (data: Frete[], pagination: FretePagination) => void;
+  fetchFretes: (page?: number, perPage?: number) => Promise<FreteApiResponse>;
   createFrete: (data: Frete) => Promise<Frete>;
   updateFrete: (id: number, data: Frete) => Promise<void>;
   deleteFrete: (id: number) => Promise<void>;
@@ -18,14 +24,17 @@ interface FreteStore {
 
 export const useFreteStore = create<FreteStore>((set) => ({
   fretes: [],
-
-  setFretes: (data: Frete[]) => set({ fretes: data }),
-
+  setFretes: (data: Frete[], pagination: FretePagination) =>
+    set({ fretes: data, pagination }),
+  pagination: { currentPage: 1, perPage: 10, total: 0, totalPages: 1 },
   // Buscar todos os fretes
-  fetchFretes: async () => {
-    const data = await freteService.getAll();
-    set({ fretes: data });
-    return data;
+  fetchFretes: async (
+    page: number = 1,
+    perPage: number = 10
+  ): Promise<FreteApiResponse> => {
+    const response = await freteService.getAll(page, perPage);
+    set({ fretes: response.data, pagination: response.pagination });
+    return response; // retorna { data, pagination }
   },
 
   // Criar um novo frete
@@ -34,7 +43,6 @@ export const useFreteStore = create<FreteStore>((set) => ({
     set((state) => ({ fretes: [...state.fretes, created] }));
     return created;
   },
-
   // Atualizar frete por ID
   updateFrete: async (id: number, data: Frete) => {
     await freteService.update(id, data);

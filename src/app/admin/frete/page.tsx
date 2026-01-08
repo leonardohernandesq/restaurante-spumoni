@@ -10,6 +10,7 @@ import { FiTrash2 } from "react-icons/fi";
 const FreteConfig = () => {
   const {
     fretes,
+    pagination,
     setFretes,
     fetchFretes,
     createFrete,
@@ -21,18 +22,42 @@ const FreteConfig = () => {
 
   useEffect(() => {
     const load = async () => {
-      const data = await fetchFretes();
-      originalFretesRef.current = data.map((f) => ({
+      const response = await fetchFretes(1, pagination.perPage);
+      // Atualiza o ref com os dados originais
+      originalFretesRef.current = response.data.map((f) => ({
         id: f.id,
         bairro: f.bairro ?? "",
         preco: f.preco ?? "",
+        cidade: f.cidade ?? "",
       }));
     };
     load();
-  }, [fetchFretes]);
+  }, [fetchFretes, pagination.perPage]);
 
   const handleAddFrete = () => {
-    setFretes([...fretes, { bairro: "", preco: "" }]);
+    // Adiciona um novo frete localmente (não persiste até salvar)
+    setFretes(
+      [
+        ...fretes,
+        {
+          bairro: "",
+          preco: "",
+          cidade: "",
+        },
+      ],
+      pagination
+    );
+  };
+
+  const changePage = async (newPage: number) => {
+    const response = await fetchFretes(newPage, pagination.perPage);
+    // fetchFretes já atualiza a store; atualiza o ref com os dados recebidos
+    originalFretesRef.current = response.data.map((f) => ({
+      id: f.id,
+      bairro: f.bairro ?? "",
+      preco: f.preco ?? "",
+      cidade: f.cidade ?? "",
+    }));
   };
 
   const handleChange = (
@@ -42,14 +67,17 @@ const FreteConfig = () => {
   ) => {
     const updated = [...fretes];
     updated[index] = { ...updated[index], [key]: value };
-    setFretes(updated);
+    setFretes(updated, pagination);
   };
 
   const handleDelete = async (frete: Frete, index: number) => {
     if (!confirm("Tem certeza que deseja deletar este frete?")) return;
     try {
       if (frete.id) await deleteFrete(Number(frete.id));
-      setFretes(fretes.filter((_, i) => i !== index));
+      setFretes(
+        fretes.filter((_, i) => i !== index),
+        pagination
+      );
       toast.success("Frete removido!");
     } catch (err) {
       console.error(err);
@@ -80,15 +108,21 @@ const FreteConfig = () => {
         })
       );
 
-      setFretes([...updatedFretes]);
+      // Atualiza a store com os fretes atualizados localmente
+      setFretes([...updatedFretes], pagination);
 
       try {
-        const fresh = await fetchFretes();
-        setFretes(fresh);
-        originalFretesRef.current = fresh.map((f) => ({
+        // Re-fetch para garantir a consistência com o servidor e receber paginação atualizada
+        const fresh = await fetchFretes(
+          pagination.currentPage,
+          pagination.perPage
+        );
+        setFretes(fresh.data, fresh.pagination);
+        originalFretesRef.current = fresh.data.map((f) => ({
           id: f.id,
           bairro: f.bairro ?? "",
           preco: f.preco ?? "",
+          cidade: f.cidade ?? "",
         }));
       } catch (err) {
         console.error(err);
@@ -118,7 +152,7 @@ const FreteConfig = () => {
         <div className="bg-white rounded-md border border-zinc-200 overflow-hidden">
           {fretes.map((frete, index) => (
             <div
-              key={frete.id ?? index}
+              key={index}
               className="flex gap-3 items-center p-3 last:border-b-0 border-b border-zinc-200"
             >
               <label className="flex-1">
@@ -132,6 +166,20 @@ const FreteConfig = () => {
                   value={frete.bairro || ""}
                   onChange={(e) =>
                     handleChange(index, "bairro", e.target.value)
+                  }
+                />
+              </label>
+              <label className="flex-1">
+                <span className="block text-[11px] text-zinc-500 mb-1">
+                  Cidade
+                </span>
+                <input
+                  type="text"
+                  placeholder="Cidade"
+                  className="w-full p-2 bg-zinc-100 rounded-md outline-none focus:ring-2 focus:ring-green-principal-500"
+                  value={frete.cidade || ""}
+                  onChange={(e) =>
+                    handleChange(index, "cidade", e.target.value)
                   }
                 />
               </label>
@@ -163,22 +211,58 @@ const FreteConfig = () => {
           ))}
         </div>
 
-        <div className="flex gap-3 items-center mt-4">
-          <button
-            type="button"
-            onClick={handleAddFrete}
-            className="px-4 py-2 bg-purple-principal-700 text-white rounded-md shadow-sm hover:brightness-105 transition cursor-pointer"
-          >
-            + Adicionar Frete
-          </button>
+        <div className="flex items-center justify-between mt-4 gap-4">
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={handleAddFrete}
+              className="px-4 py-2 bg-purple-principal-700 text-white rounded-md shadow-sm hover:brightness-105 transition cursor-pointer"
+            >
+              + Adicionar Frete
+            </button>
 
-          <button
-            type="button"
-            onClick={handleSaveAll}
-            className="px-4 py-2 bg-green-600 text-white rounded-md shadow-sm hover:brightness-105 transition cursor-pointer"
-          >
-            Salvar Tudo
-          </button>
+            <button
+              type="button"
+              onClick={handleSaveAll}
+              className="px-4 py-2 bg-green-600 text-white rounded-md shadow-sm hover:brightness-105 transition cursor-pointer"
+            >
+              Salvar Tudo
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => changePage(pagination.currentPage - 1)}
+              disabled={pagination.currentPage <= 1}
+              className={`px-3 py-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 transition ${
+                pagination.currentPage <= 1
+                  ? "opacity-50 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
+              aria-label="Página anterior"
+            >
+              Anterior
+            </button>
+
+            <div className="px-3 py-1 bg-zinc-100 text-sm rounded-md border border-zinc-200">
+              Página {pagination.currentPage} de {pagination.totalPages}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => changePage(pagination.currentPage + 1)}
+              disabled={pagination.currentPage >= pagination.totalPages}
+              className={`px-3 py-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 transition ${
+                pagination.currentPage >= pagination.totalPages
+                  ? "opacity-50 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
+              aria-label="Próxima página"
+            >
+              Próxima
+            </button>
+          </div>
         </div>
       </section>
     </Container>
