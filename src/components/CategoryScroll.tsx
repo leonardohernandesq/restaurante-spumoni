@@ -6,7 +6,7 @@ import { IPropsCategory } from "@/interfaces/ICategory";
 import { SkeletonComponent } from "./SkeletonComponent";
 
 export const CategoryScroll = ({ categories, isLoading }: IPropsCategory) => {
-  const [linkActive, setLinkActive] = useState(0);
+  const [linkActive, setLinkActive] = useState(1);
 
   const handleScrollLink = (item: number) => {
     setLinkActive(item);
