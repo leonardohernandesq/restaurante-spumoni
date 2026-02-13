@@ -16,6 +16,8 @@ interface EnderecoModalProps {
   addressError: boolean;
   modalEndereco: string;
   setModalEndereco: (value: string) => void;
+  modalCidade: string;
+  setModalCidade: (value: string) => void;
   modalNumero: string;
   setModalNumero: (value: string) => void;
   modalComplemento: string;
@@ -44,6 +46,7 @@ export const EnderecoModal = ({
   modalNumero,
   modalComplemento,
   modalBairro,
+  modalCidade,
   cep,
   modalReferencia,
   handleInputChange,
@@ -62,6 +65,10 @@ export const EnderecoModal = ({
   const enderecoExibido = isDelivery ? endereco : loja;
   const tituloSecao = isDelivery ? "ENTREGAR EM" : "RETIRAR EM";
   const { fetchFretes, fretes } = useFreteStore();
+  const cidadesUnicas = [...new Set(fretes.map((f) => f.cidade))];
+  const bairrosFiltrados = fretes
+    .filter((frete) => frete.cidade === modalCidade)
+    .map((frete) => frete.bairro);
 
   useEffect(() => {
     const load = async () => {
@@ -192,32 +199,63 @@ export const EnderecoModal = ({
                   </div>
                 </div>
 
-                {/* Bairro */}
-                <div>
-                  <label
-                    htmlFor="bairro"
-                    className="block text-sm font-medium mb-1"
-                  >
-                    Bairro <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    id="bairro"
-                    value={modalBairro}
-                    onChange={(e) =>
-                      handleInputChange("modalBairro", e.target.value)
-                    }
-                    className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none"
-                    required
-                  >
-                    <option value="" disabled>
-                      Selecione o bairro
-                    </option>
-                    {fretes.map((frete) => (
-                      <option key={frete.id} value={frete.bairro}>
-                        {frete.bairro}
+                <div className="flex gap-3">
+                  {/* Cidade */}
+                  <div className="w-1/2">
+                    <label
+                      htmlFor="cidade"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Cidade <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="cidade"
+                      value={modalCidade}
+                      onChange={(e) =>
+                        handleInputChange("modalCidade", e.target.value)
+                      }
+                      className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none"
+                      required
+                    >
+                      <option value="" disabled>
+                        Selecione o cidade
                       </option>
-                    ))}
-                  </select>
+                      {cidadesUnicas.map((cidade) => (
+                        <option key={cidade} value={cidade}>
+                          {cidade}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Bairro */}
+                  <div className="w-1/2">
+                    <label
+                      htmlFor="bairro"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Bairro <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="bairro"
+                      value={modalBairro}
+                      onChange={(e) =>
+                        handleInputChange("modalBairro", e.target.value)
+                      }
+                      className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed"
+                      required
+                      disabled={bairrosFiltrados.length ? false : true}
+                    >
+                      <option value="" disabled>
+                        Selecione o bairro
+                      </option>
+                      {bairrosFiltrados.map((bairro) => (
+                        <option key={bairro} value={bairro}>
+                          {bairro}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 {/* Referência */}

@@ -30,7 +30,7 @@ export const useFreteStore = create<FreteStore>((set) => ({
   // Buscar todos os fretes
   fetchFretes: async (
     page: number = 1,
-    perPage: number = 10
+    perPage: number = 100,
   ): Promise<FreteApiResponse> => {
     const response = await freteService.getAll(page, perPage);
     set({ fretes: response.data, pagination: response.pagination });

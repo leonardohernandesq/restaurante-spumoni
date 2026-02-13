@@ -64,6 +64,8 @@ const Finalizar = () => {
     setModalEndereco,
     modalNumero,
     setModalNumero,
+    modalCidade,
+    setModalCidade,
     modalComplemento,
     setModalComplemento,
     modalBairro,
@@ -79,7 +81,7 @@ const Finalizar = () => {
   const { subtotal, taxaEntrega, valorFinal } = useResumoPedido(
     produtos,
     modalBairro,
-    delivery
+    delivery,
   );
 
   const handleChangeBookingDate = (value: string) => {
@@ -241,6 +243,8 @@ const Finalizar = () => {
           setModalEndereco={setModalEndereco}
           modalNumero={modalNumero}
           abrirModalEndereco={abrirModalEndereco}
+          modalCidade={modalCidade}
+          setModalCidade={setModalCidade}
           setModalNumero={setModalNumero}
           modalComplemento={modalComplemento}
           setModalComplemento={setModalComplemento}

@@ -41,7 +41,7 @@ const ListarProdutos = () => {
       <section className="mt-6 mb-10">
         {categories.map((categoria) => {
           const produtosDaCategoria = products.filter(
-            (p) => p.categoria_id === categoria.id
+            (p) => p.categoria_id === categoria.id,
           );
 
           return (
@@ -50,7 +50,13 @@ const ListarProdutos = () => {
               key={categoria.id}
               className="mb-6 scroll-mt-20"
             >
-              <h2 className="text-xl font-semibold mb-3">{categoria.nome}</h2>
+              <h2 className="text-xl font-semibold mb-3">
+                {categoria.nome}
+                <span className="text-sm text-purple-principal-700">
+                  {" "}
+                  ({produtosDaCategoria.length})
+                </span>
+              </h2>
 
               {produtosDaCategoria.length > 0 ? (
                 produtosDaCategoria.map((product) => (

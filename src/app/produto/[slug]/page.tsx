@@ -45,7 +45,7 @@ interface Produto {
 }
 
 function isErrorWithResponse(
-  error: unknown
+  error: unknown,
 ): error is { response: { data: { error?: string } } } {
   if (typeof error === "object" && error !== null && "response" in error) {
     const response = (error as Record<string, unknown>).response;
@@ -82,7 +82,7 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
 
     if (!storeOpen) {
       toast.error(
-        "A loja está fechada no momento. Tente novamente mais tarde!"
+        "A loja está fechada no momento. Tente novamente mais tarde!",
       );
 
       setTimeout(() => {
@@ -131,7 +131,7 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
         const selecionados = atributosSelecionados[atributo.atributo_id] || [];
         if (selecionados.length === 0) {
           toast.error(
-            `O atributo "${atributo.nome_atributo}" é obrigatório. Selecione ao menos uma opção.`
+            `O atributo "${atributo.nome_atributo}" é obrigatório. Selecione ao menos uma opção.`,
           );
           return;
         }
@@ -148,7 +148,7 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
 
       selecionados.forEach((valorId) => {
         const valor = atributo.valores_atributo.find(
-          (v) => v.valor_atributo_id === valorId
+          (v) => v.valor_atributo_id === valorId,
         );
         if (valor) {
           atributosFinal.push({
@@ -187,7 +187,7 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
   const handleChangeCheckbox = (
     atributoId: number,
     valorId: number,
-    limite: number | null
+    limite: number | null,
   ) => {
     const atuais = atributosSelecionados[atributoId] || [];
     const jaSelecionado = atuais.includes(valorId);
@@ -196,7 +196,7 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
       toast.error(
         `Você só pode selecionar até ${limite} ${
           limite == 1 ? "opção" : "opções"
-        } para este atributo.`
+        } para este atributo.`,
       );
       return;
     }
@@ -231,7 +231,7 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
   }
 
   return (
-    <Container styleRow="bg-zinc-50">
+    <Container styleRow="bg-zinc-50 min-h-screen">
       <HeaderPages title={produto?.name ?? ""} />
 
       {loading || !storeOpen ? (
@@ -301,14 +301,14 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
                         id={`${atributo.atributo_id}_${atributo_valor.valor_atributo_id}`}
                         checked={
                           atributosSelecionados[atributo.atributo_id]?.includes(
-                            atributo_valor.valor_atributo_id
+                            atributo_valor.valor_atributo_id,
                           ) || false
                         }
                         onChange={() =>
                           handleChangeCheckbox(
                             atributo.atributo_id,
                             atributo_valor.valor_atributo_id,
-                            atributo.limite
+                            atributo.limite,
                           )
                         }
                       />

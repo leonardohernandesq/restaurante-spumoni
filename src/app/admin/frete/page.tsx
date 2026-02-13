@@ -45,7 +45,7 @@ const FreteConfig = () => {
           cidade: "",
         },
       ],
-      pagination
+      pagination,
     );
   };
 
@@ -63,7 +63,7 @@ const FreteConfig = () => {
   const handleChange = (
     index: number,
     key: keyof Omit<Frete, "id">,
-    value: string
+    value: string,
   ) => {
     const updated = [...fretes];
     updated[index] = { ...updated[index], [key]: value };
@@ -76,7 +76,7 @@ const FreteConfig = () => {
       if (frete.id) await deleteFrete(Number(frete.id));
       setFretes(
         fretes.filter((_, i) => i !== index),
-        pagination
+        pagination,
       );
       toast.success("Frete removido!");
     } catch (err) {
@@ -95,7 +95,7 @@ const FreteConfig = () => {
           }
 
           const original = originalFretesRef.current.find(
-            (f) => f.id === frete.id
+            (f) => f.id === frete.id,
           );
           if (
             original &&
@@ -105,7 +105,7 @@ const FreteConfig = () => {
           }
 
           return frete;
-        })
+        }),
       );
 
       // Atualiza a store com os fretes atualizados localmente
@@ -115,7 +115,7 @@ const FreteConfig = () => {
         // Re-fetch para garantir a consistência com o servidor e receber paginação atualizada
         const fresh = await fetchFretes(
           pagination.currentPage,
-          pagination.perPage
+          pagination.perPage,
         );
         setFretes(fresh.data, fresh.pagination);
         originalFretesRef.current = fresh.data.map((f) => ({

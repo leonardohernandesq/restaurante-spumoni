@@ -24,7 +24,7 @@ export const freteService = {
   // Buscar todos os fretes
   async getAll(
     page: number = 1,
-    perPage: number = 10
+    perPage: number = 10,
   ): Promise<FreteApiResponse> {
     // Usar GET com query params (ajustável conforme backend)
     const response = await api.get("/fretes", { params: { page, perPage } });

@@ -15,6 +15,7 @@ export const useEndereco = () => {
   const [modalNumero, setModalNumero] = useState("");
   const [modalComplemento, setModalComplemento] = useState("");
   const [modalBairro, setModalBairro] = useState("");
+  const [modalCidade, setModalCidade] = useState("");
   const [modalReferencia, setModalReferencia] = useState("");
 
   // Limpa erro quando todos os campos obrigatórios são preenchidos
@@ -42,6 +43,9 @@ export const useEndereco = () => {
       case "modalReferencia":
         setModalReferencia(value);
         break;
+      case "modalCidade":
+        setModalCidade(value);
+        break;
     }
   };
 
@@ -55,6 +59,7 @@ export const useEndereco = () => {
     setModalNumero("");
     setModalComplemento("");
     setModalBairro("");
+    setModalCidade("");
     setModalReferencia("");
     setCepValue("");
     setAddressError(false);
@@ -65,9 +70,15 @@ export const useEndereco = () => {
 
   const handleEndereco = async () => {
     // Validação de campos obrigatórios
-    if (!modalEndereco || !modalNumero || !modalBairro || !cep) {
+    if (
+      !modalEndereco ||
+      !modalNumero ||
+      !modalBairro ||
+      !modalCidade ||
+      !cep
+    ) {
       setErrorEndereco(
-        "Por favor, complete todos os campos obrigatórios: Endereço, Número, Bairro e CEP."
+        "Por favor, complete todos os campos obrigatórios: Endereço, Número, Bairro e CEP.",
       );
       return;
     }
@@ -77,6 +88,7 @@ export const useEndereco = () => {
       modalEndereco,
       modalNumero,
       modalComplemento,
+      modalCidade,
       modalBairro,
       cep,
     ]
@@ -108,6 +120,8 @@ export const useEndereco = () => {
     setModalEndereco,
     modalNumero,
     setModalNumero,
+    modalCidade,
+    setModalCidade,
     modalComplemento,
     setModalComplemento,
     modalBairro,

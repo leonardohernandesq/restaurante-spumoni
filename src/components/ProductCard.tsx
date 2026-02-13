@@ -20,7 +20,7 @@ export const ProductCard = ({ product }: IProductCardProps) => {
       router.push(link);
     } else {
       toast.error(
-        "A Loja está fechada no momento. \n Tente novamente mais tarde!"
+        "A Loja está fechada no momento. \n Tente novamente mais tarde!",
       );
     }
   };
@@ -37,13 +37,17 @@ export const ProductCard = ({ product }: IProductCardProps) => {
           alt={product.name}
           width={150}
           height={150}
-          className="absolute -bottom-14"
+          className="absolute -bottom-14 rounded-xl"
         />
       </div>
-      <div className="px-4 pt-16 pb-4 flex flex-col">
+      <div className="px-4 pt-20 pb-4 flex flex-col">
         <div className="flex flex-col flex-1">
-          <h2 className="font-medium text-xl mb-2">{product.name}</h2>
-          <p className="text-zinc-700 md:min-h-20">{product.description}</p>
+          <h2 className="font-medium text-xl mb-2 text-center">
+            {product.name}
+          </h2>
+          <p className="text-zinc-700 md:min-h-20 text-center">
+            {product.description}
+          </p>
         </div>
         <section className="flex justify-between items-center mt-auto">
           <div className="text-lg font-medium text-green-principal-900">
