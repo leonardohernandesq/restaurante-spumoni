@@ -1,16 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { DetailTitle } from "@/components/DetailTitle";
 import { IoLocation, IoLogoWhatsapp } from "react-icons/io5";
-import { useConfigStore } from "@/store/configStore";
 import { RiFacebookFill, RiInstagramFill } from "react-icons/ri";
 import Link from "next/link";
+import { useSettingsQuery } from "@/hooks/useSettingsQuery";
 
 const ContactSection = () => {
-  const { fetchSettings, settings } = useConfigStore();
-
-  useEffect(() => {
-    fetchSettings();
-  }, [fetchSettings]);
+  const { data: settings } = useSettingsQuery();
 
   return (
     <section>
@@ -20,24 +16,24 @@ const ContactSection = () => {
       </div>
       <div className="flex gap-2 mt-2">
         <IoLocation className="text-purple-principal-500 text-2xl w-7" />
-        <p className="text-md w-full">{settings.address}</p>
+        <p className="text-md w-full">{settings?.address}</p>
       </div>
       <div className="text-purple-principal-500 flex gap-2 text-2xl my-4">
-        {settings.facebook_url && (
-          <Link href={settings.facebook_url} target="_blank">
+        {settings?.facebook_url && (
+          <Link href={settings?.facebook_url} target="_blank">
             <RiFacebookFill />
           </Link>
         )}
-        {settings.instagram_url && (
-          <Link href={settings.instagram_url} target="_blank">
+        {settings?.instagram_url && (
+          <Link href={settings?.instagram_url} target="_blank">
             <RiInstagramFill />
           </Link>
         )}
-        {settings.whatsapp_number && (
+        {settings?.whatsapp_number && (
           <Link
-            href={`https://api.whatsapp.com/send?phone=${settings.whatsapp_number.replace(
+            href={`https://api.whatsapp.com/send?phone=${settings?.whatsapp_number.replace(
               /\D/g,
-              ""
+              "",
             )}`}
             target="_blank"
           >

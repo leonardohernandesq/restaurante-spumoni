@@ -14,7 +14,7 @@ import { HeaderPages } from "@/components/HeaderPages";
 import { ISingleProductPageProps } from "@/interfaces/ISingleProductPageProps";
 import { getProductBySlug } from "@/services/produto";
 import { AtributoSelecionado, cartStore } from "@/store/cartStore";
-import { useStoreStatus } from "@/hooks/useStoreStatus";
+import { useStatusQuery } from "@/hooks/useStatusQuery";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { formatCurrencyBRL } from "@/utils/validators";
 
@@ -75,21 +75,7 @@ export default function ProductPage({ params }: ISingleProductPageProps) {
   const [produto, setProduto] = useState<Produto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { storeOpen, loading: loadingStoreOpen } = useStoreStatus();
-
-  useEffect(() => {
-    if (loadingStoreOpen) return;
-
-    if (!storeOpen) {
-      toast.error(
-        "A loja está fechada no momento. Tente novamente mais tarde!",
-      );
-
-      setTimeout(() => {
-        router.push("/");
-      }, 1000);
-    }
-  }, [storeOpen, loadingStoreOpen, router]);
+  const { storeOpen } = useStatusQuery();
 
   useEffect(() => {
     const fetchProduct = async () => {

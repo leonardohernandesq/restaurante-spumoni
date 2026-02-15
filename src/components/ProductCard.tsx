@@ -8,11 +8,11 @@ import { BiPlus } from "react-icons/bi";
 
 import { IProductCardProps } from "@/interfaces/IProductCardProps";
 
-import { useStoreStatus } from "@/hooks/useStoreStatus";
+import { useStatusQuery } from "@/hooks/useStatusQuery";
 import { formatCurrencyBRL } from "@/utils/validators";
 
 export const ProductCard = ({ product }: IProductCardProps) => {
-  const { storeOpen } = useStoreStatus();
+  const { storeOpen } = useStatusQuery();
   const router = useRouter();
 
   const handleBuyProduct = (link: string) => {

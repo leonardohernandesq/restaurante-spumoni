@@ -8,13 +8,14 @@ import { IoWalletOutline } from "react-icons/io5";
 import { cartStore } from "@/store/cartStore";
 
 import { Container } from "@/components/Container";
-import { useStoreStatus } from "@/hooks/useStoreStatus";
+import { useStatusQuery } from "@/hooks/useStatusQuery";
 import { SkeletonComponent } from "./SkeletonComponent";
 import Link from "next/link";
+import { StatusIsOpen } from "./StatusIsOpen";
 
 export const Header = () => {
   const router = useRouter();
-  const { storeOpen } = useStoreStatus();
+  const { storeOpen } = useStatusQuery();
   const { produtos, isLoading } = cartStore();
   const totalItens = produtos.length;
 
@@ -45,17 +46,7 @@ export const Header = () => {
           </h1>
           <h2 className="text-sm">O melhor restaurante do Alto Tietê</h2>
           <div className="flex items-center justify-center">
-            {storeOpen ? (
-              <>
-                <div className="bg-green-400 h-2.5 w-2.5 rounded-full mr-2"></div>
-                <span className="text-md">Aberto</span>
-              </>
-            ) : (
-              <>
-                <div className="bg-red-600 h-2.5 w-2.5 rounded-full mr-2"></div>
-                <span className="text-md">Fechado</span>
-              </>
-            )}
+            <StatusIsOpen storeOpen={storeOpen} />
           </div>
         </div>
         <div className="relative">

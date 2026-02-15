@@ -1,7 +1,7 @@
 import { IPedido } from "@/interfaces/IPedidosData";
 import { formatCurrencyBRL } from "@/utils/validators";
 
-export const NfPrint = ({ pedido }: { pedido: IPedido | null }) => {
+export const Printer = ({ pedido }: { pedido: IPedido | null }) => {
   return (
     <div id="print-area" className="hidden print:block text-sm font-mono p-4">
       <h2 className="text-center font-bold text-base">Restaurante Spumoni</h2>
@@ -23,7 +23,7 @@ export const NfPrint = ({ pedido }: { pedido: IPedido | null }) => {
           let precoBase = produto.preco_base;
 
           const attrQueSubstituiBase = produto.atributos?.find(
-            (attr) => attr.preco_incluido === 1
+            (attr) => attr.preco_incluido === 1,
           );
           if (attrQueSubstituiBase) {
             precoBase = attrQueSubstituiBase.preco;
@@ -34,7 +34,7 @@ export const NfPrint = ({ pedido }: { pedido: IPedido | null }) => {
             [];
           const totalAdicionais = adicionais.reduce(
             (soma, attr) => soma + Number(attr.preco),
-            0
+            0,
           );
 
           return (

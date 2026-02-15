@@ -11,7 +11,7 @@ import {
 import { PiPrinter } from "react-icons/pi";
 import { FaMotorcycle } from "react-icons/fa6";
 import { FaTrashAlt } from "react-icons/fa";
-import { NfPrint } from "@/components/Printer";
+import { Printer } from "@/components/Printer";
 import { Container } from "@/components/Container";
 import { pedidoStore } from "@/store/pedidoStore";
 import { useStatusColor } from "@/hooks/useStatusColor";
@@ -94,7 +94,7 @@ export default function Pedido({ params }: PedidoPageProps) {
           {pedido?.status && (
             <div
               className={`my-2 px-3 py-1 ${getColor(
-                pedido.status
+                pedido.status,
               )} text-white rounded-md w-fit`}
             >
               {getLabel(pedido.status)}
@@ -133,7 +133,7 @@ export default function Pedido({ params }: PedidoPageProps) {
               let precoBase = produto.preco_base;
 
               const attrQueSubstituiBase = produto.atributos?.find(
-                (attr) => attr.preco_incluido === 1
+                (attr) => attr.preco_incluido === 1,
               );
               if (attrQueSubstituiBase) {
                 precoBase = attrQueSubstituiBase.preco;
@@ -141,11 +141,11 @@ export default function Pedido({ params }: PedidoPageProps) {
 
               const adicionais =
                 produto.atributos?.filter(
-                  (attr) => attr.preco_incluido === 0
+                  (attr) => attr.preco_incluido === 0,
                 ) || [];
               const totalAdicionais = adicionais.reduce(
                 (soma, attr) => soma + Number(attr.preco),
-                0
+                0,
               );
 
               return (
@@ -246,7 +246,7 @@ export default function Pedido({ params }: PedidoPageProps) {
           </button>
         </div>
       </section>
-      <NfPrint pedido={pedido} />
+      <Printer pedido={pedido} />
     </Container>
   );
 }
