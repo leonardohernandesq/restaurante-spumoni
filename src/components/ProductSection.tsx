@@ -3,20 +3,26 @@ import { Container } from "@/components/Container";
 
 import { IProductSectionProps } from "@/interfaces/IProductSectionProps";
 import { SkeletonComponent } from "./SkeletonComponent";
+import { transformString } from "@/utils/transformString";
 
 export const ProductSection = ({ data, isLoading }: IProductSectionProps) => {
   if (isLoading) {
     return <ProductSectionSkeleton />;
   }
 
+  const sortedData = [...data].sort((a, b) => {
+    if (a.category === "Pratos do Dia") return -1;
+    if (b.category === "Pratos do Dia") return 1;
+    return 0;
+  });
+
   return (
     <>
-      {data.map((item) => {
+      {sortedData.map((item) => {
         if (item.products.length === 0) return null;
-
         return (
           <Container key={item.id}>
-            <section id={item.slug} className="pt-6 pb-12">
+            <section id={transformString(item.category)} className="pt-6 pb-12">
               <div className="text-center pb-6">
                 <h2 className="font-medium text-3xl mb-3">{item.category}</h2>
                 <p className="text-zinc-700 max-w-4xl m-auto">

@@ -7,6 +7,7 @@ export interface AtributoSelecionado {
   preco: number;
   atributo_id: number;
   valor_atributo_id: number;
+  preco_incluido: boolean;
 }
 
 export interface ProdutoCarrinho {
@@ -44,7 +45,7 @@ export const cartStore = create<CartState>()(
         const { produtos } = get();
 
         const produtoExistente = produtos.find(
-          (p) => p.slug === novoProduto.slug
+          (p) => p.slug === novoProduto.slug,
         );
 
         if (produtoExistente) {
@@ -55,7 +56,7 @@ export const cartStore = create<CartState>()(
                     ...p,
                     quantidade: p.quantidade + novoProduto.quantidade,
                   }
-                : p
+                : p,
             ),
           });
         } else {
@@ -74,7 +75,7 @@ export const cartStore = create<CartState>()(
       atualizarQuantidade: (slug, novaQuantidade) => {
         set((state) => ({
           produtos: state.produtos.map((p) =>
-            p.slug === slug ? { ...p, quantidade: novaQuantidade } : p
+            p.slug === slug ? { ...p, quantidade: novaQuantidade } : p,
           ),
         }));
       },
@@ -101,6 +102,6 @@ export const cartStore = create<CartState>()(
         // terminou a reidratação
         state.setLoading(false);
       },
-    }
-  )
+    },
+  ),
 );

@@ -17,8 +17,6 @@ const ListarCategorias = () => {
     getAll();
   }, [getAll]);
 
-  console.log(categories);
-
   const handleEdit = (id: number) => {
     router.push(`/admin/editarcategorias/${id}`);
   };

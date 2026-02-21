@@ -13,7 +13,6 @@ import { formatCurrencyBRL } from "@/utils/validators";
 const Carrinho = () => {
   const router = useRouter();
   const { produtos, removerProduto, atualizarQuantidade } = cartStore();
-
   const handleCheckout = () => {
     router.push("/finalizar");
   };
@@ -32,7 +31,7 @@ const Carrinho = () => {
 
   const subtotal = produtos.reduce(
     (acc, item) => acc + item.preco * item.quantidade,
-    0
+    0,
   );
 
   return (
@@ -73,21 +72,21 @@ const Carrinho = () => {
             <section className="flex gap-2 mt-4">
               <div className="flex items-center justify-center gap-2 text-xs bg-purple-principal-500 text-white px-2 py-0.5 rounded-full w-fit">
                 <button
-                  className="p-1"
+                  className="p-1 cursor-pointer"
                   onClick={() => handleMinusQuantity(item)}
                 >
                   <FaMinus />
                 </button>
                 <span>{item.quantidade}</span>
                 <button
-                  className="p-1"
+                  className="p-1 cursor-pointer"
                   onClick={() => handlePlusQuantity(item)}
                 >
                   <FaPlus />
                 </button>
               </div>
               <button
-                className="bg-zinc-200 p-2 rounded-full w-fit"
+                className="bg-zinc-200 p-2 rounded-full w-fit cursor-pointer"
                 onClick={() => removerProduto(item.slug)}
               >
                 <BiTrash />

@@ -49,6 +49,7 @@ const Finalizar = () => {
     atributos: produto.atributos.map((attr) => ({
       atributo_id: attr.atributo_id ?? null,
       valor_atributo_id: attr.valor_atributo_id ?? null,
+      preco_incluido: attr.preco_incluido,
     })),
   }));
 

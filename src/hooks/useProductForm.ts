@@ -54,7 +54,6 @@ export const useProductForm = (slugParam?: string) => {
 
       if (slugParam) {
         const data = await getProductBySlug(slugParam);
-        console.log("📦 Dados recebidos da API:", data);
 
         const atributosFormatados: IAtributo[] = Array.isArray(data.atributos)
           ? data.atributos.map(
@@ -70,14 +69,12 @@ export const useProductForm = (slugParam?: string) => {
                         valor: valor.valor ?? "",
                         preco: valor.preco ?? "",
                         preco_incluido: !!valor.preco_incluido,
-                      })
+                      }),
                     )
                   : [],
-              })
+              }),
             )
           : [];
-
-        console.log("📅 dias_disponiveis brutos:", data.dias_disponiveis);
 
         const diasDisponiveis: boolean[] = Array(7).fill(false);
         if (Array.isArray(data.dias_disponiveis)) {
@@ -128,7 +125,6 @@ export const useProductForm = (slugParam?: string) => {
 
   const buildPayload = (): FormData => {
     const form = new FormData();
-    console.log("📦 Construindo payload com formData:", formData);
     form.append("id", String(formData.id ?? ""));
     form.append("nome", formData.nome);
     form.append("slug", formData.slug);
@@ -143,8 +139,8 @@ export const useProductForm = (slugParam?: string) => {
       JSON.stringify(
         formData.diasDisponiveis
           .map((val, i) => (val ? i + 1 : null))
-          .filter((v): v is number => v !== null)
-      )
+          .filter((v): v is number => v !== null),
+      ),
     );
 
     const atributos = formData.atributos.map((attr) => ({
@@ -176,7 +172,7 @@ export const useProductForm = (slugParam?: string) => {
       }
 
       toast.success(
-        `Produto ${slugParam ? "editado" : "cadastrado"} com sucesso!!`
+        `Produto ${slugParam ? "editado" : "cadastrado"} com sucesso!!`,
       );
       router.push("/admin/listarprodutos");
     } catch (error: any) {
@@ -184,7 +180,7 @@ export const useProductForm = (slugParam?: string) => {
       toast.error(
         `Erro ao ${slugParam ? "editar" : "cadastrar"} produto: ${
           error.message || error
-        }`
+        }`,
       );
     }
   };

@@ -36,8 +36,6 @@ export const ListProductsItem = ({ product }: ListProductsItemProps) => {
 
   const isAvailableToday = product.available_days?.includes(hojeMap);
 
-  console.log("product", product);
-
   return (
     <section className="relative py-5 gap-4 flex items-center border-b border-zinc-200">
       <div className="w-18 relative">
@@ -53,15 +51,15 @@ export const ListProductsItem = ({ product }: ListProductsItemProps) => {
             !product.active
               ? "bg-red-500"
               : isAvailableToday
-              ? "bg-green-principal-500"
-              : "bg-yellow-500"
+                ? "bg-green-principal-500"
+                : "bg-yellow-500"
           }`}
           title={
             !product.active
               ? "Inativo"
               : isAvailableToday
-              ? "Ativo e disponível hoje"
-              : "Ativo, mas indisponível hoje"
+                ? "Ativo e disponível hoje"
+                : "Ativo, mas indisponível hoje"
           }
         />
       </div>

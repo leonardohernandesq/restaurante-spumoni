@@ -13,7 +13,6 @@ export const CheckoutResume = ({
   pedido: IPedido | null;
   restaurantAddress: string;
 }) => {
-  console.log("CheckoutResume pedido:", pedido);
   return (
     <section className="w-full rounded-lg">
       <CheckoutClientData

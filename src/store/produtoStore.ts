@@ -47,7 +47,7 @@ export const productStore = create<TProductStore>((set) => ({
       const response = await updateProduct(slug, data);
       set((state) => ({
         products: state.products.map((prod) =>
-          prod.slug === slug ? response : prod
+          prod.slug === slug ? response : prod,
         ),
         product: response,
         loading: false,
@@ -64,7 +64,6 @@ export const productStore = create<TProductStore>((set) => ({
     try {
       const product = await getProductBySlug(slug);
 
-      console.log("📦 Produto obtido:", product);
       set({ product, loading: false });
       return product;
     } catch (error) {
@@ -101,7 +100,7 @@ export const productStore = create<TProductStore>((set) => ({
           .map((product) => ({
             ...product,
             categoria_id: cat.id,
-          }))
+          })),
       );
 
       set({ products: flatProducts, loading: false });

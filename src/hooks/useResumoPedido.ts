@@ -13,7 +13,7 @@ type ProdutoCarrinho = {
 export const useResumoPedido = (
   produtos: ProdutoCarrinho[],
   bairro: string,
-  delivery: "delivery" | "takeaway"
+  delivery: "delivery" | "takeaway",
 ) => {
   const { fetchFretes, fretes } = useFreteStore();
 
@@ -25,7 +25,7 @@ export const useResumoPedido = (
     if (delivery === "takeaway") return 0;
 
     const freteEncontrado = fretes.find(
-      (frete) => frete.bairro.toLowerCase() === bairro.toLowerCase()
+      (frete) => frete.bairro.toLowerCase() === bairro.toLowerCase(),
     );
     if (freteEncontrado) {
       return parseFloat(freteEncontrado.preco);
