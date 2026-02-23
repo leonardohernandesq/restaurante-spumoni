@@ -28,10 +28,8 @@ export default function Home() {
     <main className="bg-zinc-100">
       <Header />
 
-      <>
-        <CategoryScroll categories={categories} isLoading={catLoading} />
-        <ProductSection data={productsAll} isLoading={prodLoading} />
-      </>
+      <CategoryScroll categories={categories} isLoading={catLoading} />
+      <ProductSection data={productsAll} isLoading={prodLoading} />
 
       <Footer />
     </main>

@@ -26,7 +26,7 @@ const AdicionarCategorias = () => {
       toast.success("Categoria criada com sucesso!");
       router.push("/admin/listarcategorias");
     } catch (err) {
-      console.log("Erro: ", err);
+      console.error("Erro: ", err);
     }
   };
 

@@ -44,7 +44,6 @@ export const pedidoStore = create<PedidoStore>((set, get) => ({
       const pedidosAtuais = get().pedidos;
       set({ pedidos: [...pedidosAtuais, novoPedido] });
 
-      console.log("✅ Pedido inserido com sucesso:", novoPedido);
       return novoPedido.pedido_id ?? 0; // ou novoPedido.pedido_id, depende do que você usa
     } catch (error) {
       console.error("❌ Erro ao inserir pedido:", error);
@@ -66,7 +65,7 @@ export const pedidoStore = create<PedidoStore>((set, get) => ({
 
       set((state) => ({
         pedidos: state.pedidos.map((pedido) =>
-          pedido.id === id ? { ...pedido, status: data.status } : pedido
+          pedido.id === id ? { ...pedido, status: data.status } : pedido,
         ),
       }));
 

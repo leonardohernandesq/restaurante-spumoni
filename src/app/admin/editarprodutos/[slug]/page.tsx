@@ -20,7 +20,7 @@ export default function EditarProdutoPage() {
   const updateAtributo = (
     index: number,
     field: string,
-    value: string | number | boolean | null
+    value: string | number | boolean | null,
   ) => {
     const novos = [...formData.atributos];
     novos[index] = { ...novos[index], [field]: value };
@@ -31,7 +31,7 @@ export default function EditarProdutoPage() {
     attrIndex: number,
     valIndex: number,
     field: string,
-    value: string | number | boolean | null
+    value: string | number | boolean | null,
   ) => {
     const novos = [...formData.atributos];
     const valores = [...novos[attrIndex].valores_atributo];
@@ -71,8 +71,6 @@ export default function EditarProdutoPage() {
     dias[index] = !dias[index];
     setFormData((prev) => ({ ...prev, diasDisponiveis: dias }));
   };
-
-  console.log("Dias: ", formData.diasDisponiveis);
 
   return (
     <Container styleRow="bg-zinc-100" styleContainer="min-h-screen mb-10">
@@ -173,7 +171,7 @@ export default function EditarProdutoPage() {
                     updateAtributo(
                       i,
                       "limite",
-                      e.target.value ? parseInt(e.target.value) : null
+                      e.target.value ? parseInt(e.target.value) : null,
                     )
                   }
                 />
