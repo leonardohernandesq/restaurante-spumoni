@@ -22,14 +22,15 @@ import { DeliveryOptions } from "@/components/DeliveryOptions";
 import { PedidoResumoHeader } from "@/components/PedidoResumoHeader";
 import { RequiredAsteristic } from "@/components/RequiredAsteristic";
 import { IPedidoCreate } from "@/interfaces/IPedidoCreate";
+import { useSettingsQuery } from "@/hooks/useSettingsQuery";
 
 const Finalizar = () => {
   const router = useRouter();
-  const loja =
-    "Estrada da Giesteira 65/67, Arruda dos Vinhos, 2630-241, Portugal";
 
   const { insertPedido } = pedidoStore();
   const { produtos, limparCarrinho } = cartStore();
+  const { data: settings } = useSettingsQuery();
+  const loja = settings?.address;
 
   const [delivery, setDelivery] = useState<"delivery" | "takeaway">("delivery");
   const [entrega, setEntrega] = useState<"booking" | "now">("now");
@@ -256,7 +257,7 @@ const Finalizar = () => {
           modalReferencia={modalReferencia}
           handleInputChange={handleInputChange}
           handleCepChange={handleCepChange}
-          loja={loja}
+          loja={loja ?? ""}
         />
 
         <BookingInputs

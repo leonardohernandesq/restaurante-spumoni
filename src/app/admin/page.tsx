@@ -96,6 +96,7 @@ const Login = () => {
               </>
             )}{" "}
           </button>
+          <Link href={"/recuperar-senha"}>Recuperar Senha</Link>
         </section>
       </main>
     </Container>
