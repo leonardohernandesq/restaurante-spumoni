@@ -23,7 +23,7 @@ export default function AlterarSenha() {
     if (!code) return alert("Code não encontrado!");
 
     try {
-      await reset.mutateAsync({ code, newPassword });
+      await reset.mutateAsync({ code, new_password: newPassword });
       router.push("/");
     } catch (err) {
       console.log(err);
