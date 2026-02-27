@@ -1,23 +1,28 @@
+import { useSettingsQuery } from "@/hooks/useSettingsQuery";
 import { IPedido } from "@/interfaces/IPedidosData";
 import { formatCurrencyBRL } from "@/utils/validators";
 
 export const Printer = ({ pedido }: { pedido: IPedido | null }) => {
+  const { data: settings } = useSettingsQuery();
+
   return (
-    <div id="print-area" className="hidden print:block text-sm font-mono p-4">
+    <div id="print-area" className="hidden print:block text-md font-mono p-4">
       <h2 className="text-center font-bold text-base">Restaurante Spumoni</h2>
       <p>CNPJ: 27.417.449/0001-06</p>
-      <p>Endereço: R. Raimundo Correia, 38 - Centro, Poá</p>
-      <hr className="my-2 border" />
+      <hr className="my-2" />
       <p>
         <strong>Cliente:</strong> {pedido?.nome_cliente}
       </p>
       <strong>Endereço:</strong>{" "}
-      {pedido?.tipo_entrega === "delivery" && (
+      {pedido?.tipo_entrega === "delivery" ? (
         <p>
           {pedido?.endereco_entrega}, {pedido?.numero} {pedido?.complemento} -{" "}
           {pedido?.bairro} - {pedido?.cep} - {pedido?.referencia}
         </p>
+      ) : (
+        <p>Retirada - Endereço: {settings?.address}</p>
       )}
+      <hr className="my-2" />
       {pedido?.produtos.map((produto, index) => {
         const calcularPrecoProduto = () => {
           let precoBase = produto.preco_base;
@@ -80,7 +85,7 @@ export const Printer = ({ pedido }: { pedido: IPedido | null }) => {
       <p>
         <strong>Forma de pagamento:</strong> {pedido?.forma_pagamento}
       </p>
-      <hr className="my-2 border" />
+      <hr className="my-2" />
       <p className="text-right font-semibold">
         Entrega: {formatCurrencyBRL(Number(pedido?.taxa_entrega))}
       </p>
@@ -98,10 +103,10 @@ export const Printer = ({ pedido }: { pedido: IPedido | null }) => {
                     }
                     #print-area {
                         position: absolute;
-                        top: 50%;
+                        top: 0;
                         left: 50%;
-                        transform: translate(-50%, -50%);
-                        width: 76mm;
+                        transform: translate(-50%, 0%);
+                        width: ${settings?.tamanho_bobina};
                         padding: 10px;
                     }
                 }

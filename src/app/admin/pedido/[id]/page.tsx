@@ -84,7 +84,7 @@ export default function Pedido({ params }: PedidoPageProps) {
           </button>
           <h1>Voltar ao Gestor de Pedidos</h1>
         </div>
-        <button onClick={handlePrint}>
+        <button onClick={handlePrint} className="cursor-pointer">
           <PiPrinter size={30} />
         </button>
       </header>

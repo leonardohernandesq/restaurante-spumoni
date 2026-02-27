@@ -222,10 +222,33 @@ const Finalizar = () => {
           </label>
           <input
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              // mantém apenas números
+              const onlyNumbers = e.target.value.replace(/\D/g, "");
+              setPhone(onlyNumbers);
+            }}
+            onKeyDown={(e) => {
+              // Permite teclas de controle
+              const allowedKeys = [
+                "Backspace",
+                "Delete",
+                "ArrowLeft",
+                "ArrowRight",
+                "Tab",
+              ];
+
+              if (allowedKeys.includes(e.key)) return;
+
+              // Se não for número, bloqueia
+              if (!/^\d$/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
             name="whatsapp"
             id="whatsapp"
-            type="text"
+            type="tel"
+            inputMode="numeric"
+            maxLength={11}
             placeholder="Digite o seu telefone"
             className="w-full p-2 border border-zinc-400 rounded-md"
             required

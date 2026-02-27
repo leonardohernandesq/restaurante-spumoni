@@ -11,6 +11,9 @@ import { pedidoStore } from "@/store/pedidoStore";
 import { useConfigStore } from "@/store/configStore";
 import { Container } from "@/components/Container";
 import { CheckoutResume } from "@/components/CheckoutResume";
+import { FaWhatsapp } from "react-icons/fa6";
+import Image from "next/image";
+import { formatCurrencyBRL } from "@/utils/validators";
 
 const ObrigadoClient = () => {
   const searchParams = useSearchParams();
@@ -18,9 +21,11 @@ const ObrigadoClient = () => {
   const { getPedidoById, pedido } = pedidoStore();
   const { fetchSettings, settings } = useConfigStore();
 
-  const [telefoneDigitado, setTelefoneDigitado] = useState("");
-  const [telefoneConfirmado, setTelefoneConfirmado] = useState(false);
-  const [erroTelefone, setErroTelefone] = useState("");
+  // const [telefoneDigitado, setTelefoneDigitado] = useState("");
+  // const [telefoneConfirmado, setTelefoneConfirmado] = useState(false);
+  // const [erroTelefone, setErroTelefone] = useState("");
+
+  const [whatsappSend, setWhatsappSend] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -36,56 +41,132 @@ const ObrigadoClient = () => {
     }
   }, [searchParams, getPedidoById]);
 
-  const handleConfirmTelefone = () => {
-    if (!pedido?.telefone) {
-      setErroTelefone("Pedido não encontrado.");
-      return;
+  // const handleConfirmTelefone = () => {
+  //   if (!pedido?.telefone) {
+  //     setErroTelefone("Pedido não encontrado.");
+  //     return;
+  //   }
+
+  //   const normalizar = (v: string) => v.replace(/\D/g, "");
+
+  //   if (normalizar(telefoneDigitado) !== normalizar(pedido.telefone)) {
+  //     setErroTelefone(
+  //       "Este número de telefone não realizou nenhum pedido hoje."
+  //     );
+  //     return;
+  //   }
+
+  //   setTelefoneConfirmado(true);
+  // };
+
+  const handleSendWhatsapp = () => {
+    const phone = "351922269283"; // número com DDI + DDD e sem símbolos
+
+    if (!pedido) return;
+
+    //  <h2 className="font-medium mb-2">
+    //           {produto.quantidade}x - {produto.produto_nome}
+    //         </h2>
+
+    //         {produto.atributos?.length > 0 && (
+    //           <div className="ml-4 mb-2 text-sm text-zinc-700">
+    //             {produto.atributos.map((attr) => (
+    //               <p key={attr.id}>
+    //                 • <strong>{attr.nome_atributo}:</strong> {attr.valor}{" "}
+    //                 {Number(attr.preco) > 0 &&
+    //                   `(${formatCurrencyBRL(Number(attr.preco))})`}
+    //               </p>
+    //             ))}
+    //           </div>
+    //         )}
+
+    const produtosTexto = pedido.produtos
+      .map((produto) => {
+        const atributosTexto = produto.atributos
+          .map((attr) => {
+            const precoExtra =
+              Number(attr.preco) > 0
+                ? ` (${formatCurrencyBRL(Number(attr.preco))})`
+                : "";
+
+            return `${attr.nome_atributo}: ${attr.valor}${precoExtra}`;
+          })
+          .join("\n");
+
+        return `${produto.quantidade}x - ${produto.produto_nome}\n${atributosTexto}`;
+      })
+      .join("\n\n");
+
+    const message = `
+====== 🏷 Pedido ${pedido.id} ======
+
+${produtosTexto}
+
+${
+  pedido.tipo_entrega === "delivery"
+    ? `Delivery (Entrega) ${formatCurrencyBRL(Number(pedido.taxa_entrega))}`
+    : `Retirar pedido em loja`
+}
+Valor Total: ${formatCurrencyBRL(Number(pedido.valor_total))}
+${pedido.forma_pagamento.toUpperCase()}${
+      pedido.troco
+        ? ` - Troco para ${formatCurrencyBRL(Number(pedido.troco))}`
+        : ""
     }
 
-    const normalizar = (v: string) => v.replace(/\D/g, "");
+====== Dados do Cliente ======
 
-    if (normalizar(telefoneDigitado) !== normalizar(pedido.telefone)) {
-      setErroTelefone(
-        "Este número de telefone não realizou nenhum pedido hoje."
-      );
-      return;
+👤 ${pedido.nome_cliente}
+📱 ${pedido.telefone}
+📍 ${
+      pedido.tipo_entrega === "delivery"
+        ? `${pedido.endereco_entrega}, ${pedido.numero} ${
+            pedido.complemento || ""
+          } - ${pedido.bairro} | CEP: ${pedido.cep} ${pedido.referencia || ""}`
+        : "Retirar em Loja"
     }
 
-    setTelefoneConfirmado(true);
+====== Detalhes do Pedido ======
+
+https://restaurantespumoni.com.br/obrigado?pedido_id=${pedido?.id}
+`;
+    const encodedMessage = encodeURIComponent(message);
+
+    const url = `https://wa.me/${phone}?text=${encodedMessage}`;
+
+    window.open(url, "_blank");
+
+    setWhatsappSend(true);
   };
 
-  if (!telefoneConfirmado) {
+  if (!whatsappSend) {
     return (
-      <Container>
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="w-full max-w-md rounded bg-white p-6 shadow-2xl border border-gray-200">
-            <h2 className="mb-4 text-center text-xl font-medium">
-              Confirme seu telefone
-            </h2>
+      <Container
+        styleRow="bg-green-principal-500"
+        styleContainer="flex flex-col w-screen items-center h-screen justify-center text-white"
+      >
+        <Image src={"/logo-header.svg"} alt="" width={80} height={150} />
+        <h2 className="font-bold text-2xl mt-8">O Número do seu pedido é</h2>
+        <span className="font-black text-7xl mb-5">{pedido?.id}</span>
+        <p className="text-xl">
+          Para confirmar seu pedido, clique no botão abaixo e envie-o pelo nosso
+          WhatsApp.
+        </p>
 
-            <input
-              type="tel"
-              placeholder="Digite seu telefone"
-              value={telefoneDigitado}
-              onChange={(e) => {
-                setTelefoneDigitado(e.target.value);
-                setErroTelefone("");
-              }}
-              className="mb-2 w-full rounded border px-3 py-2"
-            />
+        <button
+          className="flex items-center gap-2 bg-purple-principal-500 py-4 px-12 mt-8 rounded-lg text-lg font-bold uppercase cursor-pointer"
+          onClick={() => handleSendWhatsapp()}
+        >
+          <FaWhatsapp size={25} />
+          Finalize o seu pedido
+        </button>
 
-            {erroTelefone && (
-              <p className="mb-2 text-sm text-red-600">{erroTelefone}</p>
-            )}
-
-            <button
-              onClick={handleConfirmTelefone}
-              className="w-full rounded bg-green-principal-700 py-2 text-white hover:bg-green-principal-800 cursor-pointer"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
+        <button
+          className="mt-3 text-lg font-bold cursor-pointer py-4 px-12"
+          onClick={() => setWhatsappSend(true)}
+        >
+          Ver resumo do pedido
+        </button>
       </Container>
     );
   }
@@ -146,7 +227,7 @@ const ObrigadoClient = () => {
                 <Link
                   href={`https://api.whatsapp.com/send?phone=${settings.whatsapp_number.replace(
                     /\D/g,
-                    ""
+                    "",
                   )}`}
                   target="_blank"
                 >
