@@ -58,9 +58,8 @@ const ObrigadoClient = () => {
 
   //   setTelefoneConfirmado(true);
   // };
-
   const handleSendWhatsapp = () => {
-    const phone = "351922269283"; // número com DDI + DDD e sem símbolos
+    const phone = "5511930854943"; // número com DDI + DDD e sem símbolos
 
     if (!pedido) return;
 
