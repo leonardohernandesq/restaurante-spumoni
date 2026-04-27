@@ -126,8 +126,7 @@ ${pedido.forma_pagamento.toUpperCase()}${
     }
 
 ====== Detalhes do Pedido ======
-
-https://restaurantespumoni.com.br/obrigado?pedido_id=${pedido?.id}
+https://site.restaurantespumoni.com.br/obrigado?pedido_id=${pedido?.id}
 `;
     const encodedMessage = encodeURIComponent(message);
 
