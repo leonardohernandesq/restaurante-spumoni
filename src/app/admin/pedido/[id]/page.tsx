@@ -128,84 +128,87 @@ export default function Pedido({ params }: PedidoPageProps) {
           )}
         </div>
         <div className="p-2.5 border border-zinc-300 w-full rounded-md">
-          {pedido?.produtos.map((produto, index) => {
-            const calcularPrecoProduto = () => {
-              let precoBase = produto.preco_base;
+          {pedido &&
+            (() => {
+              const calcularPrecoProduto = (
+                produto: (typeof pedido.produtos)[0],
+              ) => {
+                let precoFinal = Number(produto.preco_base);
+                produto.atributos?.forEach((attr) => {
+                  if (Number(attr.preco_incluido) === 1) {
+                    precoFinal = Number(attr.preco);
+                  } else {
+                    precoFinal += Number(attr.preco);
+                  }
+                });
+                return precoFinal * produto.quantidade;
+              };
 
-              const attrQueSubstituiBase = produto.atributos?.find(
-                (attr) => attr.preco_incluido === 1,
-              );
-              if (attrQueSubstituiBase) {
-                precoBase = attrQueSubstituiBase.preco;
-              }
-
-              const adicionais =
-                produto.atributos?.filter(
-                  (attr) => attr.preco_incluido === 0,
-                ) || [];
-              const totalAdicionais = adicionais.reduce(
-                (soma, attr) => soma + Number(attr.preco),
+              const totalProdutos = pedido.produtos.reduce(
+                (acc, p) => acc + calcularPrecoProduto(p),
                 0,
               );
+              const totalGeral = totalProdutos + Number(pedido.taxa_entrega);
 
               return (
-                (Number(precoBase) + Number(totalAdicionais)) *
-                produto.quantidade
-              );
-            };
+                <>
+                  {pedido.produtos.map((produto, index) => {
+                    const valorTotal = calcularPrecoProduto(produto);
+                    return (
+                      <div
+                        key={produto.id}
+                        className={`${index >= 1 && "border-b border-zinc-400"} p-1`}
+                      >
+                        <h2 className="font-medium mb-2">
+                          {produto.quantidade}x - {produto.produto_nome}
+                        </h2>
 
-            const valorTotal = calcularPrecoProduto();
+                        {produto.atributos?.length > 0 && (
+                          <div className="ml-4 mb-2 text-sm text-zinc-700">
+                            {produto.atributos.map((attr) => (
+                              <p key={attr.id}>
+                                • <strong>{attr.nome_atributo}:</strong>{" "}
+                                {attr.valor}
+                                {Number(attr.preco) > 0 &&
+                                  ` (${formatCurrencyBRL(Number(attr.preco))})`}
+                              </p>
+                            ))}
+                          </div>
+                        )}
 
-            return (
-              <div
-                key={produto.id}
-                className={`${index >= 1 && "border-b border-zinc-400"} p-1`}
-              >
-                <h2 className="font-medium mb-2">
-                  {produto.quantidade}x - {produto.produto_nome}
-                </h2>
+                        {produto.observacao && (
+                          <p>
+                            <strong>Obs.:</strong> {produto.observacao}
+                          </p>
+                        )}
 
-                {produto.atributos?.length > 0 && (
-                  <div className="ml-4 mb-2 text-sm text-zinc-700">
-                    {produto.atributos.map((attr) => (
-                      <p key={attr.id}>
-                        • <strong>{attr.nome_atributo}:</strong> {attr.valor}
-                        {Number(attr.preco) > 0 &&
-                          ` (${formatCurrencyBRL(Number(attr.preco))})`}
-                      </p>
-                    ))}
+                        <p className="font-bold mt-1">
+                          Subtotal: {formatCurrencyBRL(valorTotal)}
+                        </p>
+                      </div>
+                    );
+                  })}
+                  <div className="mt-3 pt-2 border-t border-zinc-300">
+                    <p>
+                      Delivery:{" "}
+                      <span className="font-medium">
+                        {formatCurrencyBRL(Number(pedido.taxa_entrega))}
+                      </span>
+                    </p>
+                    <p>
+                      Total:{" "}
+                      <span className="font-medium">
+                        {formatCurrencyBRL(totalGeral)}
+                      </span>
+                    </p>
+                    <p>
+                      Forma de Pagamento:{" "}
+                      <span className="font-medium"> PIX</span>
+                    </p>
                   </div>
-                )}
-
-                {produto.observacao && (
-                  <p>
-                    <strong>Obs.:</strong> {produto.observacao}
-                  </p>
-                )}
-
-                <p className="font-bold mt-1">
-                  Subtotal: {formatCurrencyBRL(valorTotal)}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-        <div className="p-2.5 border border-zinc-300 w-full rounded-md">
-          <p>
-            Delivery:
-            <span className="font-medium">
-              {formatCurrencyBRL(Number(pedido?.taxa_entrega))}
-            </span>
-          </p>
-          <p>
-            Total:
-            <span className="font-medium">
-              {formatCurrencyBRL(Number(pedido?.valor_total))}
-            </span>
-          </p>
-          <p>
-            Forma de Pagamento: <span className="font-medium"> PIX</span>
-          </p>
+                </>
+              );
+            })()}
         </div>
 
         <div className="w-full rounded-md flex border border-zinc-300">
