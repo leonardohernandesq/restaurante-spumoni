@@ -95,8 +95,15 @@ const Finalizar = () => {
       return;
     }
 
-    const bookingHours = bookingDate.getHours();
-    const currentHours = currentDate.getHours();
+    const toSPHour = (date: Date) =>
+      parseInt(
+        date
+          .toLocaleString("sv-SE", { timeZone: "America/Sao_Paulo" })
+          .slice(11, 13),
+      );
+
+    const bookingHours = toSPHour(bookingDate);
+    const currentHours = toSPHour(currentDate);
 
     const isWithinBusinessHours = bookingHours >= 9 && bookingHours < 18;
 
@@ -161,7 +168,9 @@ const Finalizar = () => {
       forma_pagamento: payment,
       troco: troco || undefined,
       nota_fiscal: nf || undefined,
-      data_pedido: new Date().toISOString(),
+      data_pedido: new Date()
+        .toLocaleString("sv-SE", { timeZone: "America/Sao_Paulo" })
+        .replace("T", " "),
       produtos: produtosParaApi,
     };
 

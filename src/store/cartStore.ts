@@ -91,7 +91,9 @@ export const cartStore = create<CartState>()(
 
         if (typeof window !== "undefined") {
           const storedDate = localStorage.getItem("carrinho-storage-date");
-          const today = new Date().toISOString().slice(0, 10);
+          const today = new Date()
+            .toLocaleString("sv-SE", { timeZone: "America/Sao_Paulo" })
+            .slice(0, 10);
 
           if (storedDate !== today) {
             state.limparCarrinho();
