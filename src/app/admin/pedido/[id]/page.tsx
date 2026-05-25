@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   FaArrowLeft,
@@ -22,19 +22,22 @@ interface PedidoPageProps {
 }
 
 export default function Pedido({ params }: PedidoPageProps) {
-  const [pedidoId, setPedidoId] = useState<number | null>(null);
   const { getColor, getLabel } = useStatusColor();
   const { getPedidoById, pedido, changeStatus } = pedidoStore();
   const { id } = use(params);
+  const pedidoId = parseInt(id);
   const router = useRouter();
 
   useEffect(() => {
-    params.then(({ id }) => {
-      const numId = parseInt(id);
-      setPedidoId(numId);
-      getPedidoById(numId);
-    });
-  }, [params, getPedidoById]);
+    // Pré-popula com os dados básicos da lista (acesso instantâneo)
+    // enquanto o detalhe completo (com atributos, etc.) carrega em background
+    const pedidoDaLista = pedidoStore
+      .getState()
+      .pedidos.find((p) => p.id === pedidoId);
+    pedidoStore.setState({ pedido: pedidoDaLista ?? null });
+
+    getPedidoById(pedidoId);
+  }, [pedidoId, getPedidoById]);
 
   const handleBack = () => {
     router.back();
@@ -157,7 +160,7 @@ export default function Pedido({ params }: PedidoPageProps) {
                     return (
                       <div
                         key={produto.id}
-                        className={`${index >= 1 && "border-b border-zinc-400"} p-1`}
+                        className={`${index < pedido.produtos.length - 1 && "border-b border-zinc-300"} py-2 px-1`}
                       >
                         <h2 className="font-medium mb-2">
                           {produto.quantidade}x - {produto.produto_nome}
@@ -188,7 +191,7 @@ export default function Pedido({ params }: PedidoPageProps) {
                       </div>
                     );
                   })}
-                  <div className="mt-3 pt-2 border-t border-zinc-300">
+                  <div className="pt-2 border-t border-zinc-300">
                     <p>
                       Delivery:{" "}
                       <span className="font-medium">

@@ -11,7 +11,40 @@ export const Printer = ({ pedido }: { pedido: IPedido | null }) => {
       <p>CNPJ: 27.417.449/0001-06</p>
       <hr className="my-2" />
       <p>
-        <strong>Cliente:</strong> {pedido?.nome_cliente}
+        {pedido?.id && (
+          <>
+            <strong>Pedido:</strong> {pedido.id} -{" "}
+          </>
+        )}
+        {pedido?.data_pedido &&
+          new Date(pedido.data_pedido).toLocaleString("pt-BR", {
+            timeZone: "America/Sao_Paulo",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          })}
+
+        {pedido?.data_entrega && (
+          <>
+            {" "}
+            <strong>Entrega agendada:</strong>{" "}
+            {new Date(pedido.data_entrega).toLocaleString("pt-BR", {
+              timeZone: "America/Sao_Paulo",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })}
+          </>
+        )}
+      </p>
+      <p>
+        <strong>Cliente:</strong> {pedido?.nome_cliente} - {pedido?.telefone}
       </p>
       <strong>Endereço:</strong>{" "}
       {pedido?.tipo_entrega === "delivery" ? (
@@ -23,75 +56,79 @@ export const Printer = ({ pedido }: { pedido: IPedido | null }) => {
         <p>Retirada - Endereço: {settings?.address}</p>
       )}
       <hr className="my-2" />
-      {pedido?.produtos.map((produto, index) => {
-        const calcularPrecoProduto = () => {
-          let precoBase = produto.preco_base;
+      {pedido &&
+        (() => {
+          const calcularPrecoProduto = (
+            produto: (typeof pedido.produtos)[0],
+          ) => {
+            let precoFinal = Number(produto.preco_base);
+            produto.atributos?.forEach((attr) => {
+              if (Number(attr.preco_incluido) === 1) {
+                precoFinal = Number(attr.preco);
+              } else {
+                precoFinal += Number(attr.preco);
+              }
+            });
+            return precoFinal * produto.quantidade;
+          };
 
-          const attrQueSubstituiBase = produto.atributos?.find(
-            (attr) => attr.preco_incluido === 1,
-          );
-          if (attrQueSubstituiBase) {
-            precoBase = attrQueSubstituiBase.preco;
-          }
-
-          const adicionais =
-            produto.atributos?.filter((attr) => attr.preco_incluido === 0) ||
-            [];
-          const totalAdicionais = adicionais.reduce(
-            (soma, attr) => soma + Number(attr.preco),
+          const totalProdutos = pedido.produtos.reduce(
+            (acc, p) => acc + calcularPrecoProduto(p),
             0,
           );
+          const totalGeral = totalProdutos + Number(pedido.taxa_entrega);
 
           return (
-            (Number(precoBase) + Number(totalAdicionais)) * produto.quantidade
-          );
-        };
+            <>
+              {pedido.produtos.map((produto, index) => {
+                const valorTotal = calcularPrecoProduto(produto);
+                return (
+                  <div
+                    key={produto.id}
+                    className={`${index >= 1 && "border-b border-zinc-400"} p-1`}
+                  >
+                    <h2 className="font-medium mb-2">
+                      {produto.quantidade}x - {produto.produto_nome}
+                    </h2>
 
-        const valorTotal = calcularPrecoProduto();
+                    {produto.atributos?.length > 0 && (
+                      <div className="ml-4 mb-2 text-sm text-zinc-700">
+                        {produto.atributos.map((attr) => (
+                          <p key={attr.id}>
+                            • <strong>{attr.nome_atributo}:</strong>{" "}
+                            {attr.valor}{" "}
+                            {Number(attr.preco) > 0 &&
+                              `(${formatCurrencyBRL(Number(attr.preco))})`}
+                          </p>
+                        ))}
+                      </div>
+                    )}
 
-        return (
-          <div
-            key={produto.id}
-            className={`${index >= 1 && "border-b border-zinc-400"} p-1`}
-          >
-            <h2 className="font-medium mb-2">
-              {produto.quantidade}x - {produto.produto_nome}
-            </h2>
+                    {produto.observacao && (
+                      <p>
+                        <strong>Obs.:</strong> {produto.observacao}
+                      </p>
+                    )}
 
-            {produto.atributos?.length > 0 && (
-              <div className="ml-4 mb-2 text-sm text-zinc-700">
-                {produto.atributos.map((attr) => (
-                  <p key={attr.id}>
-                    • <strong>{attr.nome_atributo}:</strong> {attr.valor}{" "}
-                    {Number(attr.preco) > 0 &&
-                      `(${formatCurrencyBRL(Number(attr.preco))})`}
-                  </p>
-                ))}
-              </div>
-            )}
-
-            {produto.observacao && (
+                    <p className="font-bold mt-1">
+                      Subtotal: {formatCurrencyBRL(valorTotal)}
+                    </p>
+                  </div>
+                );
+              })}
               <p>
-                <strong>Obs.:</strong> {produto.observacao}
+                <strong>Forma de pagamento:</strong> {pedido.forma_pagamento}
               </p>
-            )}
-
-            <p className="font-bold mt-1">
-              Subtotal: {formatCurrencyBRL(valorTotal)}
-            </p>
-          </div>
-        );
-      })}
-      <p>
-        <strong>Forma de pagamento:</strong> {pedido?.forma_pagamento}
-      </p>
-      <hr className="my-2" />
-      <p className="text-right font-semibold">
-        Entrega: {formatCurrencyBRL(Number(pedido?.taxa_entrega))}
-      </p>
-      <p className="text-right font-semibold">
-        Total: {formatCurrencyBRL(Number(pedido?.valor_total))}
-      </p>
+              <hr className="my-2" />
+              <p className="text-right font-semibold">
+                Entrega: {formatCurrencyBRL(Number(pedido.taxa_entrega))}
+              </p>
+              <p className="text-right font-semibold">
+                Total: {formatCurrencyBRL(totalGeral)}
+              </p>
+            </>
+          );
+        })()}
       <p className="text-center mt-4">Obrigado pela preferência!</p>
       <style>{`
                 @media print {
