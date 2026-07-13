@@ -7,6 +7,7 @@ import { FaMinus, FaPlus } from "react-icons/fa6";
 import { ButtonCart } from "@/components/ButtonCart";
 import { Container } from "@/components/Container";
 import { HeaderPages } from "@/components/HeaderPages";
+import { useResumoPedido } from "@/hooks/useResumoPedido";
 import { cartStore, ProdutoCarrinho } from "@/store/cartStore";
 import { formatCurrencyBRL } from "@/utils/validators";
 
@@ -29,10 +30,7 @@ const Carrinho = () => {
     }
   };
 
-  const subtotal = produtos.reduce(
-    (acc, item) => acc + item.preco * item.quantidade,
-    0,
-  );
+  const { subtotal } = useResumoPedido(produtos, "", "takeaway");
 
   return (
     <Container styleRow="bg-zinc-100">
@@ -97,7 +95,7 @@ const Carrinho = () => {
 
         <section className="flex justify-between items-center text-zinc-700">
           <p>SUBTOTAL</p>
-          <p>{formatCurrencyBRL(subtotal)}</p>
+          <p>{formatCurrencyBRL(Number(subtotal))}</p>
         </section>
       </main>
 
@@ -114,7 +112,7 @@ const Carrinho = () => {
             ) : (
               <>
                 <p>Continuar</p>
-                <p>{formatCurrencyBRL(subtotal)}</p>
+                <p>{formatCurrencyBRL(Number(subtotal))}</p>
               </>
             )}
           </>

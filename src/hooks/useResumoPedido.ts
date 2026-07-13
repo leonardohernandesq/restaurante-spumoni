@@ -4,10 +4,6 @@ import { useEffect, useMemo } from "react";
 type ProdutoCarrinho = {
   preco?: number;
   quantidade: number;
-  atributos: {
-    preco: number;
-    preco_incluido?: boolean;
-  }[];
 };
 
 export const useResumoPedido = (
@@ -34,23 +30,15 @@ export const useResumoPedido = (
     return 0;
   }, [delivery, bairro, fretes]);
 
-  const calcularPrecoProduto = (produto: ProdutoCarrinho) => {
-    let precoBase = produto.preco || 0;
-
-    for (const attr of produto.atributos || []) {
-      if (attr.preco_incluido) {
-        precoBase = attr.preco;
-      } else {
-        precoBase += attr.preco;
-      }
-    }
-
-    return precoBase * produto.quantidade;
-  };
-
   const subtotal = useMemo(() => {
+    // Regra única: o carrinho já salva `preco` final do item.
+    // Para manter consistência com `src/app/carrinho/page.tsx`,
+    // não recalculamos atributos aqui.
     return produtos
-      .reduce((acc, produto) => acc + calcularPrecoProduto(produto), 0)
+      .reduce(
+        (acc, produto) => acc + (Number(produto.preco) || 0) * produto.quantidade,
+        0,
+      )
       .toFixed(2);
   }, [produtos]);
 
