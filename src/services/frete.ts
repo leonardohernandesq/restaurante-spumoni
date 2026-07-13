@@ -39,7 +39,7 @@ export const freteService = {
 
   // Atualizar frete por ID
   async update(id: number, payload: Frete): Promise<void> {
-    await api.put(`/frete/edit/${id}`, payload);
+    await api.put(`/frete/edit`, payload);
   },
 
   // Deletar frete por ID
