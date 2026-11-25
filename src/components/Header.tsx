@@ -8,14 +8,15 @@ import { IoWalletOutline } from "react-icons/io5";
 import { cartStore } from "@/store/cartStore";
 
 import { Container } from "@/components/Container";
-import { useStatusQuery } from "@/hooks/useStatusQuery";
+// TODO: validação de loja aberta/fechada desativada temporariamente
+// import { useStatusQuery } from "@/hooks/useStatusQuery";
 import { SkeletonComponent } from "./SkeletonComponent";
 import Link from "next/link";
-import { StatusIsOpen } from "./StatusIsOpen";
+// import { StatusIsOpen } from "./StatusIsOpen";
 
 export const Header = () => {
   const router = useRouter();
-  const { storeOpen } = useStatusQuery();
+  // const { storeOpen } = useStatusQuery();
   const { produtos, isLoading } = cartStore();
   const totalItens = produtos.length;
 
@@ -45,9 +46,11 @@ export const Header = () => {
             <span className="text-purple-principal-700">Spumoni</span>
           </h1>
           <h2 className="text-sm">O melhor restaurante do Alto Tietê</h2>
+          {/* TODO: reativar selo de aberto/fechado
           <div className="flex items-center justify-center">
             <StatusIsOpen storeOpen={storeOpen} />
           </div>
+          */}
         </div>
         <div className="relative">
           <button
