@@ -12,7 +12,8 @@ import { ButtonCart } from "@/components/ButtonCart";
 import { LoadingIcon } from "@/components/LoadingIcon";
 import { HeaderPages } from "@/components/HeaderPages";
 import { AtributoSelecionado, cartStore } from "@/store/cartStore";
-import { useStatusQuery } from "@/hooks/useStatusQuery";
+// TODO: validação de loja aberta/fechada desativada temporariamente
+// import { useStatusQuery } from "@/hooks/useStatusQuery";
 import { formatCurrencyBRL } from "@/utils/validators";
 import { LoadingScreen } from "@/components/LoadingScreen";
 
@@ -47,7 +48,7 @@ interface ProductClientProps {
 }
 export default function ProductClient({ produto }: ProductClientProps) {
   const router = useRouter();
-  const { storeOpen } = useStatusQuery();
+  // const { storeOpen } = useStatusQuery();
   const { produtos } = cartStore();
 
   const totalItens = produtos.length;
@@ -60,10 +61,11 @@ export default function ProductClient({ produto }: ProductClientProps) {
   const [loading, setLoading] = useState(false);
 
   const handleAddProduct = () => {
-    if (!storeOpen) {
-      toast.error("A loja está fechada no momento.");
-      return;
-    }
+    // TODO: reativar validação de loja aberta/fechada
+    // if (!storeOpen) {
+    //   toast.error("A loja está fechada no momento.");
+    //   return;
+    // }
 
     for (const atributo of produto.atributos) {
       if (atributo.obrigatorio) {
@@ -160,7 +162,8 @@ export default function ProductClient({ produto }: ProductClientProps) {
     <Container styleRow="bg-zinc-50 min-h-screen">
       <HeaderPages title={produto?.name ?? ""} />
 
-      {loading || !storeOpen ? (
+      {/* TODO: reativar validação -> {loading || !storeOpen ? ( */}
+      {loading ? (
         <LoadingScreen />
       ) : (
         <section className="relative py-5 gap-4 flex flex-col mb-24">
