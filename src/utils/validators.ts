@@ -1,13 +1,6 @@
-/**
- * Remove todos os caracteres não numéricos de uma string
- */
-export const removeNonNumeric = (value: string): string => {
-  return value.replace(/\D/g, "");
-};
+import { removeNonNumeric } from "./format";
 
-/**
- * Valida se o CPF é válido
- */
+/** Valida se o CPF é válido. */
 export const isValidCPF = (cpf: string): boolean => {
   const cleanCPF = removeNonNumeric(cpf);
 
@@ -37,9 +30,7 @@ export const isValidCPF = (cpf: string): boolean => {
   return true;
 };
 
-/**
- * Valida se o CNPJ é válido
- */
+/** Valida se o CNPJ é válido. */
 export const isValidCNPJ = (cnpj: string): boolean => {
   const cleanCNPJ = removeNonNumeric(cnpj);
 
@@ -80,96 +71,18 @@ export const isValidCNPJ = (cnpj: string): boolean => {
   return true;
 };
 
-/**
- * Valida se é um CPF ou CNPJ válido
- */
+/** Valida se é um CPF ou CNPJ válido. */
 export const isValidCPForCNPJ = (value: string): boolean => {
   const cleanValue = removeNonNumeric(value);
 
-  if (cleanValue.length === 11) {
-    return isValidCPF(cleanValue);
-  } else if (cleanValue.length === 14) {
-    return isValidCNPJ(cleanValue);
-  }
+  if (cleanValue.length === 11) return isValidCPF(cleanValue);
+  if (cleanValue.length === 14) return isValidCNPJ(cleanValue);
 
   return false;
 };
 
-/**
- * Valida se o telefone contém apenas números, espaços, parênteses, hífen e símbolo de +
- */
+/** Telefone com DDD: 10 (fixo) ou 11 (celular) dígitos. */
 export const isValidPhone = (phone: string): boolean => {
   const cleanPhone = removeNonNumeric(phone);
-
-  // Telefone deve ter entre 10 e 11 dígitos (DDD + número)
-  if (cleanPhone.length < 10 || cleanPhone.length > 11) {
-    return false;
-  }
-
-  return true;
-};
-
-/**
- * Formata CPF (XXX.XXX.XXX-XX)
- */
-export const formatCPF = (value: string): string => {
-  const cleanValue = removeNonNumeric(value);
-
-  if (cleanValue.length <= 11) {
-    return cleanValue
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-  }
-
-  return value;
-};
-
-/**
- * Formata CNPJ (XX.XXX.XXX/XXXX-XX)
- */
-export const formatCNPJ = (value: string): string => {
-  const cleanValue = removeNonNumeric(value);
-
-  return cleanValue
-    .replace(/(\d{2})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1/$2")
-    .replace(/(\d{4})(\d{1,2})$/, "$1-$2");
-};
-
-/**
- * Formata CPF ou CNPJ automaticamente
- */
-export const formatCPForCNPJ = (value: string): string => {
-  const cleanValue = removeNonNumeric(value);
-
-  if (cleanValue.length <= 11) {
-    return formatCPF(value);
-  } else {
-    return formatCNPJ(value);
-  }
-};
-
-/**
- * Formata telefone (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
- */
-export const formatPhone = (value: string): string => {
-  const cleanValue = removeNonNumeric(value);
-
-  if (cleanValue.length <= 11) {
-    return cleanValue
-      .replace(/(\d{2})(\d)/, "($1) $2")
-      .replace(/(\d{5})(\d{4})$/, "$1-$2")
-      .replace(/(\d{4})(\d{4})$/, "$1-$2");
-  }
-
-  return value;
-};
-
-export const formatCurrencyBRL = (value: number): string => {
-  return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
+  return cleanPhone.length >= 10 && cleanPhone.length <= 11;
 };

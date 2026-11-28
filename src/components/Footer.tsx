@@ -6,28 +6,16 @@ import Link from "next/link";
 import { OpeningHoursFooter } from "@/components/OpeningHoursFooter";
 import { Container } from "@/components/Container";
 
-import { useConfigStore } from "@/store/configStore";
-import { useEffect } from "react";
+import { useOpeningHoursQuery, useSettingsQuery } from "@/queries/config";
 import { getDiaSemana } from "@/utils/getDiaSemana";
 import { DetailTitle } from "./DetailTitle";
 import ContactSection from "./ContactSection";
 import { SkeletonComponent } from "./SkeletonComponent";
 
 export const Footer = () => {
-  const {
-    fetchOpeningHours,
-    openingHours: horarios,
-    fetchSettings,
-    settings,
-  } = useConfigStore();
-
-  useEffect(() => {
-    fetchOpeningHours();
-    fetchSettings();
-  }, [fetchOpeningHours, fetchSettings]);
-
-  const isLoadingOpeningHours = !horarios.length;
-  const isLoadingSettings = !settings;
+  const { data: horarios = [], isLoading: isLoadingOpeningHours } =
+    useOpeningHoursQuery();
+  const { data: settings, isLoading: isLoadingSettings } = useSettingsQuery();
 
   return (
     <Container styleRow="bg-green-principal-500 text-white">

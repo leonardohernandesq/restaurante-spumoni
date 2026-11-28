@@ -1,25 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { buildCartItemKey } from "@/domain/cart";
+import { todaySaoPaulo } from "@/domain/datetime";
 
-export interface AtributoSelecionado {
-  nome: string;
-  valor: string;
-  preco: number;
-  atributo_id: number;
-  valor_atributo_id: number;
-  preco_incluido: boolean;
-}
-
-export interface ProdutoCarrinho {
-  id: number;
-  nome: string;
-  slug: string;
-  imagem: string;
-  quantidade: number;
-  preco: number;
-  observacoes?: string;
-  atributos: AtributoSelecionado[];
-}
+import type {
+  NovoProdutoCarrinho,
+  ProdutoCarrinho,
+} from "@/types/carrinho";
 
 export interface CartState {
   produtos: ProdutoCarrinho[];
@@ -27,11 +14,17 @@ export interface CartState {
 
   setLoading: (value: boolean) => void;
 
-  adicionarProduto: (produto: ProdutoCarrinho) => void;
-  removerProduto: (slug: string) => void;
+  adicionarProduto: (produto: NovoProdutoCarrinho) => void;
+  removerProduto: (itemId: string) => void;
   limparCarrinho: () => void;
-  atualizarQuantidade: (slug: string, quantidade: number) => void;
+  atualizarQuantidade: (itemId: string, quantidade: number) => void;
 }
+
+/**
+ * Versão do formato salvo no localStorage.
+ * v2: itens passaram a ser identificados por `itemId` (antes era o `slug`).
+ */
+const CART_STORAGE_VERSION = 2;
 
 export const cartStore = create<CartState>()(
   persist(
@@ -42,46 +35,57 @@ export const cartStore = create<CartState>()(
       setLoading: (value) => set({ isLoading: value }),
 
       adicionarProduto: (novoProduto) => {
-        const { produtos } = get();
-
-        const produtoExistente = produtos.find(
-          (p) => p.slug === novoProduto.slug,
+        const itemId = buildCartItemKey(
+          novoProduto.id,
+          novoProduto.atributos.map((a) => a.valor_atributo_id),
+          novoProduto.observacoes,
         );
 
-        if (produtoExistente) {
+        const { produtos } = get();
+        const existente = produtos.find((p) => p.itemId === itemId);
+
+        if (existente) {
           set({
             produtos: produtos.map((p) =>
-              p.slug === novoProduto.slug
-                ? {
-                    ...p,
-                    quantidade: p.quantidade + novoProduto.quantidade,
-                  }
+              p.itemId === itemId
+                ? { ...p, quantidade: p.quantidade + novoProduto.quantidade }
                 : p,
             ),
           });
-        } else {
-          set({ produtos: [...produtos, novoProduto] });
+          return;
         }
+
+        set({ produtos: [...produtos, { ...novoProduto, itemId }] });
       },
 
-      removerProduto: (slug) => {
+      removerProduto: (itemId) => {
         set((state) => ({
-          produtos: state.produtos.filter((p) => p.slug !== slug),
+          produtos: state.produtos.filter((p) => p.itemId !== itemId),
         }));
       },
 
       limparCarrinho: () => set({ produtos: [] }),
 
-      atualizarQuantidade: (slug, novaQuantidade) => {
+      atualizarQuantidade: (itemId, novaQuantidade) => {
         set((state) => ({
           produtos: state.produtos.map((p) =>
-            p.slug === slug ? { ...p, quantidade: novaQuantidade } : p,
+            p.itemId === itemId ? { ...p, quantidade: novaQuantidade } : p,
           ),
         }));
       },
     }),
     {
       name: "carrinho-storage",
+      version: CART_STORAGE_VERSION,
+
+      // Carrinhos salvos no formato antigo (sem itemId) são descartados.
+      // O carrinho já é limpo todo dia, então o impacto é mínimo.
+      migrate: (persisted, version) => {
+        if (version < CART_STORAGE_VERSION) {
+          return { produtos: [] } as unknown as CartState;
+        }
+        return persisted as CartState;
+      },
 
       onRehydrateStorage: () => (state) => {
         if (!state) return;
@@ -91,9 +95,7 @@ export const cartStore = create<CartState>()(
 
         if (typeof window !== "undefined") {
           const storedDate = localStorage.getItem("carrinho-storage-date");
-          const today = new Date()
-            .toLocaleString("sv-SE", { timeZone: "America/Sao_Paulo" })
-            .slice(0, 10);
+          const today = todaySaoPaulo();
 
           if (storedDate !== today) {
             state.limparCarrinho();

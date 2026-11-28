@@ -1,12 +1,12 @@
 "use client";
 
-import { formatCurrencyBRL } from "@/utils/validators";
+import { formatCurrencyBRL } from "@/utils/format";
 
 interface ResumoPedidoProps {
   produtosLength: number;
-  subtotal: string;
+  subtotal: number;
   taxaEntrega: number;
-  valorFinal: string;
+  valorFinal: number;
 }
 
 export const ResumoPedido = ({
@@ -20,7 +20,7 @@ export const ResumoPedido = ({
       <p className="text-sm">RESUMO</p>
       <div className="flex justify-between items-center my-2 text-sm">
         <p>{produtosLength === 1 ? "1 Item" : `${produtosLength} Itens`}</p>
-        <p>{formatCurrencyBRL(Number(subtotal))}</p>
+        <p>{formatCurrencyBRL(subtotal)}</p>
       </div>
       <div className="flex justify-between items-center my-2 text-sm">
         <p>Entrega</p>
@@ -28,7 +28,7 @@ export const ResumoPedido = ({
       </div>
       <div className="flex justify-between items-center my-2 text-sm">
         <p>Total</p>
-        <p>{formatCurrencyBRL(Number(valorFinal))}</p>
+        <p>{formatCurrencyBRL(valorFinal)}</p>
       </div>
     </section>
   );

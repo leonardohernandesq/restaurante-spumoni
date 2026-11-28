@@ -1,30 +1,33 @@
-import { TUser } from "@/store/userStore";
 import { api } from "@/config/api";
+import type {
+  Credenciais,
+  LoginResponse,
+  MensagemResponse,
+  ResetPasswordDto,
+} from "@/types/auth";
 
-export async function loginUser({ email, senha }: TUser) {
-  const res = await api.post("/users/login", { email, senha });
+/** Login do admin. O token fica num cookie httpOnly gravado pela API. */
+export const authService = {
+  async login({ email, senha }: Credenciais): Promise<LoginResponse> {
+    const { data } = await api.post<LoginResponse>("/users/login", { email, senha });
+    return data;
+  },
 
-  return res.data;
-}
+  async logout(): Promise<MensagemResponse> {
+    const { data } = await api.post<MensagemResponse>("/users/logout");
+    return data;
+  },
 
-export async function logoutUser() {
-  const res = await api.post("/users/logout");
+  async pedirRecuperacao(email: string): Promise<MensagemResponse> {
+    const { data } = await api.post<MensagemResponse>("/users/recovery", { email });
+    return data;
+  },
 
-  return res.data;
-}
-
-export async function requestPasswordReset(email: string) {
-  const res = await api.post("/users/recovery", { email });
-  return res.data;
-}
-
-export async function resetPassword({
-  code,
-  new_password,
-}: {
-  code: string;
-  new_password: string;
-}) {
-  const res = await api.post("/users/reset", { code, new_password });
-  return res.data;
-}
+  async redefinirSenha({ code, new_password }: ResetPasswordDto): Promise<MensagemResponse> {
+    const { data } = await api.post<MensagemResponse>("/users/reset", {
+      code,
+      new_password,
+    });
+    return data;
+  },
+};

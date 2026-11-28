@@ -1,45 +1,24 @@
-import { useMemo } from "react";
+import {
+  PEDIDO_STATUS,
+  PEDIDO_STATUS_LIST,
+  PedidoStatus,
+  getStatusColor,
+  getStatusLabel,
+} from "@/domain/pedidoStatus";
 
-interface StatusInfo {
-  label: string;
-  color: string;
-}
+export type StatusKey = PedidoStatus;
 
-export type StatusKey = 0 | 1 | 2 | 3 | 4;
+const statusOptions = PEDIDO_STATUS_LIST.map((id) => ({
+  id,
+  label: PEDIDO_STATUS[id].label,
+}));
 
+/** Mantido para compatibilidade; a fonte dos dados é `domain/pedidoStatus`. */
 export function useStatusColor() {
-  const statusMap = useMemo<Record<StatusKey, StatusInfo>>(
-    () => ({
-      0: { label: "Cancelado", color: "bg-red-700" },
-      1: { label: "Novo pedido", color: "bg-yellow-600" },
-      2: { label: "Preparando", color: "bg-blue-700" },
-      3: { label: "Saindo para entrega", color: "bg-purple-700" },
-      4: { label: "Finalizado", color: "bg-green-700" },
-    }),
-    []
-  );
-
-  const statusOptions = useMemo(
-    () =>
-      (Object.entries(statusMap) as [string, StatusInfo][]).map(
-        ([key, { label }]) => ({
-          id: Number(key) as StatusKey,
-          label,
-        })
-      ),
-    [statusMap]
-  );
-
-  const getLabel = (status: number): string =>
-    statusMap[status as StatusKey]?.label ?? "Desconhecido";
-
-  const getColor = (status: number): string =>
-    statusMap[status as StatusKey]?.color ?? "bg-gray-400";
-
   return {
-    statusMap,
+    statusMap: PEDIDO_STATUS,
     statusOptions,
-    getLabel,
-    getColor,
+    getLabel: getStatusLabel,
+    getColor: getStatusColor,
   };
 }

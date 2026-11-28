@@ -1,4 +1,4 @@
-import { IPedido } from "@/interfaces/IPedidosData";
+import type { Pedido } from "@/types/pedido";
 import { CheckoutClientData } from "./CheckoutClientData";
 import { CheckoutEntregaData } from "./CheckoutEntregaData";
 import { CheckoutPagamentoData } from "./CheckoutPagamentoData";
@@ -10,7 +10,7 @@ export const CheckoutResume = ({
   pedido,
   restaurantAddress,
 }: {
-  pedido: IPedido | null;
+  pedido: Pedido | null;
   restaurantAddress: string;
 }) => {
   return (

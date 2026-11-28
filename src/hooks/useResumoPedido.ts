@@ -1,50 +1,43 @@
-import { useFreteStore } from "@/store/freteStore";
-import { useEffect, useMemo } from "react";
+import { useAllFretesQuery } from "@/queries/fretes";
+import { calcularTaxaEntrega } from "@/domain/frete";
+import { calcularSubtotal, calcularTotalPedido } from "@/domain/pricing";
+import { useMemo } from "react";
 
-type ProdutoCarrinho = {
+type ItemCarrinho = {
+  /** Preço unitário final, já com atributos (salvo no carrinho). */
   preco?: number;
   quantidade: number;
 };
 
+/** Totais do carrinho/checkout, em número (formate só na tela). */
 export const useResumoPedido = (
-  produtos: ProdutoCarrinho[],
+  produtos: ItemCarrinho[],
   bairro: string,
   delivery: "delivery" | "takeaway",
+  cidade = "",
 ) => {
-  const { fetchFretes, fretes } = useFreteStore();
+  const { data: fretes = [] } = useAllFretesQuery();
 
-  useEffect(() => {
-    fetchFretes();
-  }, [fetchFretes]);
+  const taxaEntrega = useMemo(
+    () => calcularTaxaEntrega(fretes, cidade, bairro, delivery),
+    [fretes, cidade, bairro, delivery],
+  );
 
-  const taxaEntrega = useMemo(() => {
-    if (delivery === "takeaway") return 0;
+  const subtotal = useMemo(
+    () =>
+      calcularSubtotal(
+        produtos.map((p) => ({
+          precoUnitario: Number(p.preco) || 0,
+          quantidade: p.quantidade,
+        })),
+      ),
+    [produtos],
+  );
 
-    const freteEncontrado = fretes.find(
-      (frete) => frete.bairro.toLowerCase() === bairro.toLowerCase(),
-    );
-    if (freteEncontrado) {
-      return parseFloat(freteEncontrado.preco);
-    }
-
-    return 0;
-  }, [delivery, bairro, fretes]);
-
-  const subtotal = useMemo(() => {
-    // Regra única: o carrinho já salva `preco` final do item.
-    // Para manter consistência com `src/app/carrinho/page.tsx`,
-    // não recalculamos atributos aqui.
-    return produtos
-      .reduce(
-        (acc, produto) => acc + (Number(produto.preco) || 0) * produto.quantidade,
-        0,
-      )
-      .toFixed(2);
-  }, [produtos]);
-
-  const valorFinal = useMemo(() => {
-    return (parseFloat(subtotal) + taxaEntrega).toFixed(2);
-  }, [subtotal, taxaEntrega]);
+  const valorFinal = useMemo(
+    () => calcularTotalPedido(subtotal, taxaEntrega),
+    [subtotal, taxaEntrega],
+  );
 
   return { subtotal, taxaEntrega, valorFinal };
 };

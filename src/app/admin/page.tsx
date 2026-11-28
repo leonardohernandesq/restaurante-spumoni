@@ -3,12 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 import { BsArrowRight } from "react-icons/bs";
 import { toast } from "react-toastify";
 
 import { Container } from "@/components/Container";
-import { userStore } from "@/store/userStore";
+import { useLogin } from "@/queries/auth";
 import { LoadingIcon } from "@/components/LoadingIcon";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
@@ -16,7 +16,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { login, loading } = userStore();
+  const login = useLogin();
+  const loading = login.isPending;
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -26,7 +27,7 @@ const Login = () => {
     }
 
     try {
-      await login(email, senha);
+      await login.mutateAsync({ email, senha });
 
       toast.success("Login realizado com sucesso!");
 

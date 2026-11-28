@@ -1,186 +1,91 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from "react";
-import { getAllCategory } from "@/services/category";
-import { productStore } from "@/store/produtoStore";
-import { ICategory } from "@/interfaces/ICategory";
-import {
-  IProductFormData,
-  IAtributo,
-  IValorAtributo,
-} from "@/interfaces/IProductFormData";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "nextjs-toploader/app";
 import { toast } from "react-toastify";
+import { isAxiosError } from "axios";
+import type { IProductFormData } from "@/interfaces/IProductFormData";
+import { useCategoriasQuery } from "@/queries/categorias";
+import { useProdutoQuery, useSaveProduto } from "@/queries/produtos";
+import {
+  formularioParaFormData,
+  formularioVazio,
+  produtoParaFormulario,
+  validarProduto,
+} from "@/domain/produtoForm";
 
+/** Mensagem da API (ex.: "Imagem inválida...") ou uma genérica. */
+const mensagemDeErro = (error: unknown): string => {
+  if (isAxiosError<{ error?: string; message?: string }>(error)) {
+    const dados = error.response?.data;
+    if (dados?.error || dados?.message) return String(dados.error || dados.message);
+    if (!error.response) return "Sem conexão com o servidor.";
+  }
+  return "Tente novamente.";
+};
+
+/** Formulário de produto: cadastro (sem slug) ou edição (com slug). */
 export const useProductForm = (slugParam?: string) => {
-  const { addNewProduct, updateProduct, getProductBySlug, loading } =
-    productStore();
   const router = useRouter();
 
-  const [formData, setFormData] = useState<IProductFormData>({
-    id: 0,
-    nome: "",
-    slug: "",
-    descricao: "",
-    preco: "",
-    categoria_id: "",
-    ativo: true,
-    image: null,
-    imageUrl: null,
-    atributos: [
-      {
-        atributo_id: null,
-        nomes_atributos: "",
-        limite: null,
-        obrigatorio: false,
-        valores_atributo: [
-          {
-            valor_atributo_id: null,
-            valor: "",
-            preco: "",
-            preco_incluido: false,
-          },
-        ],
-      },
-    ],
-    diasDisponiveis: Array(7).fill(false),
-  });
+  const categoriasQuery = useCategoriasQuery();
+  const produtoQuery = useProdutoQuery(slugParam);
+  const categories = categoriasQuery.data ?? [];
+  const { data: produto, isLoading: carregandoProduto } = produtoQuery;
 
-  const [categories, setCategories] = useState<ICategory[]>([]);
+  // Na edição, salvar um formulário vazio (produto não carregou) apagaria o
+  // produto. Sem categorias, não dá para escolher a categoria.
+  const erroAoCarregar =
+    (!!slugParam && produtoQuery.isError && !produto) ||
+    (categoriasQuery.isError && !categoriasQuery.data);
 
-  useEffect(() => {
-    const load = async () => {
-      const categorias = await getAllCategory();
-      setCategories(categorias);
-
-      if (slugParam) {
-        const data = await getProductBySlug(slugParam);
-
-        const atributosFormatados: IAtributo[] = Array.isArray(data.atributos)
-          ? data.atributos.map(
-              (atributo): IAtributo => ({
-                atributo_id: atributo.atributo_id ?? null,
-                nomes_atributos: atributo.nome_atributo ?? "",
-                limite: atributo.limite ?? null,
-                obrigatorio: !!atributo.obrigatorio,
-                valores_atributo: Array.isArray(atributo.valores_atributo)
-                  ? atributo.valores_atributo.map(
-                      (valor): IValorAtributo => ({
-                        valor_atributo_id: valor.valor_atributo_id ?? undefined,
-                        valor: valor.valor ?? "",
-                        preco: valor.preco ?? "",
-                        preco_incluido: !!valor.preco_incluido,
-                      }),
-                    )
-                  : [],
-              }),
-            )
-          : [];
-
-        const diasDisponiveis: boolean[] = Array(7).fill(false);
-        if (Array.isArray(data.dias_disponiveis)) {
-          data.dias_disponiveis.forEach((i: number) => {
-            const index = i - 1;
-            if (index >= 0 && index < 7) diasDisponiveis[index] = true;
-          });
-        }
-
-        setFormData({
-          id: data.id,
-          nome: data.name ?? "",
-          slug: data.slug ?? "",
-          descricao: data.descricao ?? "",
-          preco: data.preco !== undefined ? String(data.preco) : "",
-          categoria_id: data.categoria_id ? String(data.categoria_id) : "",
-          ativo: !!data.ativo,
-          image: null,
-          imageUrl: data.image
-            ? `${process.env.NEXT_PUBLIC_IMAGE_PATH}/${data.image}`
-            : null,
-          atributos:
-            atributosFormatados.length > 0
-              ? atributosFormatados
-              : [
-                  {
-                    atributo_id: null,
-                    nomes_atributos: "",
-                    limite: null,
-                    obrigatorio: false,
-                    valores_atributo: [
-                      {
-                        valor_atributo_id: null,
-                        valor: "",
-                        preco: "",
-                        preco_incluido: false,
-                      },
-                    ],
-                  },
-                ],
-          diasDisponiveis,
-        });
-      }
-    };
-
-    load();
-  }, [slugParam, getProductBySlug]);
-
-  const buildPayload = (): FormData => {
-    const form = new FormData();
-    form.append("id", String(formData.id ?? ""));
-    form.append("nome", formData.nome);
-    form.append("slug", formData.slug);
-    form.append("descricao", formData.descricao);
-    form.append("preco", formData.preco);
-    form.append("categoria_id", String(formData.categoria_id));
-    form.append("ativo", formData.ativo ? "1" : "0");
-    form.append("image_url", formData.image ?? "");
-
-    form.append(
-      "dias_disponiveis",
-      JSON.stringify(
-        formData.diasDisponiveis
-          .map((val, i) => (val ? i + 1 : null))
-          .filter((v): v is number => v !== null),
-      ),
-    );
-
-    const atributos = formData.atributos.map((attr) => ({
-      atributo_id: attr.atributo_id ?? null,
-      nome_atributo: attr.nomes_atributos,
-      limite: attr.limite,
-      obrigatorio: attr.obrigatorio,
-      valores_atributo: attr.valores_atributo.map((v) => ({
-        valor_atributo_id: v.valor_atributo_id ?? null,
-        valor: v.valor,
-        preco: v.preco,
-        preco_incluido: v.preco_incluido ? 1 : 0,
-      })),
-    }));
-
-    form.append("atributos", JSON.stringify(atributos));
-
-    return form;
+  const tentarDeNovo = () => {
+    categoriasQuery.refetch();
+    if (slugParam) produtoQuery.refetch();
   };
+  const saveProduto = useSaveProduto();
+
+  const [formData, setFormData] = useState<IProductFormData>(formularioVazio);
+
+  // Na edição, preenche o formulário quando o produto chega
+  useEffect(() => {
+    if (produto) {
+      setFormData(
+        produtoParaFormulario(produto, process.env.NEXT_PUBLIC_IMAGE_PATH),
+      );
+    }
+  }, [produto]);
 
   const handleSubmit = async () => {
-    const payload = buildPayload();
+    const erro = validarProduto(formData, { editando: !!slugParam });
+    if (erro) {
+      toast.warn(erro.mensagem);
+      document
+        .getElementById(`campo-${erro.campo}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    if (
+      formData.ativo &&
+      !formData.diasDisponiveis.some(Boolean) &&
+      !confirm("Nenhum dia marcado: o produto não vai aparecer no cardápio. Salvar mesmo assim?")
+    ) {
+      return;
+    }
 
     try {
-      if (slugParam) {
-        await updateProduct(slugParam, payload);
-      } else {
-        await addNewProduct(payload);
-      }
+      await saveProduto.mutateAsync({
+        slug: slugParam,
+        form: formularioParaFormData(formData),
+      });
 
       toast.success(
         `Produto ${slugParam ? "editado" : "cadastrado"} com sucesso!!`,
       );
       router.push("/admin/listarprodutos");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Erro ao salvar produto:", error);
       toast.error(
-        `Erro ao ${slugParam ? "editar" : "cadastrar"} produto: ${
-          error.message || error
-        }`,
+        `Não foi possível ${slugParam ? "salvar" : "cadastrar"} o produto. ${mensagemDeErro(error)}`,
       );
     }
   };
@@ -190,6 +95,9 @@ export const useProductForm = (slugParam?: string) => {
     setFormData,
     categories,
     handleSubmit,
-    loading,
+    loading: saveProduto.isPending || (!!slugParam && carregandoProduto),
+    erroAoCarregar,
+    tentando: categoriasQuery.isFetching || produtoQuery.isFetching,
+    tentarDeNovo,
   };
 };

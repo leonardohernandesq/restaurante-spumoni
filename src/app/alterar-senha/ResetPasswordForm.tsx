@@ -1,10 +1,11 @@
 "use client";
 
 import React from "react";
-import { useResetPassword } from "@/hooks/usePasswordRecoveryQuery";
-import { useRouter } from "next/navigation";
+import { useResetPassword } from "@/queries/auth";
+import { useRouter } from "nextjs-toploader/app";
 import { BsArrowRight } from "react-icons/bs";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { toast } from "react-toastify";
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/Container";
@@ -21,14 +22,22 @@ export default function ResetPasswordForm({ code }: Props) {
   const router = useRouter();
 
   const onHandleReset = async () => {
-    if (!code) return alert("Token não encontrado!");
+    if (!code) {
+      toast.error("Código de recuperação não encontrado.");
+      return;
+    }
+    if (!newPassword) {
+      toast.error("Digite a nova senha.");
+      return;
+    }
 
     try {
       await reset.mutateAsync({ code, new_password: newPassword });
-      router.push("/");
+      toast.success("Senha alterada! Faça login com a nova senha.");
+      router.push("/admin");
     } catch (err) {
-      console.log(err);
-      alert("Erro ao alterar senha");
+      console.error("Erro ao alterar senha:", err);
+      toast.error("Erro ao alterar senha. O código pode ter expirado.");
     }
   };
 

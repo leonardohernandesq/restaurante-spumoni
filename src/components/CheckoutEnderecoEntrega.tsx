@@ -1,11 +1,11 @@
-import { IPedido } from "@/interfaces/IPedidosData";
-import { formatCurrencyBRL } from "@/utils/validators";
+import type { Pedido } from "@/types/pedido";
+import { formatCurrencyBRL } from "@/utils/format";
 
 export const CheckoutEnderecoEntrega = ({
   pedido,
   restaurantAddress,
 }: {
-  pedido: IPedido | null;
+  pedido: Pedido | null;
   restaurantAddress?: string;
 }) => {
   if (pedido?.tipo_entrega === "delivery") {
@@ -18,7 +18,7 @@ export const CheckoutEnderecoEntrega = ({
         </p>
         <p>
           <strong>Taxa de Entrega:</strong>{" "}
-          {formatCurrencyBRL(Number(pedido?.taxa_entrega))}
+          {formatCurrencyBRL(pedido?.taxa_entrega ?? 0)}
         </p>
       </div>
     );

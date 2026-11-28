@@ -1,12 +1,6 @@
-export interface ICategory {
-  id: number;
-  nome?: string;
-  slug?: string;
-  descricao?: string;
-  total_produtos?: number;
-}
+import type { Categoria } from "@/types/categoria";
 
 export interface IPropsCategory {
-  categories: ICategory[];
+  categories: Categoria[];
   isLoading?: boolean;
 }

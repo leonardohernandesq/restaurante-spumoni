@@ -1,51 +1,27 @@
-// services/freteService.ts
 import { api } from "@/config/api";
-
-export interface Frete {
-  id?: number;
-  bairro: string;
-  preco: string;
-  cidade: string;
-}
-
-export interface FretePagination {
-  currentPage: number;
-  perPage: number;
-  total: number;
-  totalPages: number;
-}
-
-export interface FreteApiResponse {
-  data: Frete[];
-  pagination: FretePagination;
-}
+import type { Frete, FreteApiResponse } from "@/types/frete";
 
 export const freteService = {
-  // Buscar todos os fretes
-  async getAll(
-    page: number = 1,
-    perPage: number = 10,
-  ): Promise<FreteApiResponse> {
-    // Usar GET com query params (ajustável conforme backend)
-    const response = await api.get("/fretes", { params: { page, perPage } });
-    return response.data; // já retorna { data, pagination }
+  /** Uma página de fretes: `{ data, pagination }`. */
+  async listar(page = 1, perPage = 10): Promise<FreteApiResponse> {
+    const { data } = await api.get<FreteApiResponse>("/fretes", {
+      params: { page, perPage },
+    });
+    return data;
   },
 
-  // Criar novo frete
-  async create(payload: Frete): Promise<Frete> {
-    const { data } = await api.post("/fretes", payload);
-    return data; // deve retornar o frete com ID
+  async criar(frete: Frete): Promise<Frete> {
+    const { data } = await api.post<Frete>("/fretes", frete);
+    return data;
   },
 
-  // Atualizar frete por ID
-  async update(id: number, payload: Frete): Promise<void> {
-    await api.put(`/frete/edit?id=${id}`, payload);
+  async atualizar(id: number, frete: Frete): Promise<unknown> {
+    const { data } = await api.put("/frete/edit", frete, { params: { id } });
+    return data;
   },
 
-  // Deletar frete por ID
-  async delete(id: number): Promise<void> {
-    const res = await api.delete("/frete/delete", { data: { id } });
-
-    return res.data;
+  async remover(id: number): Promise<unknown> {
+    const { data } = await api.delete("/frete/delete", { data: { id } });
+    return data;
   },
 };

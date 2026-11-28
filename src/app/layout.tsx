@@ -1,11 +1,10 @@
-"use client";
-
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ToastContainer } from "react-toastify";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import React from "react";
+import NextTopLoader from "nextjs-toploader";
+import { Providers } from "./providers";
+import { SITE } from "@/constants/app";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,37 +16,39 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE.url),
+  title: {
+    default: SITE.titulo,
+    template: `%s | ${SITE.nome}`,
+  },
+  description: SITE.descricao,
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: SITE.nome,
+    title: SITE.titulo,
+    description: SITE.descricao,
+    url: "/",
+  },
+};
+
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const [queryClient] = React.useState(() => new QueryClient());
-
+}: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <head>
-        <title>Restaurante Spumoni - O melhor restaurante do Alto Tietê</title>
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased scroll-smooth`}
       >
-        <QueryClientProvider client={queryClient}>
-          {children}
-          <ToastContainer
-            position="bottom-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
+        {/* Barra de progresso no topo ao trocar de página (links e router.push) */}
+        <NextTopLoader
+          color="#973f78"
+          height={3}
+          showSpinner={false}
+          shadow="0 0 10px #973f78,0 0 5px #973f78"
+        />
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

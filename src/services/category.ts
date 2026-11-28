@@ -1,50 +1,33 @@
-import { TCategory } from '@/store/categoryStore';
-import { api } from '@/config/api'
+import { api } from "@/config/api";
+import type {
+  Categoria,
+  CategoriaCreateDto,
+  CategoriaUpdateDto,
+} from "@/types/categoria";
 
-export async function createCategory({ nome, slug, descricao }: TCategory) {
-    const res = await api.post('/category/create', { nome, slug, descricao });
+export const categoriaService = {
+  async listar(): Promise<Categoria[]> {
+    const { data } = await api.get<Categoria[]>("/category");
+    return data ?? [];
+  },
 
-    return res.data;
-}
+  async buscar(id: number): Promise<Categoria> {
+    const { data } = await api.get<Categoria>("/categoryId", { params: { id } });
+    return data;
+  },
 
-export async function getAllCategory() {
-    const res = await api.get('/category', {
-        params: {
-            _t: Date.now()
-        },
-        headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-        }
-    });
+  async criar({ nome, slug, descricao }: CategoriaCreateDto): Promise<unknown> {
+    const { data } = await api.post("/category/create", { nome, slug, descricao });
+    return data;
+  },
 
-    return res.data;
-}
+  async atualizar({ id, nome, slug, descricao }: CategoriaUpdateDto): Promise<unknown> {
+    const { data } = await api.put("/category/edit", { id, nome, slug, descricao });
+    return data;
+  },
 
-
-export async function getCategoryById({ id }: { id: number }) {
-    const res = await api.get(`/categoryId`, {
-        params: {
-            id,
-            _t: Date.now() // quebra cache
-        },
-        headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-        }
-    });
-
-    return res.data;
-}
-
-export async function deleteCategory({ id }: { id: number }) {
-    const res = await api.delete('/category/delete', { data: { id } });
-
-    return res.data;
-}
-
-export async function updateCategory({ id, nome, slug, descricao }: TCategory) {
-    const res = await api.put('/category/edit', { id, nome, slug, descricao });
-
-    return res.data;
-}
+  async remover(id: number): Promise<unknown> {
+    const { data } = await api.delete("/category/delete", { data: { id } });
+    return data;
+  },
+};
