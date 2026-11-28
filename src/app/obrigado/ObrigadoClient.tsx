@@ -20,6 +20,25 @@ import {
   montarMensagemWhatsappLoja,
 } from "@/domain/pedidoResumo";
 
+/** Lembra que o WhatsApp já foi enviado (recarregar não pede de novo). */
+const chaveEnviado = (id: number) => `pedido_whatsapp_enviado_${id}`;
+
+const lerEnviado = (id: number): boolean => {
+  try {
+    return sessionStorage.getItem(chaveEnviado(id)) === "1";
+  } catch {
+    return false;
+  }
+};
+
+const marcarEnviado = (id: number) => {
+  try {
+    sessionStorage.setItem(chaveEnviado(id), "1");
+  } catch {
+    // sem storage: vale só enquanto a página estiver aberta
+  }
+};
+
 const ObrigadoClient = () => {
   const searchParams = useSearchParams();
   const pedidoIdParam = Number(searchParams.get("pedido_id"));
@@ -31,11 +50,20 @@ const ObrigadoClient = () => {
   // O resumo vem do sessionStorage salvo no checkout, não da API:
   // GET /order?id= é (ou será) protegido por login (item 1.2 / B1).
   const [pedido, setPedido] = useState<Pedido | null>(null);
-  const [whatsappSend, setWhatsappSend] = useState(false);
+  // O resumo só libera depois de abrir o WhatsApp com o pedido
+  const [enviado, setEnviado] = useState(false);
+  const [verResumo, setVerResumo] = useState(false);
+  const [aviso, setAviso] = useState(false);
 
   useEffect(() => {
     setPedido(pedidoId ? lerResumoPedido(pedidoId) : null);
+    setEnviado(pedidoId ? lerEnviado(pedidoId) : false);
   }, [pedidoId]);
+
+  const handleVerResumo = () => {
+    if (enviado) setVerResumo(true);
+    else setAviso(true);
+  };
 
   const handleSendWhatsapp = () => {
     if (!pedidoId) return;
@@ -46,10 +74,12 @@ const ObrigadoClient = () => {
     const whatsappLoja = settings?.whatsapp_number || LOJA.whatsappFallback;
     window.open(buildWhatsappUrl(whatsappLoja, message), "_blank");
 
-    setWhatsappSend(true);
+    marcarEnviado(pedidoId);
+    setEnviado(true);
+    setAviso(false);
   };
 
-  if (!whatsappSend) {
+  if (!verResumo) {
     return (
       <main className="relative flex min-h-dvh w-full items-center justify-center overflow-hidden bg-gradient-to-br from-green-principal-500 to-green-principal-900 px-4 py-10 text-white">
         {/* Bolhas decorativas */}
@@ -73,8 +103,16 @@ const ObrigadoClient = () => {
           </div>
 
           <p className="mt-6 text-lg leading-snug">
-            Falta só um passo: <strong>envie o pedido pelo nosso WhatsApp</strong>{" "}
-            para confirmar.
+            {enviado ? (
+              <>
+                Pronto! Confira se a mensagem foi <strong>enviada no WhatsApp</strong>.
+              </>
+            ) : (
+              <>
+                Falta só um passo: <strong>envie o pedido pelo nosso WhatsApp</strong>{" "}
+                para confirmar.
+              </>
+            )}
           </p>
 
           <button
@@ -82,15 +120,33 @@ const ObrigadoClient = () => {
             onClick={handleSendWhatsapp}
           >
             <FaWhatsapp size={26} />
-            Enviar pelo WhatsApp
+            {enviado ? "Enviar de novo pelo WhatsApp" : "Enviar pelo WhatsApp"}
           </button>
 
+          {/* aria-disabled (não disabled): o clique ainda mostra o aviso */}
           <button
-            className="mt-3 cursor-pointer rounded-xl px-6 py-3 font-semibold text-white/90 underline-offset-4 hover:underline"
-            onClick={() => setWhatsappSend(true)}
+            type="button"
+            aria-disabled={!enviado}
+            aria-describedby={aviso ? "aviso-resumo" : undefined}
+            className={`mt-3 rounded-xl px-6 py-3 font-semibold underline-offset-4 transition ${
+              enviado
+                ? "cursor-pointer text-white hover:underline"
+                : "cursor-not-allowed text-white/50"
+            }`}
+            onClick={handleVerResumo}
           >
             Ver resumo do pedido
           </button>
+
+          {aviso && !enviado && (
+            <p
+              id="aviso-resumo"
+              role="alert"
+              className="mt-1 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-green-principal-900 shadow"
+            >
+              Envie o pedido pelo WhatsApp primeiro para ver o resumo.
+            </p>
+          )}
         </div>
       </main>
     );
