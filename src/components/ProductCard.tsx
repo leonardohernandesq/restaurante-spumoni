@@ -9,6 +9,7 @@ import { BiPlus } from "react-icons/bi";
 import { IProductCardProps } from "@/interfaces/IProductCardProps";
 
 import { useStoreStatusQuery as useStatusQuery } from "@/queries/config";
+import { VALIDAR_LOJA_ABERTA } from "@/constants/app";
 import { formatCurrencyBRL } from "@/utils/format";
 
 export const ProductCard = ({ product }: IProductCardProps) => {
@@ -16,7 +17,7 @@ export const ProductCard = ({ product }: IProductCardProps) => {
   const router = useRouter();
 
   const handleBuyProduct = (link: string) => {
-    if (storeOpen) {
+    if (!VALIDAR_LOJA_ABERTA || storeOpen) {
       router.push(link);
     } else {
       toast.error(

@@ -1,6 +1,12 @@
 /** Intervalo do polling da lista de pedidos no admin. */
 export const REFETCH_PEDIDOS_MS = 5_000;
 
+/**
+ * Bloquear pedidos com a loja fechada (selo Aberto/Fechado no topo e aviso
+ * ao escolher um produto). Desativado temporariamente: `true` para reativar.
+ */
+export const VALIDAR_LOJA_ABERTA = false;
+
 /** Paginação da lista de pedidos no admin. */
 export const DEFAULT_PER_PAGE = 20;
 export const PER_PAGE_OPTIONS = [10, 20, 50] as const;
