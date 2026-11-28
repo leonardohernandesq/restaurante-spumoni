@@ -1,37 +1,27 @@
-"use client";
+import { categoriaService } from "@/services/category";
+import { achatarProdutos, produtoService } from "@/services/produto";
+import HomeClient from "./HomeClient";
 
-import { useEffect } from "react";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { ProductSection } from "@/components/ProductSection";
-import { CategoryScroll } from "@/components/CategoryScroll";
-import { categoryStore } from "@/store/categoryStore";
-import { productStore } from "@/store/produtoStore";
-import { IProductAll } from "@/interfaces/IProductAll";
+// O cardápio muda com o dia da semana: a página é refeita no máximo a cada 60s
+export const revalidate = 60;
 
-export default function Home() {
-  const { categories, getAll, loading: catLoading } = categoryStore();
-  const { products, fetchProducts, loading: prodLoading } = productStore();
+/** Busca no servidor; se a API falhar, o navegador tenta de novo sozinho. */
+const tentar = async <T,>(buscar: () => Promise<T>): Promise<T | undefined> => {
+  try {
+    return await buscar();
+  } catch (error) {
+    console.error("Erro ao carregar o cardápio no servidor:", error);
+    return undefined;
+  }
+};
 
-  useEffect(() => {
-    Promise.all([getAll(), fetchProducts(0)]);
-  }, [getAll, fetchProducts]);
-
-  const productsAll: IProductAll[] = categories.map((cat) => ({
-    id: cat.id.toString(),
-    category: cat.nome ?? "",
-    descriptionCategory: cat.descricao ?? "",
-    products: products.filter((p) => p.categoria_id === cat.id),
-  }));
+export default async function Home() {
+  const [categorias, produtos] = await Promise.all([
+    tentar(categoriaService.listar),
+    tentar(async () => achatarProdutos(await produtoService.listarCardapio())),
+  ]);
 
   return (
-    <main className="bg-zinc-100">
-      <Header />
-
-      <CategoryScroll categories={categories} isLoading={catLoading} />
-      <ProductSection data={productsAll} isLoading={prodLoading} />
-
-      <Footer />
-    </main>
+    <HomeClient categoriasIniciais={categorias} produtosIniciais={produtos} />
   );
 }

@@ -1,6 +1,6 @@
-import { IProductAll } from "./IProductAll";
+import { CategoriaComProdutos } from "@/types/produto";
 
 export interface IProductSectionProps {
-  data: IProductAll[];
+  data: CategoriaComProdutos[];
   isLoading?: boolean;
 }

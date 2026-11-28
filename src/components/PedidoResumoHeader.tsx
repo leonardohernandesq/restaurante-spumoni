@@ -11,7 +11,7 @@ export const PedidoResumoHeader = ({ produtos }: IPedidoResumoHeaderProps) => {
             <div className="flex opacity-75">
                 {produtos.map((produto) => (
                     <Image
-                        key={produto.id}
+                        key={produto.itemId}
                         className="shadow rounded-full ml-[-10px]"
                         src={`${process.env.NEXT_PUBLIC_IMAGE_PATH}/${produto.imagem}`}
                         alt={produto.nome}

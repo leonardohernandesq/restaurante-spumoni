@@ -2,18 +2,20 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { FaMinus, FaPlus } from "react-icons/fa6";
 import { FiShoppingCart } from "react-icons/fi";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 import { toast } from "react-toastify";
 
 import { Container } from "@/components/Container";
 import { ButtonCart } from "@/components/ButtonCart";
 import { LoadingIcon } from "@/components/LoadingIcon";
 import { HeaderPages } from "@/components/HeaderPages";
-import { AtributoSelecionado, cartStore } from "@/store/cartStore";
-import { useStatusQuery } from "@/hooks/useStatusQuery";
-import { formatCurrencyBRL } from "@/utils/validators";
+import { QuantityStepper } from "@/components/ui/QuantityStepper";
+import { cartStore } from "@/store/cartStore";
+import type { AtributoSelecionado } from "@/types/carrinho";
+import { useStoreStatusQuery as useStatusQuery } from "@/queries/config";
+import { formatCurrencyBRL } from "@/utils/format";
+import { calcularPrecoUnitario, toNumber } from "@/domain/pricing";
 import { LoadingScreen } from "@/components/LoadingScreen";
 
 interface ValorAtributo {
@@ -31,7 +33,8 @@ interface Atributo {
   valores_atributo: ValorAtributo[];
 }
 
-interface Produto {
+/** Formato devolvido por GET /product (detalhe usado na página do produto). */
+export interface ProdutoDetalhe {
   id: number;
   name: string;
   slug: string;
@@ -43,7 +46,7 @@ interface Produto {
 }
 
 interface ProductClientProps {
-  produto: Produto;
+  produto: ProdutoDetalhe;
 }
 export default function ProductClient({ produto }: ProductClientProps) {
   const router = useRouter();
@@ -78,7 +81,6 @@ export default function ProductClient({ produto }: ProductClientProps) {
     setLoading(true);
 
     const atributosFinal: AtributoSelecionado[] = [];
-    let precoFinal = parseFloat(produto.preco);
 
     produto.atributos.forEach((atributo) => {
       const selecionados = atributosSelecionados[atributo.atributo_id] || [];
@@ -92,17 +94,11 @@ export default function ProductClient({ produto }: ProductClientProps) {
           atributosFinal.push({
             nome: atributo.nome_atributo,
             valor: valor.valor,
-            preco: parseFloat(valor.preco),
+            preco: toNumber(valor.preco),
             atributo_id: atributo.atributo_id,
             valor_atributo_id: valor.valor_atributo_id,
             preco_incluido: valor.preco_incluido,
           });
-
-          if (valor.preco_incluido) {
-            precoFinal = parseFloat(valor.preco);
-          } else {
-            precoFinal += parseFloat(valor.preco);
-          }
         }
       });
     });
@@ -112,7 +108,7 @@ export default function ProductClient({ produto }: ProductClientProps) {
       nome: produto.name,
       slug: produto.slug,
       imagem: produto.image,
-      preco: precoFinal,
+      preco: calcularPrecoUnitario(produto.preco, atributosFinal),
       quantidade,
       observacoes,
       atributos: atributosFinal,
@@ -174,22 +170,7 @@ export default function ProductClient({ produto }: ProductClientProps) {
           />
           <div className="flex justify-between items-center">
             <h1 className="font-medium text-lg">{produto?.name}</h1>
-            <div className="flex items-center justify-center gap-2 text-xs bg-purple-principal-500 text-white px-2 py-0.5 rounded-full">
-              <button
-                className="p-1 cursor-pointer"
-                onClick={() => setQuantidade(quantidade - 1)}
-                disabled={quantidade <= 1}
-              >
-                <FaMinus />
-              </button>
-              <span>{quantidade}</span>
-              <button
-                className="p-1 cursor-pointer"
-                onClick={() => setQuantidade(quantidade + 1)}
-              >
-                <FaPlus />
-              </button>
-            </div>
+            <QuantityStepper value={quantidade} onChange={setQuantidade} />
           </div>
           <p>{produto?.descricao}</p>
           <div>

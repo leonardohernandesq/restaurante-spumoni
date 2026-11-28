@@ -1,3 +1,4 @@
+import { formatDateTimeBR } from "@/domain/datetime";
 export const CheckoutEntregaData = ({
   tipo_entrega,
   data_entrega,
@@ -9,13 +10,7 @@ export const CheckoutEntregaData = ({
 }) => {
   const tipo = tipo_entrega === "delivery" ? "entrega" : "retirada";
   const dataFormatada = data_entrega
-    ? new Date(data_entrega).toLocaleString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
+    ? formatDateTimeBR(data_entrega)
     : "";
 
   return (

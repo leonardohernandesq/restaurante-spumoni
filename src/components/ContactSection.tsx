@@ -3,7 +3,7 @@ import { DetailTitle } from "@/components/DetailTitle";
 import { IoLocation, IoLogoWhatsapp } from "react-icons/io5";
 import { RiFacebookFill, RiInstagramFill } from "react-icons/ri";
 import Link from "next/link";
-import { useSettingsQuery } from "@/hooks/useSettingsQuery";
+import { useSettingsQuery } from "@/queries/config";
 
 const ContactSection = () => {
   const { data: settings } = useSettingsQuery();

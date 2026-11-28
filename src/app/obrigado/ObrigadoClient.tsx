@@ -3,251 +3,212 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { BiCheck } from "react-icons/bi";
 import { RiFacebookFill, RiInstagramFill } from "react-icons/ri";
 import { IoLogoWhatsapp } from "react-icons/io5";
 
-import { pedidoStore } from "@/store/pedidoStore";
-import { useConfigStore } from "@/store/configStore";
+import { useSettingsQuery } from "@/queries/config";
 import { Container } from "@/components/Container";
 import { CheckoutResume } from "@/components/CheckoutResume";
+import { CheckAnimado } from "@/components/ui/CheckAnimado";
 import { FaWhatsapp } from "react-icons/fa6";
 import Image from "next/image";
-import { formatCurrencyBRL } from "@/utils/validators";
+import type { Pedido } from "@/types/pedido";
+import { buildWhatsappUrl } from "@/utils/format";
+import { LOJA } from "@/constants/app";
+import {
+  lerResumoPedido,
+  montarMensagemWhatsappLoja,
+} from "@/domain/pedidoResumo";
 
 const ObrigadoClient = () => {
   const searchParams = useSearchParams();
+  const pedidoIdParam = Number(searchParams.get("pedido_id"));
+  const pedidoId =
+    Number.isInteger(pedidoIdParam) && pedidoIdParam > 0 ? pedidoIdParam : null;
 
-  const { getPedidoById, pedido } = pedidoStore();
-  const { fetchSettings, settings } = useConfigStore();
+  const { data: settings } = useSettingsQuery();
 
-  // const [telefoneDigitado, setTelefoneDigitado] = useState("");
-  // const [telefoneConfirmado, setTelefoneConfirmado] = useState(false);
-  // const [erroTelefone, setErroTelefone] = useState("");
-
+  // O resumo vem do sessionStorage salvo no checkout, não da API:
+  // GET /order?id= é (ou será) protegido por login (item 1.2 / B1).
+  const [pedido, setPedido] = useState<Pedido | null>(null);
   const [whatsappSend, setWhatsappSend] = useState(false);
 
   useEffect(() => {
-    fetchSettings();
-  }, [fetchSettings]);
+    setPedido(pedidoId ? lerResumoPedido(pedidoId) : null);
+  }, [pedidoId]);
 
-  useEffect(() => {
-    const pedidoId = searchParams.get("pedido_id");
+  const handleSendWhatsapp = () => {
     if (!pedidoId) return;
 
-    const id = Number(pedidoId);
-    if (!isNaN(id)) {
-      getPedidoById(id);
-    }
-  }, [searchParams, getPedidoById]);
+    const linkDetalhes = `${window.location.origin}/admin/pedido/${pedidoId}`;
+    const message = montarMensagemWhatsappLoja(pedidoId, pedido, linkDetalhes);
 
-  // const handleConfirmTelefone = () => {
-  //   if (!pedido?.telefone) {
-  //     setErroTelefone("Pedido não encontrado.");
-  //     return;
-  //   }
-
-  //   const normalizar = (v: string) => v.replace(/\D/g, "");
-
-  //   if (normalizar(telefoneDigitado) !== normalizar(pedido.telefone)) {
-  //     setErroTelefone(
-  //       "Este número de telefone não realizou nenhum pedido hoje."
-  //     );
-  //     return;
-  //   }
-
-  //   setTelefoneConfirmado(true);
-  // };
-  const handleSendWhatsapp = () => {
-    const phone = "5511930854943"; // número com DDI + DDD e sem símbolos
-
-    if (!pedido) return;
-
-    //  <h2 className="font-medium mb-2">
-    //           {produto.quantidade}x - {produto.produto_nome}
-    //         </h2>
-
-    //         {produto.atributos?.length > 0 && (
-    //           <div className="ml-4 mb-2 text-sm text-zinc-700">
-    //             {produto.atributos.map((attr) => (
-    //               <p key={attr.id}>
-    //                 • <strong>{attr.nome_atributo}:</strong> {attr.valor}{" "}
-    //                 {Number(attr.preco) > 0 &&
-    //                   `(${formatCurrencyBRL(Number(attr.preco))})`}
-    //               </p>
-    //             ))}
-    //           </div>
-    //         )}
-
-    const produtosTexto = pedido.produtos
-      .map((produto) => {
-        const atributosTexto = produto.atributos
-          .map((attr) => {
-            const precoExtra =
-              Number(attr.preco) > 0
-                ? ` (${formatCurrencyBRL(Number(attr.preco))})`
-                : "";
-
-            return `${attr.nome_atributo}: ${attr.valor}${precoExtra}`;
-          })
-          .join("\n");
-
-        return `${produto.quantidade}x - ${produto.produto_nome}\n${atributosTexto}`;
-      })
-      .join("\n\n");
-
-    const message = `
-====== 🏷 Pedido ${pedido.id} ======
-
-${produtosTexto}
-
-${
-  pedido.tipo_entrega === "delivery"
-    ? `Delivery (Entrega) ${formatCurrencyBRL(Number(pedido.taxa_entrega))}`
-    : `Retirar pedido em loja`
-}
-Valor Total: ${formatCurrencyBRL(Number(pedido.valor_total))}
-${pedido.forma_pagamento.toUpperCase()}${
-      pedido.troco
-        ? ` - Troco para ${formatCurrencyBRL(Number(pedido.troco))}`
-        : ""
-    }
-
-====== Dados do Cliente ======
-
-👤 ${pedido.nome_cliente}
-📱 ${pedido.telefone}
-📍 ${
-      pedido.tipo_entrega === "delivery"
-        ? `${pedido.endereco_entrega}, ${pedido.numero} ${
-            pedido.complemento || ""
-          } - ${pedido.bairro} | CEP: ${pedido.cep} ${pedido.referencia || ""}`
-        : "Retirar em Loja"
-    }
-
-====== Detalhes do Pedido ======
-https://site.restaurantespumoni.com.br/obrigado?pedido_id=${pedido?.id}
-`;
-    const encodedMessage = encodeURIComponent(message);
-
-    const url = `https://wa.me/${phone}?text=${encodedMessage}`;
-
-    window.open(url, "_blank");
+    const whatsappLoja = settings?.whatsapp_number || LOJA.whatsappFallback;
+    window.open(buildWhatsappUrl(whatsappLoja, message), "_blank");
 
     setWhatsappSend(true);
   };
 
   if (!whatsappSend) {
     return (
-      <Container
-        styleRow="bg-green-principal-500"
-        styleContainer="flex flex-col w-screen items-center h-screen justify-center text-white"
-      >
-        <Image src={"/logo-header.svg"} alt="" width={80} height={150} />
-        <h2 className="font-bold text-2xl mt-8">O Número do seu pedido é</h2>
-        <span className="font-black text-7xl mb-5">{pedido?.id}</span>
-        <p className="text-xl">
-          Para confirmar seu pedido, clique no botão abaixo e envie-o pelo nosso
-          WhatsApp.
-        </p>
+      <main className="relative flex min-h-dvh w-full items-center justify-center overflow-hidden bg-gradient-to-br from-green-principal-500 to-green-principal-900 px-4 py-10 text-white">
+        {/* Bolhas decorativas */}
+        <span className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-white/10" />
+        <span className="pointer-events-none absolute -bottom-32 -right-20 h-96 w-96 rounded-full bg-white/10" />
 
-        <button
-          className="flex items-center gap-2 bg-purple-principal-500 py-4 px-12 mt-8 rounded-lg text-lg font-bold uppercase cursor-pointer"
-          onClick={() => handleSendWhatsapp()}
-        >
-          <FaWhatsapp size={25} />
-          Finalize o seu pedido
-        </button>
+        <div className="relative flex w-full max-w-md flex-col items-center text-center">
+          <Image src="/logo-header.svg" alt="Spumoni" width={64} height={120} />
 
-        <button
-          className="mt-3 text-lg font-bold cursor-pointer py-4 px-12"
-          onClick={() => setWhatsappSend(true)}
-        >
-          Ver resumo do pedido
-        </button>
-      </Container>
+          <CheckAnimado tamanho={120} variante="claro" className="mt-8" />
+
+          <h1 className="mt-6 text-3xl font-bold">Pedido recebido!</h1>
+
+          <div className="mt-6 w-full rounded-2xl bg-white/15 px-6 py-5 ring-1 ring-white/25 backdrop-blur-sm">
+            <p className="text-sm font-medium uppercase tracking-widest text-white/80">
+              Número do pedido
+            </p>
+            <p className="mt-1 text-6xl font-black tabular-nums">
+              #{pedidoId}
+            </p>
+          </div>
+
+          <p className="mt-6 text-lg leading-snug">
+            Falta só um passo: <strong>envie o pedido pelo nosso WhatsApp</strong>{" "}
+            para confirmar.
+          </p>
+
+          <button
+            className="mt-6 flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl bg-white px-6 py-4 text-lg font-bold uppercase text-green-principal-900 shadow-lg shadow-black/15 transition hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0"
+            onClick={handleSendWhatsapp}
+          >
+            <FaWhatsapp size={26} />
+            Enviar pelo WhatsApp
+          </button>
+
+          <button
+            className="mt-3 cursor-pointer rounded-xl px-6 py-3 font-semibold text-white/90 underline-offset-4 hover:underline"
+            onClick={() => setWhatsappSend(true)}
+          >
+            Ver resumo do pedido
+          </button>
+        </div>
+      </main>
     );
   }
 
   return (
-    <Container>
-      <div className="flex flex-col items-center justify-center py-14 lg:h-screen lg:py-0">
-        <BiCheck
-          size={100}
-          className="mb-4 rounded-full bg-zinc-100 text-green-principal-700 shadow"
-        />
+    <main className="min-h-dvh w-full bg-custom-gray-100">
+      <Container styleContainer="flex flex-col items-center py-12 lg:py-16">
+        <CheckAnimado tamanho={96} />
 
-        <h1 className="mb-12 text-center text-4xl font-medium text-green-principal-900">
+        <h1 className="mt-5 text-center text-3xl font-bold text-green-principal-900 lg:text-4xl">
           Obrigado pela sua compra!
         </h1>
+        <p className="mt-2 text-center text-zinc-600">
+          Pedido <strong className="text-zinc-800">#{pedidoId}</strong> recebido
+          com sucesso.
+        </p>
 
-        <div className="flex flex-col-reverse items-center gap-10 lg:flex-row">
-          <CheckoutResume
-            pedido={pedido}
-            restaurantAddress={settings.address}
-          />
+        <div className="mt-10 grid w-full gap-6 lg:grid-cols-[3fr_2fr] lg:items-start">
+          <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-zinc-200">
+            {pedido ? (
+              <CheckoutResume
+                pedido={pedido}
+                restaurantAddress={settings?.address ?? ""}
+              />
+            ) : (
+              <section className="p-6 text-zinc-700">
+                <p className="text-lg font-bold text-purple-principal-700">
+                  Pedido nº {pedidoId}
+                </p>
+                <p className="mt-2">
+                  O resumo completo fica disponível apenas no aparelho em que o
+                  pedido foi feito. Em caso de dúvida, fale com a gente pelo
+                  WhatsApp.
+                </p>
+              </section>
+            )}
+          </div>
 
-          <section className="flex w-full flex-col">
-            <p className="py-2">
+          <section className="flex flex-col gap-3 rounded-2xl bg-white p-6 text-zinc-700 shadow-sm ring-1 ring-zinc-200 lg:sticky lg:top-6">
+            <p>
               Agradecemos imensamente por escolher o{" "}
               <strong className="text-green-principal-900">
                 Restaurante & Sorveteria Spumoni
               </strong>
-              . Seu pedido foi recebido com sucesso e está sendo preparado com
-              todo carinho e dedicação para garantir a melhor experiência
-              gastronômica.
+              . Seu pedido está sendo preparado com todo carinho e dedicação.
             </p>
 
-            <p className="py-2">
+            <p>
               Fique tranquilo, estamos cuidando de tudo para que sua refeição
               chegue até você com frescor e sabor!
             </p>
 
-            <p className="py-2">
-              Aproveite seu momento e, caso queira, não deixe de nos acompanhar
-              nas redes sociais para mais novidades e promoções exclusivas!
-            </p>
+            <div className="mt-2 border-t border-zinc-200 pt-4">
+              <p className="text-sm font-medium text-zinc-500">
+                Acompanhe novidades e promoções
+              </p>
+              <div className="mt-3 flex gap-3">
+                {settings?.facebook_url && (
+                  <Link
+                    href={settings.facebook_url}
+                    target="_blank"
+                    aria-label="Facebook"
+                    className="flex h-11 w-11 items-center justify-center rounded-full bg-purple-principal-500 text-2xl text-white transition hover:bg-purple-principal-900"
+                  >
+                    <RiFacebookFill />
+                  </Link>
+                )}
 
-            <div className="flex gap-2 py-2 text-3xl text-purple-principal-500">
-              {settings.facebook_url && (
-                <Link href={settings.facebook_url} target="_blank">
-                  <RiFacebookFill />
-                </Link>
-              )}
+                {settings?.instagram_url && (
+                  <Link
+                    href={settings.instagram_url}
+                    target="_blank"
+                    aria-label="Instagram"
+                    className="flex h-11 w-11 items-center justify-center rounded-full bg-purple-principal-500 text-2xl text-white transition hover:bg-purple-principal-900"
+                  >
+                    <RiInstagramFill />
+                  </Link>
+                )}
 
-              {settings.instagram_url && (
-                <Link href={settings.instagram_url} target="_blank">
-                  <RiInstagramFill />
-                </Link>
-              )}
-
-              {settings.whatsapp_number && (
-                <Link
-                  href={`https://api.whatsapp.com/send?phone=${settings.whatsapp_number.replace(
-                    /\D/g,
-                    "",
-                  )}`}
-                  target="_blank"
-                >
-                  <IoLogoWhatsapp />
-                </Link>
-              )}
+                {settings?.whatsapp_number && (
+                  <Link
+                    href={`https://api.whatsapp.com/send?phone=${settings.whatsapp_number.replace(
+                      /\D/g,
+                      "",
+                    )}`}
+                    target="_blank"
+                    aria-label="WhatsApp"
+                    className="flex h-11 w-11 items-center justify-center rounded-full bg-purple-principal-500 text-2xl text-white transition hover:bg-purple-principal-900"
+                  >
+                    <IoLogoWhatsapp />
+                  </Link>
+                )}
+              </div>
             </div>
 
-            <h2 className="text-lg font-medium">
-              Desejamos a você uma excelente refeição!
-            </h2>
+            <div className="mt-2 border-t border-zinc-200 pt-4">
+              <p className="font-medium text-zinc-800">
+                Desejamos a você uma excelente refeição!
+              </p>
+              <p>
+                Equipe{" "}
+                <span className="font-semibold text-purple-principal-900">
+                  Spumoni
+                </span>
+              </p>
+            </div>
 
-            <h2 className="text-lg">
-              Equipe{" "}
-              <span className="font-medium text-purple-principal-900">
-                Spumoni
-              </span>
-            </h2>
+            <Link
+              href="/"
+              className="mt-2 rounded-xl bg-green-principal-700 px-5 py-3 text-center font-bold text-white transition hover:bg-green-principal-900"
+            >
+              Voltar ao cardápio
+            </Link>
           </section>
         </div>
-      </div>
-    </Container>
+      </Container>
+    </main>
   );
 };
 

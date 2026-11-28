@@ -1,75 +1,52 @@
 import { api } from "@/config/api";
-import { IProduct } from "@/interfaces/IProductAll";
+import type { CategoriaComProdutos, Produto } from "@/types/produto";
 
-export async function getAllProducts(all = null as number | null) {
-  const res = await api.get(`/products`, {
-    params: {
-      all,
-      _t: Date.now(),
-    },
-    headers: {
-      "Cache-Control": "no-cache",
-      Pragma: "no-cache",
-    },
-  });
+const multipart = { headers: { "Content-Type": "multipart/form-data" } };
 
-  return res.data;
-}
+export const produtoService = {
+  /**
+   * Cardápio agrupado por categoria (só os pratos de hoje).
+   * `incluirInativos` = lista do admin (todos os produtos e dias).
+   */
+  async listarCardapio(incluirInativos = false): Promise<CategoriaComProdutos[]> {
+    const { data } = await api.get<CategoriaComProdutos[]>("/products", {
+      params: { all: incluirInativos ? 1 : 0 },
+    });
+    return data ?? [];
+  },
 
-export async function getProductBySlug(slug: string) {
-  const res = await api.get(`/product`, {
-    params: {
-      slug,
-      _t: Date.now(), // quebra cache
-    },
-    headers: {
-      "Cache-Control": "no-cache",
-      Pragma: "no-cache",
-    },
-  });
+  async buscar(slug: string): Promise<Produto> {
+    const { data } = await api.get<Produto>("/product", { params: { slug } });
+    return data;
+  },
 
-  return res.data;
-}
+  async criar(form: FormData): Promise<unknown> {
+    const { data } = await api.post("/products", form, multipart);
+    return data;
+  },
 
-export async function addProduct(data: FormData | IProduct) {
-  const isFormData = data instanceof FormData;
+  async atualizar(slug: string, form: FormData): Promise<unknown> {
+    if (!form.has("slug")) form.append("slug", slug);
+    const { data } = await api.put("/products/edit", form, multipart);
+    return data;
+  },
 
-  const res = await api.post("/products", data, {
-    headers: isFormData ? { "Content-Type": "multipart/form-data" } : undefined,
-  });
+  /** Liga/desliga o produto no cardápio (a API inverte o estado atual). */
+  async alternarAtivo(id: string | number): Promise<unknown> {
+    const { data } = await api.put("/product/visible", { id });
+    return data;
+  },
 
-  return res.data;
-}
+  async remover(id: string | number): Promise<unknown> {
+    const { data } = await api.delete("/products/delete", { data: { id } });
+    return data;
+  },
+};
 
-export async function updateProduct(slug: string, data: FormData | IProduct) {
-  const isFormData = data instanceof FormData;
-
-  if (!isFormData) {
-    (data as IProduct).slug = slug;
-  }
-
-  try {
-    const response = await api.put(
-      `/products/edit`,
-      isFormData ? data : JSON.stringify(data),
-      {
-        headers: isFormData
-          ? { "Content-Type": "multipart/form-data" }
-          : { "Content-Type": "application/json" },
-      },
-    );
-
-    return response.data;
-  } catch (error) {
-    console.error("Erro ao atualizar produto:", error);
-    throw new Error("Erro ao atualizar o produto");
-  }
-}
-
-export async function deleteProduct({ id }: { id: string | number }) {
-  const res = await api.delete("/products/delete", {
-    data: { id },
-  });
-
-  return res.data;
-}
+/** Achata o cardápio em uma lista de produtos, guardando a categoria de cada um. */
+export const achatarProdutos = (categorias: CategoriaComProdutos[]): Produto[] =>
+  categorias.flatMap((cat) =>
+    (cat.products ?? [])
+      .filter((produto) => !!produto?.id)
+      .map((produto) => ({ ...produto, categoria_id: Number(cat.id) })),
+  );

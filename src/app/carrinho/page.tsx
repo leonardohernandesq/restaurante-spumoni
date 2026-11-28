@@ -1,33 +1,22 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 import { BiTrash } from "react-icons/bi";
-import { FaMinus, FaPlus } from "react-icons/fa6";
 
 import { ButtonCart } from "@/components/ButtonCart";
 import { Container } from "@/components/Container";
 import { HeaderPages } from "@/components/HeaderPages";
+import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { useResumoPedido } from "@/hooks/useResumoPedido";
-import { cartStore, ProdutoCarrinho } from "@/store/cartStore";
-import { formatCurrencyBRL } from "@/utils/validators";
+import { cartStore } from "@/store/cartStore";
+import { formatCurrencyBRL } from "@/utils/format";
+import { calcularTotalItem } from "@/domain/pricing";
 
 const Carrinho = () => {
   const router = useRouter();
   const { produtos, removerProduto, atualizarQuantidade } = cartStore();
   const handleCheckout = () => {
     router.push("/finalizar");
-  };
-
-  const handleMinusQuantity = (item: ProdutoCarrinho) => {
-    if (item.quantidade > 1) {
-      atualizarQuantidade(item.slug, item.quantidade - 1);
-    }
-  };
-
-  const handlePlusQuantity = (item: ProdutoCarrinho) => {
-    if (item.quantidade > 0) {
-      atualizarQuantidade(item.slug, item.quantidade + 1);
-    }
   };
 
   const { subtotal } = useResumoPedido(produtos, "", "takeaway");
@@ -39,9 +28,9 @@ const Carrinho = () => {
         <p className="font-light">
           SEU PEDIDO ({produtos.length} ITEM{produtos.length > 1 && "S"})
         </p>
-        {produtos.map((item, index) => (
+        {produtos.map((item) => (
           <section
-            key={index}
+            key={item.itemId}
             className="flex flex-col border-b border-zinc-200 pb-4 gap-1"
           >
             <div className="flex justify-between items-center mb-2">
@@ -49,10 +38,9 @@ const Carrinho = () => {
                 <p className="font-medium">{item.nome}</p>
               </div>
               <p className="font-medium">
-                {formatCurrencyBRL(item.preco * item.quantidade)}
+                {formatCurrencyBRL(calcularTotalItem({ precoUnitario: item.preco, quantidade: item.quantidade }))}
               </p>
             </div>
-            <p className="text-sm">{item?.observacoes}</p>
 
             {item.atributos.map((attr, i) => (
               <div key={i} className="text-sm text-zinc-500 italic">
@@ -68,24 +56,13 @@ const Carrinho = () => {
             )}
 
             <section className="flex gap-2 mt-4">
-              <div className="flex items-center justify-center gap-2 text-xs bg-purple-principal-500 text-white px-2 py-0.5 rounded-full w-fit">
-                <button
-                  className="p-1 cursor-pointer"
-                  onClick={() => handleMinusQuantity(item)}
-                >
-                  <FaMinus />
-                </button>
-                <span>{item.quantidade}</span>
-                <button
-                  className="p-1 cursor-pointer"
-                  onClick={() => handlePlusQuantity(item)}
-                >
-                  <FaPlus />
-                </button>
-              </div>
+              <QuantityStepper
+                value={item.quantidade}
+                onChange={(qtd) => atualizarQuantidade(item.itemId, qtd)}
+              />
               <button
                 className="bg-zinc-200 p-2 rounded-full w-fit cursor-pointer"
-                onClick={() => removerProduto(item.slug)}
+                onClick={() => removerProduto(item.itemId)}
               >
                 <BiTrash />
               </button>
@@ -95,7 +72,7 @@ const Carrinho = () => {
 
         <section className="flex justify-between items-center text-zinc-700">
           <p>SUBTOTAL</p>
-          <p>{formatCurrencyBRL(Number(subtotal))}</p>
+          <p>{formatCurrencyBRL(subtotal)}</p>
         </section>
       </main>
 
@@ -112,7 +89,7 @@ const Carrinho = () => {
             ) : (
               <>
                 <p>Continuar</p>
-                <p>{formatCurrencyBRL(Number(subtotal))}</p>
+                <p>{formatCurrencyBRL(subtotal)}</p>
               </>
             )}
           </>

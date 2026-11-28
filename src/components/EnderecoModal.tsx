@@ -1,226 +1,196 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 import { BiPencil } from "react-icons/bi";
 import { Modal } from "./Modal";
-import { useFreteStore } from "@/store/freteStore";
+import { useAllFretesQuery } from "@/queries/fretes";
+import {
+  descreverEndereco,
+  formatarCep,
+  isEnderecoCompleto,
+  type CheckoutForm,
+  type EnderecoEntrega,
+} from "@/domain/checkout";
 
 interface EnderecoModalProps {
-  endereco: string;
-  delivery: string;
-  showModal: boolean;
-  setShowModal: (value: boolean) => void;
-  abrirModalEndereco: () => void;
-  handleEndereco: () => void;
-  errorEndereco: string;
-  addressError: boolean;
-  modalEndereco: string;
-  setModalEndereco: (value: string) => void;
-  modalCidade: string;
-  setModalCidade: (value: string) => void;
-  modalNumero: string;
-  setModalNumero: (value: string) => void;
-  modalComplemento: string;
-  setModalComplemento: (value: string) => void;
-  modalBairro: string;
-  setModalBairro: (value: string) => void;
-  cep: string;
-  setCepValue: (value: string) => void;
-  modalReferencia: string;
-  handleInputChange: (field: string, value: string) => void;
-  handleCepChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** Endereço da loja, mostrado na retirada. */
   loja: string;
-  limparEndereco?: () => void;
 }
 
-export const EnderecoModal = ({
-  endereco,
-  delivery,
-  showModal,
-  setShowModal,
-  abrirModalEndereco,
-  handleEndereco,
-  errorEndereco,
-  addressError,
-  modalEndereco,
-  modalNumero,
-  modalComplemento,
-  modalBairro,
-  modalCidade,
-  cep,
-  modalReferencia,
-  handleInputChange,
-  handleCepChange,
-  loja,
-  limparEndereco,
-}: EnderecoModalProps) => {
-  // Limpa o endereço quando mudar de delivery para takeaway
-  useEffect(() => {
-    if (delivery === "takeaway" && endereco && limparEndereco) {
-      limparEndereco();
+const inputClass =
+  "w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none";
+const labelClass = "block text-sm font-medium mb-1";
+const Obrigatorio = () => <span className="text-red-500">*</span>;
+
+/**
+ * Endereço de entrega (ou da loja, na retirada). O modal edita um rascunho;
+ * só ao confirmar o endereço vai para o formulário (e entra no frete).
+ */
+export const EnderecoModal = ({ loja }: EnderecoModalProps) => {
+  const {
+    control,
+    setValue,
+    clearErrors,
+    formState: { errors },
+  } = useFormContext<CheckoutForm>();
+  const [tipoEntrega, endereco] = useWatch({
+    control,
+    name: ["tipoEntrega", "endereco"],
+  });
+
+  const [aberto, setAberto] = useState(false);
+  const [rascunho, setRascunho] = useState<EnderecoEntrega>(endereco);
+  const [erroRascunho, setErroRascunho] = useState("");
+
+  const { data: fretes = [] } = useAllFretesQuery();
+  const cidades = [...new Set(fretes.map((f) => f.cidade))];
+  const bairros = fretes
+    .filter((f) => f.cidade === rascunho.cidade)
+    .map((f) => f.bairro);
+
+  const isDelivery = tipoEntrega === "delivery";
+  const enderecoExibido = isDelivery
+    ? descreverEndereco(endereco) || "Nenhum endereço cadastrado"
+    : loja;
+
+  const abrir = () => {
+    setRascunho(endereco);
+    setErroRascunho("");
+    setAberto(true);
+  };
+
+  const alterar = (campo: keyof EnderecoEntrega, valor: string) => {
+    setErroRascunho("");
+    setRascunho((atual) => ({
+      ...atual,
+      [campo]: valor,
+      // O bairro escolhido pertence à cidade anterior; mantê-lo calculava
+      // a taxa de entrega errada.
+      ...(campo === "cidade" && valor !== atual.cidade ? { bairro: "" } : {}),
+    }));
+  };
+
+  const confirmar = () => {
+    if (!isEnderecoCompleto(rascunho)) {
+      setErroRascunho(
+        "Por favor, complete todos os campos obrigatórios: Endereço, Número, CEP, Cidade e Bairro.",
+      );
+      return;
     }
-  }, [delivery, endereco, limparEndereco]);
-
-  const isDelivery = delivery === "delivery";
-  const enderecoExibido = isDelivery ? endereco : loja;
-  const tituloSecao = isDelivery ? "ENTREGAR EM" : "RETIRAR EM";
-  const { fetchFretes, fretes } = useFreteStore();
-  const cidadesUnicas = [...new Set(fretes.map((f) => f.cidade))];
-  const bairrosFiltrados = fretes
-    .filter((frete) => frete.cidade === modalCidade)
-    .map((frete) => frete.bairro);
-
-  useEffect(() => {
-    const load = async () => {
-      await fetchFretes();
-    };
-    load();
-  }, [fetchFretes]);
+    setValue("endereco", rascunho, { shouldDirty: true });
+    clearErrors("endereco");
+    setAberto(false);
+  };
 
   return (
     <section className="flex items-center justify-between border-b border-zinc-200 pb-4">
-      {/* Informações de Endereço */}
       <div className="flex-1">
-        <p className="font-light text-sm text-zinc-600">{tituloSecao}</p>
-        <p className="font-medium pr-2 mt-1">
-          {enderecoExibido ||
-            (isDelivery ? "Nenhum endereço cadastrado" : loja)}
+        <p className="font-light text-sm text-zinc-600">
+          {isDelivery ? "ENTREGAR EM" : "RETIRAR EM"}
         </p>
-        {addressError && isDelivery && (
+        <p className="font-medium pr-2 mt-1">{enderecoExibido}</p>
+        {errors.endereco && isDelivery && (
           <p className="text-red-700 text-sm mt-1">
             ⚠️ Você deve inserir um endereço válido
           </p>
         )}
       </div>
 
-      {/* Botão de Editar e Modal (apenas para delivery) */}
       {isDelivery && (
         <div className="flex-shrink-0">
           <button
+            type="button"
             className={`bg-purple-principal-700 text-white p-2 rounded-full hover:bg-purple-principal-900 transition-colors ${
-              addressError && "animate-bounce"
+              errors.endereco ? "animate-bounce" : ""
             } cursor-pointer`}
-            onClick={abrirModalEndereco}
+            onClick={abrir}
             aria-label="Editar endereço"
           >
             <BiPencil size={20} />
           </button>
 
-          {showModal && (
-            <Modal onClose={() => setShowModal(false)}>
+          {aberto && (
+            <Modal onClose={() => setAberto(false)}>
               <h2 className="text-center text-2xl font-bold mb-4">
                 Insira seu endereço
               </h2>
 
-              {/* Formulário de Endereço */}
-              <form
-                className="flex flex-col gap-3"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleEndereco();
-                }}
-              >
-                {/* Endereço */}
+              <div className="flex flex-col gap-3">
                 <div>
-                  <label
-                    htmlFor="endereco"
-                    className="block text-sm font-medium mb-1"
-                  >
-                    Endereço <span className="text-red-500">*</span>
+                  <label htmlFor="endereco" className={labelClass}>
+                    Endereço <Obrigatorio />
                   </label>
                   <input
                     id="endereco"
-                    value={modalEndereco}
-                    onChange={(e) =>
-                      handleInputChange("modalEndereco", e.target.value)
-                    }
+                    value={rascunho.rua}
+                    onChange={(e) => alterar("rua", e.target.value)}
                     placeholder="Rua, Avenida, etc."
-                    className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none"
-                    required
+                    autoComplete="address-line1"
+                    className={inputClass}
                   />
                 </div>
 
-                {/* Número e Complemento */}
                 <div className="flex gap-3">
                   <div className="w-1/3">
-                    <label
-                      htmlFor="numero"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Número <span className="text-red-500">*</span>
+                    <label htmlFor="numero" className={labelClass}>
+                      Número <Obrigatorio />
                     </label>
                     <input
                       id="numero"
-                      value={modalNumero}
-                      onChange={(e) =>
-                        handleInputChange("modalNumero", e.target.value)
-                      }
+                      value={rascunho.numero}
+                      onChange={(e) => alterar("numero", e.target.value)}
                       placeholder="Nº"
-                      className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none"
-                      required
+                      className={inputClass}
                     />
                   </div>
                   <div className="w-1/3">
-                    <label
-                      htmlFor="complemento"
-                      className="block text-sm font-medium mb-1"
-                    >
+                    <label htmlFor="complemento" className={labelClass}>
                       Complemento
                     </label>
                     <input
                       id="complemento"
-                      value={modalComplemento}
-                      onChange={(e) =>
-                        handleInputChange("modalComplemento", e.target.value)
-                      }
+                      value={rascunho.complemento}
+                      onChange={(e) => alterar("complemento", e.target.value)}
                       placeholder="Apto, Bloco, etc."
-                      className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none"
+                      className={inputClass}
                     />
                   </div>
-                  {/* CEP */}
                   <div className="w-1/3">
-                    <label
-                      htmlFor="cep"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      CEP <span className="text-red-500">*</span>
+                    <label htmlFor="cep" className={labelClass}>
+                      CEP <Obrigatorio />
                     </label>
                     <input
                       type="text"
                       id="cep"
-                      value={cep}
-                      onChange={handleCepChange}
+                      inputMode="numeric"
+                      autoComplete="postal-code"
+                      value={rascunho.cep}
+                      onChange={(e) =>
+                        alterar("cep", formatarCep(e.target.value))
+                      }
                       placeholder="XXXXX-XXX"
-                      pattern="\d{5}-\d{3}"
                       maxLength={9}
-                      className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none"
-                      required
+                      className={inputClass}
                     />
                   </div>
                 </div>
 
                 <div className="flex gap-3">
-                  {/* Cidade */}
                   <div className="w-1/2">
-                    <label
-                      htmlFor="cidade"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Cidade <span className="text-red-500">*</span>
+                    <label htmlFor="cidade" className={labelClass}>
+                      Cidade <Obrigatorio />
                     </label>
                     <select
                       id="cidade"
-                      value={modalCidade}
-                      onChange={(e) =>
-                        handleInputChange("modalCidade", e.target.value)
-                      }
-                      className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none"
-                      required
+                      value={rascunho.cidade}
+                      onChange={(e) => alterar("cidade", e.target.value)}
+                      className={inputClass}
                     >
                       <option value="" disabled>
-                        Selecione o cidade
+                        Selecione a cidade
                       </option>
-                      {cidadesUnicas.map((cidade) => (
+                      {cidades.map((cidade) => (
                         <option key={cidade} value={cidade}>
                           {cidade}
                         </option>
@@ -228,28 +198,21 @@ export const EnderecoModal = ({
                     </select>
                   </div>
 
-                  {/* Bairro */}
                   <div className="w-1/2">
-                    <label
-                      htmlFor="bairro"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Bairro <span className="text-red-500">*</span>
+                    <label htmlFor="bairro" className={labelClass}>
+                      Bairro <Obrigatorio />
                     </label>
                     <select
                       id="bairro"
-                      value={modalBairro}
-                      onChange={(e) =>
-                        handleInputChange("modalBairro", e.target.value)
-                      }
-                      className="w-full p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed"
-                      required
-                      disabled={bairrosFiltrados.length ? false : true}
+                      value={rascunho.bairro}
+                      onChange={(e) => alterar("bairro", e.target.value)}
+                      className={`${inputClass} disabled:opacity-30 disabled:cursor-not-allowed`}
+                      disabled={bairros.length === 0}
                     >
                       <option value="" disabled>
                         Selecione o bairro
                       </option>
-                      {bairrosFiltrados.map((bairro) => (
+                      {bairros.map((bairro) => (
                         <option key={bairro} value={bairro}>
                           {bairro}
                         </option>
@@ -258,41 +221,33 @@ export const EnderecoModal = ({
                   </div>
                 </div>
 
-                {/* Referência */}
                 <div>
-                  <label
-                    htmlFor="referencia"
-                    className="block text-sm font-medium mb-1"
-                  >
+                  <label htmlFor="referencia" className={labelClass}>
                     Ponto de Referência
                   </label>
                   <textarea
                     id="referencia"
-                    value={modalReferencia}
-                    onChange={(e) =>
-                      handleInputChange("modalReferencia", e.target.value)
-                    }
+                    value={rascunho.referencia}
+                    onChange={(e) => alterar("referencia", e.target.value)}
                     placeholder="Ex: Próximo ao mercado, em frente à igreja, etc."
-                    className="w-full h-24 p-2 border border-zinc-400 rounded-md focus:border-purple-principal-500 focus:outline-none resize-none"
+                    className={`${inputClass} h-24 resize-none`}
                   />
                 </div>
 
-                {/* Mensagem de Erro */}
-                {errorEndereco && (
+                {erroRascunho && (
                   <p className="text-red-600 text-sm bg-red-50 p-2 rounded">
-                    ⚠️ {errorEndereco}
+                    ⚠️ {erroRascunho}
                   </p>
                 )}
 
-                {/* Botão de Confirmar */}
                 <button
-                  type="submit"
-                  disabled={!!errorEndereco}
-                  className="bg-purple-principal-500 p-3 rounded-md text-white font-medium cursor-pointer hover:bg-purple-principal-900 transition-colors disabled:bg-zinc-400 disabled:cursor-not-allowed w-full"
+                  type="button"
+                  onClick={confirmar}
+                  className="bg-purple-principal-500 p-3 rounded-md text-white font-medium cursor-pointer hover:bg-purple-principal-900 transition-colors w-full"
                 >
                   Adicionar Endereço
                 </button>
-              </form>
+              </div>
             </Modal>
           )}
         </div>

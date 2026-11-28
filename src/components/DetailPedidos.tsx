@@ -1,10 +1,8 @@
-import { useStatusColor } from '@/hooks/useStatusColor';
+import { useStatusColor } from "@/hooks/useStatusColor";
 
+/** Faixa na lateral esquerda do pedido, com a cor do status. */
 export const DetailPedidos = ({ status }: { status: number }) => {
-    const { getColor } = useStatusColor();
-    const color = getColor(status);
+  const { getColor } = useStatusColor();
 
-    return (
-        <div className={`w-1 h-full flex absolute top-0 left-0 rounded-sm ${color}`}></div>
-    )
-}
+  return <div aria-hidden className={`absolute inset-y-0 left-0 w-1.5 ${getColor(status)}`} />;
+};

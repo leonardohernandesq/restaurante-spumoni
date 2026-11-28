@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { IPropsCategory } from "@/interfaces/ICategory";
 import { SkeletonComponent } from "./SkeletonComponent";
+import { ordenarComDestaque } from "@/domain/categoria";
 
 export const CategoryScroll = ({ categories, isLoading }: IPropsCategory) => {
   const [linkActive, setLinkActive] = useState(0);
@@ -12,11 +13,7 @@ export const CategoryScroll = ({ categories, isLoading }: IPropsCategory) => {
     setLinkActive(item);
   };
 
-  const sortedData = [...categories].sort((a, b) => {
-    if (a.nome === "Pratos do Dia") return -1;
-    if (b.nome === "Pratos do Dia") return 1;
-    return 0;
-  });
+  const sortedData = ordenarComDestaque(categories, (c) => c.nome);
 
   if (isLoading) {
     return categoryScrollSkeleton();

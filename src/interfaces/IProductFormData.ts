@@ -7,7 +7,7 @@ export interface IValorAtributo {
 
 export interface IAtributo {
     atributo_id?: string | number | null;
-    limite?: null;
+    limite?: number | null;
     obrigatorio: boolean;
     nomes_atributos: string;
     valores_atributo: IValorAtributo[];

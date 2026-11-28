@@ -1,14 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 import { IoWalletOutline } from "react-icons/io5";
 
 import { cartStore } from "@/store/cartStore";
 
 import { Container } from "@/components/Container";
-import { useStatusQuery } from "@/hooks/useStatusQuery";
+import { useStoreStatusQuery as useStatusQuery } from "@/queries/config";
 import { SkeletonComponent } from "./SkeletonComponent";
 import Link from "next/link";
 import { StatusIsOpen } from "./StatusIsOpen";

@@ -1,91 +1,140 @@
 "use client";
 
-import { IProduct } from "@/interfaces/IProductAll";
-import { productStore } from "@/store/produtoStore";
-import { formatCurrencyBRL } from "@/utils/validators";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { FaPencil, FaX } from "react-icons/fa6";
+import { useRouter } from "nextjs-toploader/app";
 import { toast } from "react-toastify";
+import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import type { Produto } from "@/types/produto";
+import { useAlternarProdutoAtivo, useDeleteProduto } from "@/queries/produtos";
+import { formatCurrencyBRL } from "@/utils/format";
+import { DIAS_PRODUTO } from "@/domain/produtoForm";
+import { STATUS_PRODUTO, rotuloStatus, statusDoProduto } from "@/domain/produtoLista";
 
 interface ListProductsItemProps {
-  product: IProduct;
+  product: Produto;
+  /** Dia olhado na lista (1 = domingo … 7 = sábado); padrão: hoje. */
+  dia?: number;
+  /** Dia de hoje na convenção do produto (1 = domingo … 7 = sábado). */
+  diaHoje: number;
 }
 
-export const ListProductsItem = ({ product }: ListProductsItemProps) => {
-  const { deleteProductApi } = productStore();
+export const ListProductsItem = ({ product, dia: diaOlhado, diaHoje }: ListProductsItemProps) => {
+  const dia = diaOlhado ?? diaHoje;
   const router = useRouter();
+  const deleteProduto = useDeleteProduto();
+  const alternarAtivo = useAlternarProdutoAtivo();
 
-  const handleEdit = () => {
-    router.push(`/admin/editarprodutos/${product.slug}`);
-  };
+  const status = statusDoProduto(product, dia);
+  const info = STATUS_PRODUTO[status];
+  const ativo = status !== "inativo";
+  const dias = (product.available_days ?? []).map(Number);
+  const descricao = product.description ?? product.descricao;
 
-  const handleDelete = async (id: string | number) => {
-    if (confirm("Tem certeza que deseja eliminar este produto?")) {
-      await deleteProductApi(id);
-      toast.success(`Produto ${product.name} foi eliminado com sucesso!`);
+  const editar = () => router.push(`/admin/editarprodutos/${product.slug}`);
+
+  const excluir = async () => {
+    if (!confirm(`Excluir "${product.name}"? Ele sai do cardápio e não dá para desfazer.`)) return;
+    try {
+      await deleteProduto.mutateAsync(product.id);
+      toast.success(`"${product.name}" foi excluído.`);
+    } catch (error) {
+      console.error(error);
+      toast.error(`Não foi possível excluir "${product.name}".`);
     }
   };
 
-  if (!product) {
-    return <p>Erro ao carregar produto!</p>;
-  }
-
-  const hoje = new Date().getDay(); // 0 = domingo ... 6 = sábado
-  const hojeMap = hoje === 0 ? 1 : hoje + 1;
-
-  const isAvailableToday = product.available_days?.includes(hojeMap);
+  const alternar = () =>
+    alternarAtivo.mutate(product.id, {
+      onSuccess: () =>
+        toast.success(ativo ? `"${product.name}" saiu do cardápio.` : `"${product.name}" voltou ao cardápio.`),
+      onError: () => toast.error("Não foi possível mudar o produto."),
+    });
 
   return (
-    <section className="relative py-5 gap-4 flex items-center border-b border-zinc-200">
-      <div className="w-18 relative">
-        <Image
-          src={`${process.env.NEXT_PUBLIC_IMAGE_PATH}/${product.image_url}`}
-          className="rounded-full opacity-80 w-full shadow-lg"
-          alt={product.name || "Produto inválido"}
-          width={80}
-          height={80}
-        />
-        <span
-          className={`absolute top-0 -right-1 rounded-full w-4 h-4 shadow-2xl border border-zinc-500 cursor-pointer ${
-            !product.active
-              ? "bg-red-500"
-              : isAvailableToday
-                ? "bg-green-principal-500"
-                : "bg-yellow-500"
-          }`}
-          title={
-            !product.active
-              ? "Inativo"
-              : isAvailableToday
-                ? "Ativo e disponível hoje"
-                : "Ativo, mas indisponível hoje"
-          }
-        />
-      </div>
-      <div className="w-full">
-        <h2 className="text-lg font-medium">{product.name}</h2>
-        <p className="text-sm/4.5 text-zinc-700 mt-2 mb-1">
-          {product.description}
-        </p>
-        <p className="font-medium">
-          {formatCurrencyBRL(Number(product.price))}
-        </p>
-      </div>
-      <div className="flex items-center gap-3 flex-1">
+    <article
+      className={`flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4 ${
+        ativo ? "" : "bg-zinc-50"
+      }`}
+    >
+      {/* Foto + textos */}
+      <button
+        type="button"
+        onClick={editar}
+        className="flex min-w-0 flex-1 cursor-pointer items-center gap-4 text-left"
+      >
+        <span className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-zinc-100 ${ativo ? "" : "grayscale"}`}>
+          {product.image_url && (
+            <Image
+              src={`${process.env.NEXT_PUBLIC_IMAGE_PATH}/${product.image_url}`}
+              alt=""
+              fill
+              sizes="64px"
+              className="object-cover"
+            />
+          )}
+        </span>
+        <span className="min-w-0">
+          <span className="flex flex-wrap items-center gap-2">
+            <span className={`font-semibold ${ativo ? "text-zinc-900" : "text-zinc-500"}`}>{product.name}</span>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${info.classe}`}>{rotuloStatus(status, dia, diaHoje)}</span>
+          </span>
+          {descricao && <span className="mt-0.5 line-clamp-1 block text-sm text-zinc-500">{descricao}</span>}
+          <span className="mt-1 flex items-center gap-3">
+            <span className="font-medium tabular-nums text-zinc-800">
+              {formatCurrencyBRL(Number(product.price ?? product.preco ?? 0))}
+            </span>
+            {/* Dias da semana: marcados em roxo; dia olhado sublinhado */}
+            <span className="flex gap-0.5" aria-label={`Dias: ${dias.map((d) => DIAS_PRODUTO[d - 1]).join(", ") || "nenhum"}`}>
+              {DIAS_PRODUTO.map((nomeDia, i) => (
+                <span
+                  key={nomeDia}
+                  title={nomeDia}
+                  className={`flex h-5 w-5 items-center justify-center rounded text-[10px] font-semibold ${
+                    dias.includes(i + 1) ? "bg-purple-principal-500/15 text-purple-principal-700" : "text-zinc-300"
+                  } ${i + 1 === dia ? "underline underline-offset-2" : ""}`}
+                  aria-hidden
+                >
+                  {nomeDia[0]}
+                </span>
+              ))}
+            </span>
+          </span>
+        </span>
+      </button>
+
+      {/* Ações */}
+      <div className="flex items-center justify-end gap-1 sm:shrink-0">
+        <label className="mr-2 flex cursor-pointer items-center gap-2 text-sm text-zinc-600" title="Aparece no cardápio">
+          <span className="sm:sr-only">No cardápio</span>
+          <input
+            type="checkbox"
+            role="switch"
+            className="peer sr-only"
+            checked={ativo}
+            disabled={alternarAtivo.isPending}
+            onChange={alternar}
+            aria-label={`${product.name} aparece no cardápio`}
+          />
+          <span className="relative h-6 w-10 shrink-0 rounded-full bg-zinc-300 transition peer-checked:bg-green-principal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-green-principal-500 peer-disabled:opacity-50 after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-4" />
+        </label>
         <button
-          onClick={handleEdit}
-          className="text-yellow-600 p-2 cursor-pointer"
+          type="button"
+          onClick={editar}
+          className="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100"
         >
-          <FaPencil />
+          <FiEdit2 aria-hidden /> Editar
         </button>
         <button
-          onClick={() => handleDelete(product.id)}
-          className="text-red-600 p-2 cursor-pointer"
+          type="button"
+          onClick={excluir}
+          disabled={deleteProduto.isPending}
+          aria-label={`Excluir ${product.name}`}
+          title="Excluir produto"
+          className="cursor-pointer rounded-lg p-2.5 text-zinc-400 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
         >
-          <FaX />
+          <FiTrash2 aria-hidden />
         </button>
       </div>
-    </section>
+    </article>
   );
 };

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from "nextjs-toploader/app";
 import { FaArrowLeft } from 'react-icons/fa6'
 
 export const HeaderPages = ({ title }: { title: string }) => {

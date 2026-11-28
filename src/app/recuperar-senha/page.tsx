@@ -1,13 +1,15 @@
 "use client";
 
 import { Container } from "@/components/Container";
-import { useRequestPasswordReset } from "@/hooks/usePasswordRecoveryQuery";
+import { useRequestPasswordReset } from "@/queries/auth";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 import React from "react";
 import { BsArrowRight } from "react-icons/bs";
+import { toast } from "react-toastify";
+import { isAxiosError } from "axios";
 
 export default function RecuperarSenha() {
   const [email, setEmail] = React.useState("");
@@ -15,15 +17,27 @@ export default function RecuperarSenha() {
   const router = useRouter();
 
   const onHandleRecovery = () => {
-    try {
-      recovery.mutate(email, {
-        onSuccess: () => {
-          router.push("/");
-        },
-      });
-    } catch (err) {
-      console.log(err);
+    if (!email.trim()) {
+      toast.error("Digite o seu email.");
+      return;
     }
+
+    recovery.mutate(email.trim(), {
+      onSuccess: () => {
+        // A API não diz se o e-mail existe (para não revelar quem tem conta)
+        toast.success(
+          "Se o e-mail estiver cadastrado, você vai receber o link em instantes. Ele vale por 30 minutos.",
+        );
+        router.push("/");
+      },
+      onError: (err) => {
+        console.error("Erro ao pedir recuperação de senha:", err);
+        const mensagem = isAxiosError<{ message?: string }>(err)
+          ? err.response?.data?.message
+          : undefined;
+        toast.error(mensagem || "Não foi possível enviar o link. Tente novamente.");
+      },
+    });
   };
 
   return (
@@ -46,13 +60,15 @@ export default function RecuperarSenha() {
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            type="text"
+            type="email"
+            autoComplete="email"
             className="bg-green-950 py-2.5 px-5 placeholder:text-zinc-400 rounded-xl"
             placeholder="Digite seu email: "
           />
 
           <button
-            className="bg-purple-principal-700 py-2.5 px-5 rounded-xl font-medium flex items-center justify-center gap-3 cursor-pointer hover:bg-purple-principal-900 transition-colors"
+            className="bg-purple-principal-700 py-2.5 px-5 rounded-xl font-medium flex items-center justify-center gap-3 cursor-pointer hover:bg-purple-principal-900 transition-colors disabled:opacity-50"
+            disabled={recovery.isPending}
             onClick={onHandleRecovery}
           >
             <>

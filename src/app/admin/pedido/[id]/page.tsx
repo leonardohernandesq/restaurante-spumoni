@@ -1,257 +1,131 @@
 "use client";
 
-import { use, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import {
-  FaArrowLeft,
-  FaCheckDouble,
-  FaPlus,
-  FaUserCheck,
-} from "react-icons/fa6";
-import { PiPrinter } from "react-icons/pi";
-import { FaMotorcycle } from "react-icons/fa6";
-import { FaTrashAlt } from "react-icons/fa";
+import { use, useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "nextjs-toploader/app";
+import { toast } from "react-toastify";
+import { FiArrowLeft } from "react-icons/fi";
 import { Printer } from "@/components/Printer";
 import { Container } from "@/components/Container";
-import { pedidoStore } from "@/store/pedidoStore";
-import { useStatusColor } from "@/hooks/useStatusColor";
-import { formatCurrencyBRL } from "@/utils/validators";
+import { PedidoCabecalho } from "@/components/pedido/PedidoCabecalho";
+import { PedidoTotais } from "@/components/pedido/PedidoTotais";
+import { PedidoCliente } from "@/components/pedido/PedidoCliente";
+import { PedidoAcoes } from "@/components/pedido/PedidoAcoes";
+import { PedidoExclusao } from "@/components/pedido/PedidoExclusao";
+import { ErrorState, LoadingState } from "@/components/ui/QueryState";
+import { useChangePedidoStatus, usePedidoQuery } from "@/queries/pedidos";
+import { buildWhatsappUrl } from "@/utils/format";
+import { calcularTotaisDoPedido } from "@/domain/pricing";
+import { PEDIDO_STATUS, PedidoStatus } from "@/domain/pedidoStatus";
 
 interface PedidoPageProps {
   params: Promise<{ id: string }>;
 }
 
 export default function Pedido({ params }: PedidoPageProps) {
-  const { getColor, getLabel } = useStatusColor();
-  const { getPedidoById, pedido, changeStatus } = pedidoStore();
   const { id } = use(params);
   const pedidoId = parseInt(id);
   const router = useRouter();
 
+  // Abre na hora com os dados da lista; o detalhe completo chega em seguida
+  const {
+    data: pedido = null,
+    isError,
+    isFetching,
+    isPlaceholderData,
+    refetch,
+  } = usePedidoQuery(pedidoId);
+  const changeStatus = useChangePedidoStatus();
+
+  // Relógio da tela: atualiza o "há X min"
+  const [agora, setAgora] = useState(() => new Date());
   useEffect(() => {
-    // Pré-popula com os dados básicos da lista (acesso instantâneo)
-    // enquanto o detalhe completo (com atributos, etc.) carrega em background
-    const pedidoDaLista = pedidoStore
-      .getState()
-      .pedidos.find((p) => p.id === pedidoId);
-    pedidoStore.setState({ pedido: pedidoDaLista ?? null });
+    const t = setInterval(() => setAgora(new Date()), 30_000);
+    return () => clearInterval(t);
+  }, []);
 
-    getPedidoById(pedidoId);
-  }, [pedidoId, getPedidoById]);
+  const totais = pedido
+    ? calcularTotaisDoPedido(pedido.produtos ?? [], pedido.taxa_entrega)
+    : null;
+  const carregandoItens = isPlaceholderData && !pedido?.produtos?.length;
 
-  const handleBack = () => {
-    router.back();
-  };
+  const handleChangeStatus = async (status: PedidoStatus) => {
+    if (!pedidoId || !pedido) return;
 
-  const handleSendNotification = async (status: number) => {
-    if (!pedidoId) return;
+    // A aba precisa ser aberta ainda dentro do clique (antes do await),
+    // senão o navegador bloqueia como pop-up. O endereço é definido depois.
+    const whatsappWindow = window.open("", "_blank");
+
     try {
-      await changeStatus({ id: pedidoId, status });
-      getPedidoById(pedidoId);
+      await changeStatus.mutateAsync({ id: pedidoId, status });
 
-      const statusMessages: Record<number, string> = {
-        0: `Olá ${pedido?.nome_cliente}, Somos do *Restaurante & Sorveteria Spumoni* :)\nSeu pedido foi *cancelado*. Se tiver dúvidas, estamos à disposição.`,
-        1: `Olá ${pedido?.nome_cliente}, Somos do *Restaurante & Sorveteria Spumoni* :)\nRecebemos seu pedido <3 Em breve começaremos o preparo.`,
-        2: `Olá ${pedido?.nome_cliente}, Somos do *Restaurante & Sorveteria Spumoni* :)\nSeu pedido está sendo *preparado* <3`,
-        3: `Olá ${pedido?.nome_cliente}, Somos do *Restaurante & Sorveteria Spumoni* :)\nSeu pedido *saiu para entrega* <3 Aguarde só mais um pouquinho!`,
-        4: `Olá ${pedido?.nome_cliente}, Somos do *Restaurante & Sorveteria Spumoni* :)\nPedido *concluído* com sucesso! <3 Esperamos que tenha gostado. Até a próxima!`,
-      };
+      const url = buildWhatsappUrl(
+        pedido.telefone,
+        PEDIDO_STATUS[status].whatsappMessage(pedido.nome_cliente, {
+          numero: pedidoId,
+          retirada: pedido.tipo_entrega === "takeaway",
+        }),
+      );
 
-      const message = statusMessages[status];
-      if (message) {
-        const whatsappUrl = `https://wa.me/${
-          pedido?.telefone
-        }?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, "_blank");
+      if (whatsappWindow) {
+        whatsappWindow.location.href = url;
+      } else {
+        window.open(url, "_blank");
       }
 
       router.push("/admin/pedidos");
     } catch (error) {
+      whatsappWindow?.close();
       console.error("Erro ao mudar status:", error);
+      toast.error("Não foi possível alterar o status do pedido.");
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
-    <Container styleRow="bg-zinc-100" styleContainer="min-h-screen mb-10">
-      <header className="relative py-5 flex items-center justify-between ">
-        <div className="flex items-center gap-4">
-          <button
-            className="p-2 bg-white rounded-full cursor-pointer"
-            onClick={handleBack}
-          >
-            <FaArrowLeft />
-          </button>
-          <h1>Voltar ao Gestor de Pedidos</h1>
-        </div>
-        <button onClick={handlePrint} className="cursor-pointer">
-          <PiPrinter size={30} />
-        </button>
-      </header>
+    <Container styleRow="bg-zinc-100" styleContainer="min-h-screen pb-10">
+      <div className="py-4 print:hidden">
+        <Link
+          href="/admin/pedidos"
+          className="inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium text-zinc-600 transition hover:bg-white hover:text-zinc-900"
+        >
+          <FiArrowLeft aria-hidden /> Voltar aos pedidos
+        </Link>
+      </div>
 
-      <section className="relative py-5 flex flex-col gap-4">
-        <div className=" p-2.5 border border-zinc-300 w-full rounded-md">
-          {pedido?.status && (
-            <div
-              className={`my-2 px-3 py-1 ${getColor(
-                pedido.status,
-              )} text-white rounded-md w-fit`}
-            >
-              {getLabel(pedido.status)}
-            </div>
-          )}
-          <div className="flex items-center">
-            <span className="py-1 px-3 bg-green-principal-700 text-white rounded-md">
-              Delivery (Entrega)
-            </span>
-            <span className="py-1 px-3 font-medium">Pedido: {id}</span>
-            <div className="bg-purple-principal-700 w-4 h-0.5 rounded-full"></div>
-            <span className="py-1 px-3">
-              {pedido?.data_pedido &&
-                new Date(pedido.data_pedido).toLocaleString("pt-BR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-            </span>
-          </div>
+      <div className="flex flex-col gap-5">
+        {isError && !pedido && (
+          <ErrorState
+            mensagem="Não foi possível carregar este pedido."
+            onRetry={() => refetch()}
+            tentando={isFetching}
+          />
+        )}
+        {!pedido && !isError && <LoadingState mensagem="Carregando pedido..." />}
 
-          <p className="font-medium mt-3">{pedido?.nome_cliente}</p>
-          <p>{pedido?.telefone}</p>
-          {pedido?.tipo_entrega === "delivery" && (
-            <p>
-              {pedido?.endereco_entrega}, {pedido?.numero} {pedido?.complemento}
-              - {pedido?.bairro} - {pedido?.cep} - {pedido?.referencia}
-            </p>
-          )}
-        </div>
-        <div className="p-2.5 border border-zinc-300 w-full rounded-md">
-          {pedido &&
-            (() => {
-              const calcularPrecoProduto = (
-                produto: (typeof pedido.produtos)[0],
-              ) => {
-                let precoFinal = Number(produto.preco_base);
-                produto.atributos?.forEach((attr) => {
-                  if (Number(attr.preco_incluido) === 1) {
-                    precoFinal = Number(attr.preco);
-                  } else {
-                    precoFinal += Number(attr.preco);
-                  }
-                });
-                return precoFinal * produto.quantidade;
-              };
+        {pedido && totais && (
+          <>
+            {pedido.excluido && <PedidoExclusao pedido={pedido} />}
+            <PedidoCabecalho pedidoId={pedidoId} pedido={pedido} agora={agora} />
 
-              const totalProdutos = pedido.produtos.reduce(
-                (acc, p) => acc + calcularPrecoProduto(p),
-                0,
-              );
-              const totalGeral = totalProdutos + Number(pedido.taxa_entrega);
+            <PedidoAcoes
+              pedido={pedido}
+              onChangeStatus={handleChangeStatus}
+              desabilitado={changeStatus.isPending}
+            />
 
-              return (
-                <>
-                  {pedido.produtos.map((produto, index) => {
-                    const valorTotal = calcularPrecoProduto(produto);
-                    return (
-                      <div
-                        key={produto.id}
-                        className={`${index < pedido.produtos.length - 1 && "border-b border-zinc-300"} py-2 px-1`}
-                      >
-                        <h2 className="font-medium mb-2">
-                          {produto.quantidade}x - {produto.produto_nome}
-                        </h2>
-
-                        {produto.atributos?.length > 0 && (
-                          <div className="ml-4 mb-2 text-sm text-zinc-700">
-                            {produto.atributos.map((attr) => (
-                              <p key={attr.id}>
-                                • <strong>{attr.nome_atributo}:</strong>{" "}
-                                {attr.valor}
-                                {Number(attr.preco) > 0 &&
-                                  ` (${formatCurrencyBRL(Number(attr.preco))})`}
-                              </p>
-                            ))}
-                          </div>
-                        )}
-
-                        {produto.observacao && (
-                          <p>
-                            <strong>Obs.:</strong> {produto.observacao}
-                          </p>
-                        )}
-
-                        <p className="font-bold mt-1">
-                          Subtotal: {formatCurrencyBRL(valorTotal)}
-                        </p>
-                      </div>
-                    );
-                  })}
-                  <div className="pt-2 border-t border-zinc-300">
-                    <p>
-                      Delivery:{" "}
-                      <span className="font-medium">
-                        {formatCurrencyBRL(Number(pedido.taxa_entrega))}
-                      </span>
-                    </p>
-                    <p>
-                      Total:{" "}
-                      <span className="font-medium">
-                        {formatCurrencyBRL(totalGeral)}
-                      </span>
-                    </p>
-                    <p>
-                      Forma de Pagamento:{" "}
-                      <span className="font-medium"> PIX</span>
-                    </p>
-                  </div>
-                </>
-              );
-            })()}
-        </div>
-
-        <div className="w-full rounded-md flex border border-zinc-300">
-          <button
-            onClick={() => handleSendNotification(0)}
-            className="w-full text-center flex flex-col items-center gap-2 border-r border-zinc-300 p-3 cursor-pointer"
-          >
-            <FaTrashAlt size={20} />
-            <p className="text-sm/4 font-medium">Cancelar Pedido</p>
-          </button>
-          <button
-            onClick={() => handleSendNotification(1)}
-            className="w-full text-center flex flex-col items-center gap-2 border-r border-zinc-300 p-3 cursor-pointer"
-          >
-            <FaPlus size={20} />
-            <p className="text-sm/4 font-medium">Novo Pedido</p>
-          </button>
-          <button
-            onClick={() => handleSendNotification(2)}
-            className="w-full text-center flex flex-col items-center gap-2 border-r border-zinc-300 p-3 cursor-pointer"
-          >
-            <FaUserCheck size={20} />
-            <p className="text-sm/4 font-medium">Preparando Pedido</p>
-          </button>
-          <button
-            onClick={() => handleSendNotification(3)}
-            className="w-full text-center flex flex-col items-center gap-2 border-r border-zinc-300 p-3 cursor-pointer"
-          >
-            <FaMotorcycle size={20} />
-            <p className="text-sm/4 font-medium ">Saiu para Entrega</p>
-          </button>
-          <button
-            onClick={() => handleSendNotification(4)}
-            className="w-full text-center flex flex-col items-center gap-2 border-r border-zinc-300 p-3 cursor-pointer"
-          >
-            <FaCheckDouble size={20} />
-            <p className="text-sm/4 font-medium">Concluir Pedido</p>
-          </button>
-        </div>
-      </section>
+            {/* Cliente, entrega e pagamento primeiro: não somem com pedidos grandes */}
+            <PedidoCliente pedido={pedido} total={totais.total} />
+            <PedidoTotais
+              itens={totais.itens}
+              subtotal={totais.subtotal}
+              taxaEntrega={totais.taxaEntrega}
+              total={totais.total}
+              entrega={pedido.tipo_entrega === "delivery"}
+              carregando={carregandoItens}
+            />
+          </>
+        )}
+      </div>
       <Printer pedido={pedido} />
     </Container>
   );

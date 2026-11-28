@@ -1,15 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 import { toast } from "react-toastify";
 
 import { BiPlus } from "react-icons/bi";
 
 import { IProductCardProps } from "@/interfaces/IProductCardProps";
 
-import { useStatusQuery } from "@/hooks/useStatusQuery";
-import { formatCurrencyBRL } from "@/utils/validators";
+import { useStoreStatusQuery as useStatusQuery } from "@/queries/config";
+import { formatCurrencyBRL } from "@/utils/format";
 
 export const ProductCard = ({ product }: IProductCardProps) => {
   const { storeOpen } = useStatusQuery();
