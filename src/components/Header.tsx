@@ -9,7 +9,6 @@ import { cartStore } from "@/store/cartStore";
 
 import { Container } from "@/components/Container";
 import { useStoreStatusQuery as useStatusQuery } from "@/queries/config";
-import { VALIDAR_LOJA_ABERTA } from "@/constants/app";
 import { SkeletonComponent } from "./SkeletonComponent";
 import Link from "next/link";
 import { StatusIsOpen } from "./StatusIsOpen";
@@ -46,11 +45,9 @@ export const Header = () => {
             <span className="text-purple-principal-700">Spumoni</span>
           </h1>
           <h2 className="text-sm">O melhor restaurante do Alto Tietê</h2>
-          {VALIDAR_LOJA_ABERTA && (
-            <div className="flex items-center justify-center">
-              <StatusIsOpen storeOpen={storeOpen} />
-            </div>
-          )}
+          <div className="flex items-center justify-center">
+            <StatusIsOpen storeOpen={storeOpen} />
+          </div>
         </div>
         <div className="relative">
           <button

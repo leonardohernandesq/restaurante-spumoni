@@ -14,7 +14,6 @@ import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { cartStore } from "@/store/cartStore";
 import type { AtributoSelecionado } from "@/types/carrinho";
 import { useStoreStatusQuery as useStatusQuery } from "@/queries/config";
-import { VALIDAR_LOJA_ABERTA } from "@/constants/app";
 import { formatCurrencyBRL } from "@/utils/format";
 import { calcularPrecoUnitario, toNumber } from "@/domain/pricing";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -51,8 +50,7 @@ interface ProductClientProps {
 }
 export default function ProductClient({ produto }: ProductClientProps) {
   const router = useRouter();
-  const { storeOpen: aberta } = useStatusQuery();
-  const storeOpen = !VALIDAR_LOJA_ABERTA || aberta;
+  const { storeOpen } = useStatusQuery();
   const { produtos } = cartStore();
 
   const totalItens = produtos.length;
